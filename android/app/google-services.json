@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "362604763800",
+    "project_id": "dutytable-49a2b",
+    "storage_bucket": "dutytable-49a2b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:362604763800:android:431478324dbefd4babceed",
+        "android_client_info": {
+          "package_name": "com.schedulelab.dutytable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "362604763800-v6qo232u6av6jk0ah5hd7lsih7tdd36t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.schedulelab.dutytable",
+            "certificate_hash": "a1b4b1c748b735a17a647c60ad49ce01c9d7a657"
+          }
+        },
+        {
+          "client_id": "362604763800-rv6sptqta996r3hsv69jt7cb3o1pg7ru.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXa-EzFRahBGu8qz5yZ_-JXFMp-yBx3Cc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "362604763800-rv6sptqta996r3hsv69jt7cb3o1pg7ru.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "362604763800-4i0qhb5v7sa40pb9ihvlgbovfhrrv23r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.schedulelab.dutytable"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
