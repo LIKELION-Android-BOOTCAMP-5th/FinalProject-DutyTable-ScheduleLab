@@ -1,0 +1,33 @@
+name: 🛡️ Branch Merge Check
+
+on:
+  # Pull Request가 열리거나 업데이트될 때마다 이 워크플로우를 실행합니다.
+  pull_request:
+    types: [opened, synchronize, reopened]
+    # main 브랜치로 들어오는 PR에 대해서만 실행하도록 제한합니다.
+    branches:
+      - main 
+
+jobs:
+  check_allowed_source_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📝 Set Allowed Source Branch
+        # main으로 병합이 허용되는 유일한 브랜치를 설정합니다.
+        run: echo "ALLOWED_BRANCH=dev" >> $GITHUB_ENV
+
+      - name: 🔍 Check Branch Compliance
+        # GITHUB_BASE_REF는 PR의 대상 브랜치 (main)
+        # GITHUB_HEAD_REF는 PR의 소스 브랜치 (feature/A 등)
+        run: |
+          echo "PR Base Branch: ${{ github.base_ref }}"
+          echo "PR Head Branch: ${{ github.head_ref }}"
+          echo "Allowed Source Branch: ${{ env.ALLOWED_BRANCH }}"
+
+          # 대상이 'main'이고, 소스가 'dev'이 아닌 경우에만 실패 처리
+          if [[ "${{ github.base_ref }}" == "main" && "${{ github.head_ref }}" != "${{ env.ALLOWED_BRANCH }}" ]]; then
+            echo "::error title=Forbidden Merge::Merging from branch '${{ github.head_ref }}' into 'main' is strictly prohibited. Please merge into '${{ env.ALLOWED_BRANCH }}' first."
+            exit 1 # 워크플로우 실패 처리
+          else
+            echo "Branch check passed. Allowed to merge from ${{ github.head_ref }} to ${{ github.base_ref }}."
+          fi
