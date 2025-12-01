@@ -144,3 +144,37 @@ type: 제목
 5. 제목은 명령문으로 사용하며 과거형을 사용하지 않는다.
 6. 본문의 각 행은 72글자 내로 제한한다.
 7. 어떻게 보다는 무엇과 왜를 설명한다.
+
+
+## 기술 스택
+### 라이브러리
+- google_calendar
+- dio
+- image_picker
+- flutter_naver_map
+- shared_preference
+- url_launcher
+- flutter_launcher_icons
+
+
+### 프론트엔드
+- Flutter: 크로스 플랫폼 모바일 앱 개발 프레임워크
+- Provider: 상태 관리 및 의존성 주입 (Provider 기반)
+- GoRouter: 선언적 라우팅 및 Deep Link 지원
+
+
+### 백엔드
+- Supabase: 백엔드 서비스 (인증, 데이터베이스, Storage)
+- PostgreSQL: 관계형 데이터베이스
+- Supabase Storage: 이미지 및 파일 저장
+
+
+### 인증
+- Supabase Auth: OAuth 및 소셜 로그인 지원
+- 소셜 로그인: google_sign_in
+
+
+### 푸시 알림
+- Firebase Cloud Messaging: 푸시 알림 서비스
+- Supabase Edge Functions: 알림 전송 로직
+
