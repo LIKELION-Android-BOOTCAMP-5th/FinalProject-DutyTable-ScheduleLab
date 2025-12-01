@@ -1,22 +1,29 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dutytable/supabase_user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'main.dart';
 
 class LoginViewModel extends ChangeNotifier {
   GoogleSignInAccount? _googleUser;
+
   GoogleSignInAccount? get googleUser => _googleUser;
+  SupabaseUserModel? userAccount;
 
   // 로그인
-  Future<User?> googleSignIn(BuildContext context) async {
+  Future<void> googleSignIn(BuildContext context) async {
     final scopes = ['email', 'profile'];
 
     // 구글 프로바이더 작동
     final googleSignIn = GoogleSignIn.instance;
     await googleSignIn.initialize(
       serverClientId:
-          '362604763800-rv6sptqta996r3hsv69jt7cb3o1pg7ru.apps.googleusercontent.com',
+          '174693600398-vng406q0u208sbnonb5hc3va8u9384u9.apps.googleusercontent.com',
+      clientId:
+          '174693600398-dnhnb2j1l6bhkl2g3r1goj7lcj3e53d8.apps.googleusercontent.com',
     );
     // 구글 프로바이더 작동
 
@@ -26,7 +33,7 @@ class LoginViewModel extends ChangeNotifier {
 
     // 구글 계정 없음
     if (_googleUser == null) {
-      return null;
+      throw AuthException('Failed to sign in with Google.');
     }
     // 구글 계정 없음
 
@@ -38,19 +45,30 @@ class LoginViewModel extends ChangeNotifier {
     final idToken = googleUser?.authentication.idToken;
 
     if (idToken == null) {
-      return null;
+      throw AuthException('No ID Token found.');
     }
 
-    // Firebase로 인증
-    final OAuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: authorization?.accessToken,
+    await supabase.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
       idToken: idToken,
+      accessToken: authorization?.accessToken,
     );
+    print("_googleUser : $_googleUser");
+    // 토큰 발급 과정?
 
-    UserCredential userCredential = await FirebaseAuth.instance
-        .signInWithCredential(credential);
+    // supabase public 테이블에 _googleUser로 받은 이메일이 있는지 확인
+    // userAccount = await CoreDataSource.instance.fetchPublicUser(
+    //   _googleUser!.email,
+    // );
+    // supabase public 테이블에 _googleUser로 받은 이메일이 있는지 확인
 
-    print("userCredential.user : ${userCredential.user}");
-    return userCredential.user;
+    // 리얼타임 채널 재구독
+    // final alertViewModel = context.read<AlertProvider>();
+    // alertViewModel.resubscribeRealtime();
+    // 리얼타임 채널 재구독
+
+    // if (userAccount != null) {
+    //   alertViewModel.fetchAlerts();
+    // }
   }
 }
