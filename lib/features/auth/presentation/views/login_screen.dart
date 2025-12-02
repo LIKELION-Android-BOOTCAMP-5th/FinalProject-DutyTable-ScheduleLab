@@ -1,4 +1,4 @@
-import 'package:dutytable/login_viewmodel.dart';
+import 'package:dutytable/features/auth/presentation/viewmodels/login_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
