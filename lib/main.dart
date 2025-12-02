@@ -1,4 +1,4 @@
-import 'package:dutytable/features/auth/presentation/views/login_screen.dart';
+import 'package:dutytable/calendar_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const CalendarPage(),
     );
   }
 }

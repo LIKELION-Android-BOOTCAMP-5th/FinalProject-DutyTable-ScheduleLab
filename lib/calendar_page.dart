@@ -1,4 +1,5 @@
 import 'package:dutytable/extensions.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/calendar_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -11,12 +12,7 @@ class CalendarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text(
-      //     "당번",
-      //     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 32),
-      //   ),
-      // ),
+      appBar: CalendarAppbar(),
       body: SafeArea(
         child: Consumer<CalendarViewModel>(
           builder: (context, viewmodel, child) {
