@@ -1,25 +1,39 @@
+import 'package:dutytable/features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'features/calendar/presentation/views/personal/personal_calendar_screen.dart';
+import 'core/router/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.white, // 상태 바 배경색 - 흰색
+      statusBarIconBrightness: Brightness.dark, // 안드로이드 아이콘 색
+      statusBarBrightness: Brightness.light, // iOS 아이콘 색
+    ),
+  );
+
   await Supabase.initialize(
     url: 'https://eexkppotdipyrzzjakur.supabase.co',
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVleGtwcG90ZGlweXJ6empha3VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODcwNzksImV4cCI6MjA3NDk2MzA3OX0.HFGirj_JSIZB5bkgwm8CnQAqE9kBoRMOlcG8dl6-vyw',
   );
+
   initializeDateFormatting().then(
     (_) => runApp(
-      const MyApp(),
-      // MultiProvider(
-      //   providers: [
-      //     ChangeNotifierProvider(create: (context) => CalendarTabViewModel()),
-      //   ],
-      //   child: const MyApp(),
-      // ),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => PersonalCalendarViewModel(),
+          ),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }
@@ -31,59 +45,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      home: const PersonalCalendarScreen(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      routerConfig: createRouter(context),
+      title: "DutyTable",
     );
   }
 }
