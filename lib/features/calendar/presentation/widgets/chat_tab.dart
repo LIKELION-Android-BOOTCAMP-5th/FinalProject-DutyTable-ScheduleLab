@@ -126,13 +126,25 @@ class CustomInputChatMessageBox extends StatelessWidget {
               ),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {},
+          GestureDetector(
+            onTap: () {
+              print("전송 눌림");
+            },
             // 버튼 크기
-            style: ElevatedButton.styleFrom(
+            child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "전송",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
-            child: const Text("전송"),
           ),
         ],
       ),
@@ -293,10 +305,7 @@ class CustomChatProfileImageBox extends StatelessWidget {
     return Container(
       width: 36,
       height: 36,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        color: Colors.grey,
-      ),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
     );
   }
 }

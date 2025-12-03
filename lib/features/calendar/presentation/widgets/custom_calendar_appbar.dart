@@ -41,24 +41,17 @@ class CustomAppBarIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: GestureDetector or IconButton 선택
     // 리플 없는 버튼
-    // return GestureDetector(
-    //   behavior: HitTestBehavior.opaque,
-    //   onTap: () {
-    //     print(debugComment);
-    //   },
-    //   child: Padding(
-    //     padding: const EdgeInsets.all(8.0),
-    //     child: Icon(icon, size: 28),
-    //   ),
-    // );
-    // 리플 있는 버튼
-    return IconButton(
-      onPressed: () {
+    return GestureDetector(
+      // 전체 영역 터치 가능
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
         print(debugComment);
       },
-      icon: Icon(icon, size: 28),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Icon(icon, size: 28),
+      ),
     );
   }
 }

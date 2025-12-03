@@ -24,8 +24,8 @@ class _LoginScreen extends StatelessWidget {
         child: Center(
           child: Consumer<LoginViewModel>(
             builder: (context, viewModel, child) {
-              return ElevatedButton(
-                onPressed: () {
+              return GestureDetector(
+                onTap: () {
                   viewModel.googleSignIn(context);
                 },
                 child: const Text("로그인 하기"),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/widgets/custom_floatingactionbutton.dart';
 import '../viewmodels/schedule_view_model.dart';
 
 /// 리스트 탭(Provider 주입)
@@ -132,10 +133,7 @@ class _ListTab extends StatelessWidget {
               ),
             ],
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {},
-            child: Icon(Icons.add),
-          ),
+          floatingActionButton: CustomFloatingActionButton(),
         );
       },
     );

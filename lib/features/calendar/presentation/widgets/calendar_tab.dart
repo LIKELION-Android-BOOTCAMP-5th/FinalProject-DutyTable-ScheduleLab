@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../../../core/widgets/custom_floatingactionbutton.dart';
 import '../viewmodels/schedule_view_model.dart';
 
 class CalendarTab extends StatelessWidget {
@@ -111,10 +112,7 @@ class _CalendarTab extends StatelessWidget {
               },
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {},
-            child: Icon(Icons.add),
-          ),
+          floatingActionButton: CustomFloatingActionButton(),
         );
       },
     );
