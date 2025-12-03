@@ -23,10 +23,10 @@ class _LoginScreen extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: Consumer<LoginViewModel>(
-            builder: (context, viewmodel, child) {
+            builder: (context, viewModel, child) {
               return ElevatedButton(
                 onPressed: () {
-                  viewmodel.googleSignIn(context);
+                  viewModel.googleSignIn(context);
                 },
                 child: const Text("로그인 하기"),
               );

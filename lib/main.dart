@@ -1,10 +1,8 @@
-import 'package:dutytable/calendar_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'calendar_view_model.dart';
+import 'features/calendar/presentation/views/personal/personal_calendar_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,12 +13,13 @@ Future<void> main() async {
   );
   initializeDateFormatting().then(
     (_) => runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => CalendarViewModel()),
-        ],
-        child: const MyApp(),
-      ),
+      const MyApp(),
+      // MultiProvider(
+      //   providers: [
+      //     ChangeNotifierProvider(create: (context) => CalendarTabViewModel()),
+      //   ],
+      //   child: const MyApp(),
+      // ),
     ),
   );
 }
@@ -38,7 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: const CalendarPage(),
+      home: const PersonalCalendarScreen(),
     );
   }
 }
