@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class AppShell extends StatefulWidget {
+class AppShell extends StatelessWidget {
   final Widget child;
 
   const AppShell({super.key, required this.child});
 
-  @override
-  State<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     final currentIndex = _calculateIndex(context);
@@ -22,7 +17,7 @@ class _AppShellState extends State<AppShell> {
         highlightColor: Colors.transparent,
       ),
       child: Scaffold(
-        body: widget.child,
+        body: child,
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
             border: Border(top: BorderSide(color: Colors.grey, width: 1)),
