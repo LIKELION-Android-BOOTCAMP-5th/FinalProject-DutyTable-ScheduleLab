@@ -5,13 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 // UI
+import '../../features/auth/presentation/views/login_screen.dart';
+import '../../features/auth/presentation/views/signup_screen.dart';
 import '../../features/calendar/presentation/views/shared/shared_calendar_list_screen.dart';
 import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/shared',
+    initialLocation: '/login',
     routes: [
+      // 로그인
+      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+      // 회원가입
+      GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
       // 공유 캘린더 - 캘린더 추가
       GoRoute(
         path: '/shared/add',

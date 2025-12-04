@@ -1,11 +1,12 @@
 import 'dart:async';
 
-import 'package:dutytable/supabase_user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../main.dart';
+import '../../../../supabase_user_model.dart';
 
 class LoginViewModel extends ChangeNotifier {
   GoogleSignInAccount? _googleUser;
@@ -25,17 +26,14 @@ class LoginViewModel extends ChangeNotifier {
       clientId:
           '174693600398-dnhnb2j1l6bhkl2g3r1goj7lcj3e53d8.apps.googleusercontent.com',
     );
-    // 구글 프로바이더 작동
 
     // 구글에서 유저 정보 _googleUser로 전달
     _googleUser = await googleSignIn.authenticate();
-    // 구글에서 유저 정보 _googleUser로 전달
 
     // 구글 계정 없음
     if (_googleUser == null) {
       throw AuthException('Failed to sign in with Google.');
     }
-    // 구글 계정 없음
 
     // 토큰 발급 과정?
     final authorization =
@@ -53,9 +51,7 @@ class LoginViewModel extends ChangeNotifier {
       idToken: idToken,
       accessToken: authorization?.accessToken,
     );
-    print("_googleUser : $_googleUser");
-    // 토큰 발급 과정?
-
+    await _handlePostSignIn(context);
     // supabase public 테이블에 _googleUser로 받은 이메일이 있는지 확인
     // userAccount = await CoreDataSource.instance.fetchPublicUser(
     //   _googleUser!.email,
@@ -70,5 +66,17 @@ class LoginViewModel extends ChangeNotifier {
     // if (userAccount != null) {
     //   alertViewModel.fetchAlerts();
     // }
+  }
+
+  // 로그인 후 공통 로직: 프로필 확인 및 화면 이동
+  Future<void> _handlePostSignIn(BuildContext context) async {
+    final currentUser = supabase.auth.currentUser;
+    if (currentUser == null) {
+      throw AuthException('Failed to get user from Supabase.');
+    }
+
+    // 로그인 후 프로필 유무 상관없이 공유 캘린더로 이동
+    // 추후 프로필 유무 확인 후 이동 경로 바꿀 예정
+    GoRouter.of(context).go('/shared');
   }
 }
