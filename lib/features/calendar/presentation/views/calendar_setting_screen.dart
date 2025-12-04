@@ -5,11 +5,13 @@ import 'package:provider/provider.dart';
 import '../widgets/chat_tab.dart';
 
 class CalendarSettingScreen extends StatelessWidget {
+  /// 캘린더 설정 화면(provider 주입)
   const CalendarSettingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
+      // 캘린더 설정 뷰모델 주입
       create: (context) => CalendarSettingViewModel(),
       child: _CalendarSettingScreen(),
     );
@@ -17,38 +19,27 @@ class CalendarSettingScreen extends StatelessWidget {
 }
 
 class _CalendarSettingScreen extends StatelessWidget {
+  /// 캘린더 설정 화면(local)
   const _CalendarSettingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // 캘린더 설정 뷰모델 주입
     return Consumer<CalendarSettingViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text("캘린더 설정"),
-            centerTitle: true,
-            actions: [
-              GestureDetector(
-                onTap: () {},
-                child: const Text(
-                  "수정",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-              ),
-            ],
-            actionsPadding: EdgeInsets.all(16),
-          ),
+          // 커스텀 캘린더 설정 앱바 사용
+          appBar: _CustomCalendarSettingAppBar(),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
+              // 위젯 크기와 수에 따른 전체 영역 스크롤
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // 캘린더 이름
+                    // 커스텀 캘린더 설정 컨텐츠 박스 사용
                     CustomCalendarSettingContentBox(
                       title: const Text(
                         "캘린더 이름",
@@ -60,7 +51,7 @@ class _CalendarSettingScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 40),
-                    // 2. 캘린더 멤버 목록
+                    // 캘린더 멤버 목록
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -74,6 +65,7 @@ class _CalendarSettingScreen extends StatelessWidget {
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: viewModel.calendarMember.length,
                           itemBuilder: (context, index) {
+                            // 방장 표시
                             final List<Widget> adminWidgets =
                                 viewModel.isAdmin[index]
                                 ? [
@@ -82,30 +74,35 @@ class _CalendarSettingScreen extends StatelessWidget {
                                     const Text("방장"),
                                     const SizedBox(width: 4),
                                   ]
-                                : []; // Admin이 아니면 빈 리스트
+                                : [];
 
                             return CustomCalendarSettingContentBox(
                               title: null,
                               child: Row(
                                 children: [
+                                  // 방장 표시
                                   ...adminWidgets,
+                                  // 커스텀 프로필 이미지 박스 사용
                                   CustomChatProfileImageBox(
                                     width: 24,
                                     height: 24,
                                   ),
                                   const SizedBox(width: 4),
+                                  // 멤버 닉네임
                                   Text(viewModel.calendarMember[index]),
                                 ],
                               ),
                             );
                           },
                           separatorBuilder: (context, index) {
-                            return const SizedBox(height: 8);
+                            return const SizedBox(height: 8); // 멤버간 간격
                           },
                         ),
                       ],
                     ),
                     const SizedBox(height: 40),
+                    // 캘린더 설명
+                    // 커스텀 캘린더 설정 컨텐츠 박스 사용
                     CustomCalendarSettingContentBox(
                       title: const Text(
                         "캘린더 설명",
@@ -124,9 +121,48 @@ class _CalendarSettingScreen extends StatelessWidget {
   }
 }
 
+class _CustomCalendarSettingAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  /// 커스텀 캘린더 설정 앱바(local)
+  const _CustomCalendarSettingAppBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: const Text("캘린더 설정"),
+      centerTitle: true,
+      actions: [
+        // 리플 없는 버튼
+        GestureDetector(
+          onTap: () {
+            print("수정 버튼 눌림");
+          },
+          child: const Text(
+            "수정",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      ],
+      actionsPadding: EdgeInsets.all(16),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
 class CustomCalendarSettingContentBox extends StatelessWidget {
+  /// 박스 위에 표시할 내용
   final Widget? title;
+
+  /// 박스 안에 표시할 내용
   final Widget child;
+
+  /// 커스텀 캘린더 설정 컨텐츠 박스
   const CustomCalendarSettingContentBox({
     super.key,
     required this.child,
@@ -135,13 +171,16 @@ class CustomCalendarSettingContentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 반환할 위젯 리스트
     List<Widget> childrenList = [];
 
+    // 박스 위에 표시할 내용 없을 경우
     if (title != null) {
       childrenList.add(title!);
       childrenList.add(const SizedBox(height: 8));
     }
 
+    // 박스 위에 표시할 내용 있을 경우
     childrenList.add(
       ConstrainedBox(
         constraints: const BoxConstraints(
@@ -159,6 +198,7 @@ class CustomCalendarSettingContentBox extends StatelessWidget {
       ),
     );
 
+    // 실제 리턴 부분
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
