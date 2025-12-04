@@ -1,11 +1,12 @@
 import 'package:dutytable/features/calendar/presentation/views/add_calendar_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
+import 'package:dutytable/features/profile/views/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'app_shell.dart';
 
 // UI
 import '../../features/calendar/presentation/views/shared/shared_calendar_list_screen.dart';
+import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
   return GoRouter(
@@ -34,7 +35,7 @@ GoRouter createRouter(BuildContext context) {
           ),
 
           // 프로필
-          // GoRoute(path: '/profile', builder: null),
+          GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
         ],
       ),
     ],
