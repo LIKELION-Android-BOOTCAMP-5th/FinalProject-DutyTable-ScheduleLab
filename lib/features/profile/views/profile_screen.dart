@@ -214,7 +214,8 @@ class _ProfileScreen extends StatelessWidget {
                       onChanged: (value) {
                         viewModel.activeAlram();
                       },
-                      activeThumbColor: Colors.white,
+                      // activeThumbColor: Colors.white, // 영진 : 에러나서 아래 코드로 변경
+                      activeColor: Colors.white,
                       activeTrackColor: Color(0xFF3C82F6),
                     ),
                   ),

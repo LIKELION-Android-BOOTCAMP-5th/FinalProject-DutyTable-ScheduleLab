@@ -85,7 +85,7 @@ class _ChatTab extends StatelessWidget {
                     ],
                   );
                 },
-                separatorBuilder: (BuildContext context, int index) {
+                separatorBuilder: (context, index) {
                   return const SizedBox(height: 20.0);
                 },
               ),
@@ -252,7 +252,7 @@ class CustomMyChatCard extends StatelessWidget {
             message: message,
           ),
           // 커스텀 프로필 이미지 박스 사용
-          CustomChatProfileImageBox(),
+          CustomChatProfileImageBox(width: 36, height: 36),
         ],
       ),
     );
@@ -283,7 +283,7 @@ class CustomOtherChatCard extends StatelessWidget {
       spacing: 12,
       children: [
         // 커스텀 프로필 이미지 박스 사용
-        CustomChatProfileImageBox(),
+        CustomChatProfileImageBox(width: 36, height: 36),
         // 커스텀 채팅 박스 사용
         CustomChatBox(
           color: Colors.grey,
@@ -297,14 +297,21 @@ class CustomOtherChatCard extends StatelessWidget {
 }
 
 class CustomChatProfileImageBox extends StatelessWidget {
+  final double width;
+  final double height;
+
   /// 커스텀 프로필 이미지 박스
-  const CustomChatProfileImageBox({super.key});
+  const CustomChatProfileImageBox({
+    super.key,
+    required this.width,
+    required this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 36,
-      height: 36,
+      width: width,
+      height: height,
       decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
     );
   }
