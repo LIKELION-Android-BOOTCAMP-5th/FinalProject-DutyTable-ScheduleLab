@@ -14,7 +14,7 @@ import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/calendar/setting',
+    initialLocation: '/login',
     routes: [
       // 로그인
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
