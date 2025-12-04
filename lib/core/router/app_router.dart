@@ -8,12 +8,13 @@ import 'package:go_router/go_router.dart';
 // UI
 import '../../features/auth/presentation/views/login_screen.dart';
 import '../../features/auth/presentation/views/signup_screen.dart';
+import '../../features/calendar/presentation/views/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/shared_calendar_list_screen.dart';
 import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/calendar/setting',
     routes: [
       // 로그인
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
@@ -25,6 +26,10 @@ GoRouter createRouter(BuildContext context) {
       GoRoute(
         path: '/shared/add',
         builder: (_, __) => const AddCalendarScreen(),
+      ),
+      GoRoute(
+        path: '/calendar/setting',
+        builder: (_, __) => const CalendarSettingScreen(),
       ),
 
       // 공유 캘린더 - 알림
