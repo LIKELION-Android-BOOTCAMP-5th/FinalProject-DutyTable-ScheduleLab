@@ -68,23 +68,26 @@ class DutyTableAppBar extends StatelessWidget implements PreferredSizeWidget {
 
               const SizedBox(width: 16),
 
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  const Icon(Icons.notifications_none, size: 26),
-                  Positioned(
-                    right: -1,
-                    top: -1,
-                    child: Container(
-                      width: 10,
-                      height: 10,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
+              GestureDetector(
+                onTap: () => context.push("/notification"),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Icon(Icons.notifications_none, size: 26),
+                    Positioned(
+                      right: -1,
+                      top: -1,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
               const SizedBox(width: 16),

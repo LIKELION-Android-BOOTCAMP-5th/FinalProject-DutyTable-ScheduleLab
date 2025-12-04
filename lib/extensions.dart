@@ -46,6 +46,20 @@ extension NonNullableDateTimeExtensions on DateTime {
   }
 }
 
+extension DateTimeTimeAgoExtension on DateTime {
+  String timeAgo() {
+    final now = DateTime.now();
+    final diff = now.difference(this);
+
+    if (diff.inMinutes < 1) return "방금 전";
+    if (diff.inMinutes < 60) return "${diff.inMinutes}분 전";
+    if (diff.inHours < 24) return "${diff.inHours}시간 전";
+    if (diff.inDays < 7) return "${diff.inDays}일 전";
+
+    return "${year}-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}";
+  }
+}
+
 extension StringToDateTime on String {
   // "2022-10-23T00:00:00".toDateTime()
   DateTime toDateTime() {

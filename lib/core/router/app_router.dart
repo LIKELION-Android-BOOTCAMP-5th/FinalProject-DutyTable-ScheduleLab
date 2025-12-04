@@ -1,5 +1,6 @@
 import 'package:dutytable/features/calendar/presentation/views/add_calendar_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
+import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/views/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,12 +17,20 @@ GoRouter createRouter(BuildContext context) {
     routes: [
       // 로그인
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+
       // 회원가입
       GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
+
       // 공유 캘린더 - 캘린더 추가
       GoRoute(
         path: '/shared/add',
         builder: (_, __) => const AddCalendarScreen(),
+      ),
+
+      // 공유 캘린더 - 알림
+      GoRoute(
+        path: '/notification',
+        builder: (_, __) => const NotificationScreen(),
       ),
 
       // 바텀 네비게이션
