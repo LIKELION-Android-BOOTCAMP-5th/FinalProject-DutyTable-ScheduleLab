@@ -75,8 +75,34 @@ class LoginViewModel extends ChangeNotifier {
       throw AuthException('Failed to get user from Supabase.');
     }
 
-    // 로그인 후 프로필 유무 상관없이 공유 캘린더로 이동
-    // 추후 프로필 유무 확인 후 이동 경로 바꿀 예정
-    GoRouter.of(context).go('/shared');
+    try {
+      final response = await supabase
+          .from('users')
+          .select()
+          .eq('id', currentUser.id)
+          .maybeSingle();
+
+      if (!context.mounted) return;
+
+      if (response == null) {
+        GoRouter.of(context).go('/signup');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('로그인이 성공하였습니다.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        GoRouter.of(context).go('/shared');
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('프로필 확인 중 오류 발생: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

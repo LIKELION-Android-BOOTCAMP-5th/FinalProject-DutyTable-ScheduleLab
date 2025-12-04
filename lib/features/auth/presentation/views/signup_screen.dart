@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/configs/app_colors.dart';
 import '../viewmodels/signup_viewmodel.dart';
@@ -69,7 +71,7 @@ class _SignupScreenUI extends StatelessWidget {
               elevation: 0,
               leading: IconButton(
                 icon: Icon(Icons.arrow_back, color: textColor),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => context.go('/login'),
               ),
             ),
             body: SingleChildScrollView(
@@ -184,38 +186,51 @@ class _SignupScreenUI extends StatelessWidget {
                                         : Colors.grey, // 비활성화 상태 색상
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child:
-                                      viewmodel.isLoading &&
-                                          !viewmodel.isNicknameChecked
-                                      ? const SizedBox(
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Opacity(
+                                        opacity:
+                                            viewmodel.isLoading &&
+                                                !viewmodel.isNicknameChecked
+                                            ? 0.0
+                                            : 1.0,
+                                        child: const Text(
+                                          '중복 체크',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                      if (viewmodel.isLoading &&
+                                          !viewmodel.isNicknameChecked)
+                                        const SizedBox(
                                           width: 14,
                                           height: 14,
                                           child: CircularProgressIndicator(
                                             color: Colors.white,
                                             strokeWidth: 2,
                                           ),
-                                        )
-                                      : const Text(
-                                          '중복 체크',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white,
-                                          ),
                                         ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ],
                         ),
 
-                        // 중복 확인 결과 메시지
-                        if (viewmodel.isNicknameChecked)
+                        // 닉네임 유효성 및 중복 확인 결과 메시지
+                        if (viewmodel.nicknameMessage != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              '사용 가능한 닉네임입니다.',
+                              viewmodel.nicknameMessage!,
                               style: TextStyle(
-                                color: Colors.green,
+                                color: viewmodel.isNicknameMessageError
+                                    ? Colors.red
+                                    : Colors.green,
                                 fontSize: 12,
                               ),
                             ),
@@ -231,10 +246,11 @@ class _SignupScreenUI extends StatelessWidget {
                               height: 24,
                               child: Checkbox(
                                 value: viewmodel.isTermsAgreed,
-                                onChanged: viewmodel.isLoading
-                                    ? null
-                                    : viewmodel
-                                          .toggleTermsAgreement, // 로딩 중이면 체크박스 비활성화
+                                onChanged:
+                                    viewmodel.isLoading ||
+                                        !viewmodel.hasViewedTerms
+                                    ? null // 로딩 중이거나 약관을 보지 않았으면 비활성화
+                                    : viewmodel.toggleTermsAgreement,
                                 activeColor: AppColors.actionPositiveLight,
                                 checkColor: Colors.white,
                               ),
@@ -242,7 +258,7 @@ class _SignupScreenUI extends StatelessWidget {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                '약관동의의 약관...',
+                                '약관동의',
                                 style: TextStyle(
                                   color: subTextColor,
                                   fontSize: 14,
@@ -250,8 +266,23 @@ class _SignupScreenUI extends StatelessWidget {
                               ),
                             ),
                             TextButton(
-                              onPressed: () {
-                                // TODO: 약관 전체 보기 모달 또는 화면 표시
+                              onPressed: () async {
+                                viewmodel.viewTerms();
+                                final Uri notionUrl = Uri.parse(
+                                  'https://www.notion.so/2bf73873401a804cb9a8ef0b68a4d71c',
+                                );
+                                if (await canLaunchUrl(notionUrl)) {
+                                  await launchUrl(notionUrl);
+                                } else {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('URL을 열 수 없습니다.'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }
                               },
                               child: const Text(
                                 '전체보기',
