@@ -13,23 +13,14 @@ class ProfileViewmodel extends ChangeNotifier {
   /// 테마 드롭다운 리스트
   List<String> themeList = ["라이트모드", "다크모드", "시스템모드"];
 
-  /// 드롭다운 기본값
-  late String dropdownValue = themeList.first;
-
-  /// 테마 선택된 값
-  String selectedTheme = '';
+  /// 사용자가 테마 선택
+  String selectedOption = "option1";
 
   /// 닉네임 수정
   final nicknameContoller = TextEditingController();
 
   /// 닉네임 기본값
   var nickname = "닉네임";
-
-  //테마 변경
-  void setTheme(String value) {
-    selectedTheme = value;
-    notifyListeners();
-  }
 
   //프로필 수정
   void setProfileEdit() {
@@ -49,14 +40,15 @@ class ProfileViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 테마 설정
-  void editTheme() {
-    notifyListeners();
-  }
-
   //알림 토글
   void activeAlram() {
     is_active = !is_active;
+    notifyListeners();
+  }
+
+  // 사용자가 테마 선택하면 업데이트
+  void updateThmem(value) {
+    selectedOption = value;
     notifyListeners();
   }
 }
