@@ -6,8 +6,15 @@ import 'package:go_router/go_router.dart';
 ///  2. 현재 앱 바가 두개라 헷갈릴 수도 있음
 
 class DutyTableAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final bool deleteMode;
+  final VoidCallback? onDeletePressed;
+
   /// 공유 캘린더 앱 바
-  const DutyTableAppBar({super.key});
+  const DutyTableAppBar({
+    super.key,
+    required this.deleteMode,
+    this.onDeletePressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -50,51 +57,63 @@ class DutyTableAppBar extends StatelessWidget implements PreferredSizeWidget {
           const Spacer(),
 
           // RIGHT: 캘린더 추가, 알림, 캘린더 삭제
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF3A7BFF),
-                  shape: BoxShape.circle,
-                ),
-                child: GestureDetector(
-                  onTap: () => context.push("/shared/add"),
-                  child: Icon(Icons.add, color: Colors.white),
-                ),
-              ),
-
-              const SizedBox(width: 16),
-
-              GestureDetector(
-                onTap: () => context.push("/notification"),
-                child: Stack(
-                  clipBehavior: Clip.none,
+          deleteMode
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.notifications_none, size: 26),
-                    Positioned(
-                      right: -1,
-                      top: -1,
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
+                    GestureDetector(onTap: onDeletePressed, child: Text("취소")),
+                    const SizedBox(width: 16),
+                    Text("삭제"),
+                  ],
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF3A7BFF),
+                        shape: BoxShape.circle,
                       ),
+                      child: GestureDetector(
+                        onTap: () => context.push("/shared/add"),
+                        child: Icon(Icons.add, color: Colors.white),
+                      ),
+                    ),
+
+                    const SizedBox(width: 16),
+
+                    GestureDetector(
+                      onTap: () => context.push("/notification"),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          const Icon(Icons.notifications_none, size: 26),
+                          Positioned(
+                            right: -1,
+                            top: -1,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(width: 16),
+
+                    GestureDetector(
+                      onTap: onDeletePressed,
+                      child: const Icon(Icons.delete_outline, size: 26),
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(width: 16),
-
-              const Icon(Icons.delete_outline, size: 26),
-            ],
-          ),
         ],
       ),
     );
