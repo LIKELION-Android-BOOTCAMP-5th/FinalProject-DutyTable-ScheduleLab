@@ -1,3 +1,4 @@
+import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,8 +13,12 @@ class AddCalendarScreen extends StatelessWidget {
     final _formKey = GlobalKey<FormState>();
 
     return Scaffold(
-      appBar: _AppBar(),
-
+      appBar: BackActionsAppBar(
+        title: Text(
+          "새 캘린더",
+          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800),
+        ),
+      ),
       body: Container(
         color: Colors.white,
         child: Form(
@@ -129,38 +134,6 @@ class AddCalendarScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-// AppBar - 뒤로가기 + 제목
-class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  /// 캘린더 추가 앱 바
-  const _AppBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey, // 원하는 색
-            width: 1, // 굵기
-          ),
-        ),
-      ),
-      child: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(
-          "새 캘린더",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-        ),
-        centerTitle: true,
-      ),
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(60);
 }
 
 class _LabeledTextField extends StatelessWidget {
