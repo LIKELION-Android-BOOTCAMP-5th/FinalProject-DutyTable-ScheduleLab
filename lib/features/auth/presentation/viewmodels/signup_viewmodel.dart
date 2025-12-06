@@ -14,6 +14,7 @@ class SignupViewModel with ChangeNotifier {
   bool _isTermsAgreed = false;
   bool _isLoading = false;
   bool _hasViewedTerms = false;
+  String? _lastCheckedNickname; // 마지막으로 중복 체크한 닉네임 저장
   String? nicknameMessage;
   bool isNicknameMessageError = false;
 
@@ -29,7 +30,7 @@ class SignupViewModel with ChangeNotifier {
       _isNicknameChecked && _isTermsAgreed && !_isLoading;
 
   SignupViewModel() {
-    // 닉네임 입력이 변경될 때마다 유효성 검사 및 중복 체크 상태 초기화
+    // 닉네임 입력이 변경될 때마다 유효성 검사
     nicknameController.addListener(_validateNickname);
   }
 
@@ -42,17 +43,28 @@ class SignupViewModel with ChangeNotifier {
   void _validateNickname() {
     final newNickname = nicknameController.text;
     final isValid = newNickname.length >= 2;
+
     if (_isNicknameValid != isValid) {
       _isNicknameValid = isValid;
-      notifyListeners();
     }
-    _isNicknameChecked = false; // 닉네임이 바뀌면 중복 체크 상태 초기화
 
-    if (newNickname.isNotEmpty && !isValid) {
-      nicknameMessage = '2글자 이상 입력해주세요.';
-      isNicknameMessageError = true;
+    // 닉네임이 이전에 중복 체크 완료된 닉네임과 같다면, 체크 상태를 복원
+    if (_lastCheckedNickname != null && newNickname == _lastCheckedNickname) {
+      _isNicknameChecked = true;
+      nicknameMessage = '사용 가능한 닉네임입니다.';
+      isNicknameMessageError = false;
     } else {
-      nicknameMessage = null;
+      // 그렇지 않다면, 체크 상태를 초기화하고 유효성에 따라 메시지 설정
+      _isNicknameChecked = false;
+      if (newNickname.isNotEmpty && !isValid) {
+        nicknameMessage = '2글자 이상 입력해주세요.';
+        isNicknameMessageError = true;
+      } else if (isValid) {
+        nicknameMessage = '중복 체크를 해주세요.';
+        isNicknameMessageError = true;
+      } else {
+        nicknameMessage = null; // 2글자 미만이거나 비어있을 때
+      }
     }
     notifyListeners();
   }
@@ -79,25 +91,29 @@ class SignupViewModel with ChangeNotifier {
     }
 
     _setLoading(true);
+    final nicknameToTest = nicknameController.text;
     try {
       final response = await supabase
           .from('users')
           .select('nickname')
-          .eq('nickname', nicknameController.text)
+          .eq('nickname', nicknameToTest)
           .limit(1)
           .maybeSingle();
 
       if (response == null) {
         _isNicknameChecked = true;
+        _lastCheckedNickname = nicknameToTest; // 성공 시 닉네임 저장
         nicknameMessage = '사용 가능한 닉네임입니다.';
         isNicknameMessageError = false;
       } else {
         _isNicknameChecked = false;
+        _lastCheckedNickname = null;
         nicknameMessage = '중복된 닉네임입니다.';
         isNicknameMessageError = true;
       }
     } catch (e) {
       _isNicknameChecked = false;
+      _lastCheckedNickname = null;
       nicknameMessage = '오류가 발생했습니다: $e';
       isNicknameMessageError = true;
     } finally {

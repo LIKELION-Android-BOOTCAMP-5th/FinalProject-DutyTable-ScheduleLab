@@ -97,14 +97,13 @@ class _SignupScreenUI extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 50,
                       backgroundColor: cardBgColor, // 카드 배경색 사용
-                      child: Text(
-                        '프로필',
-                        style: TextStyle(color: subTextColor, fontSize: 16),
+                      child: Icon(
+                        Icons.add_a_photo,
+                        size: 40,
+                        color: subTextColor,
                       ),
                     ),
                   ),
-
-                  // TODO: 나중에 프로필 사진 업로드 버튼이나 아이콘 추가 가능
                   const SizedBox(height: 20),
 
                   // 회원가입 타이틀
@@ -170,6 +169,7 @@ class _SignupScreenUI extends StatelessWidget {
                             const SizedBox(width: 8),
                             SizedBox(
                               height: 40,
+                              width: 80,
                               child: GestureDetector(
                                 onTap:
                                     viewmodel.isNicknameValid &&
