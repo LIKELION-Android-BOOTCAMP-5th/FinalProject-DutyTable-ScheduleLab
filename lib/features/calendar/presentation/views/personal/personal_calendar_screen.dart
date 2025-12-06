@@ -4,8 +4,8 @@ import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../core/widgets/logo_actions_app_bar.dart';
 import '../../viewmodels/personal_calendar_view_model.dart';
-import '../../widgets/custom_calendar_appbar.dart';
 import '../../widgets/custom_calendar_tabview.dart';
 
 class PersonalCalendarScreen extends StatelessWidget {
@@ -32,8 +32,22 @@ class _PersonalCalendarScreen extends StatelessWidget {
     return Consumer<PersonalCalendarViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          // 커스텀 캘린더 앱바 사용
-          appBar: CustomCalendarAppbar(),
+          appBar: LogoActionsAppBar(
+            rightActions: Row(
+              children: [
+                //TODO : 공유 캘린더만 초대 아이콘 나오게 하기
+                // 커스텀 캘린더 앱바 아이콘 사용
+                CustomAppBarIcon(icon: Icons.person_add, debugComment: "초대 클릭"),
+                // 커스텀 캘린더 앱바 아이콘 사용
+                CustomAppBarIcon(
+                  icon: Icons.notifications,
+                  debugComment: "알림 클릭",
+                ),
+                // 커스텀 캘린더 앱바 아이콘 사용
+                CustomAppBarIcon(icon: Icons.menu, debugComment: "매뉴 클릭"),
+              ],
+            ),
+          ),
           body: SafeArea(
             // 커스텀 캘린더 탭뷰 사용
             child: CustomCalendarTabView(
@@ -58,6 +72,37 @@ class _PersonalCalendarScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class CustomAppBarIcon extends StatelessWidget {
+  /// 아이콘
+  final IconData icon;
+
+  /// 디버깅 커멘트
+  final String debugComment;
+
+  /// 커스텀 캘린더 앱바 아이콘
+  const CustomAppBarIcon({
+    super.key,
+    required this.icon,
+    required this.debugComment,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // 리플 없는 버튼
+    return GestureDetector(
+      // 전체 영역 터치 가능
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        print(debugComment);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Icon(icon, size: 28),
+      ),
     );
   }
 }

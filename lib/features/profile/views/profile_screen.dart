@@ -1,3 +1,4 @@
+import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
 import 'package:dutytable/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +10,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => ProfileViewmodel(),
+      create: (_) => ProfileViewmodel(),
       child: _ProfileScreen(),
     );
   }
@@ -23,38 +24,30 @@ class _ProfileScreen extends StatelessWidget {
     return Consumer<ProfileViewmodel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          // 앱바
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            title: Row(
-              children: [
-                const Text(
-                  "프로필",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                Spacer(),
-                // 로그아웃 버튼
-                GestureDetector(
-                  onTap: () {
-                    //로그아웃 다이얼로그
-                    showDialog(
-                      context: context,
-                      builder: (context) => showDialog1(
-                        context,
-                        height: 240.0,
-                        iconBackgroundColor: Color(0xFFDBE9FE),
-                        icon: Icons.logout_outlined,
-                        iconColor: Color(0xFF3C82F6),
-                        title: "로그아웃",
-                        message: "정말 로그아웃 하시겠습니까?",
-                        allow: "로그아웃",
-                        goto: '/login',
-                      ),
-                    );
-                  },
-                  child: Icon(Icons.logout, color: Color(0xFF545D6A)),
-                ),
-              ],
+          appBar: LogoActionsAppBar(
+            leftActions: const Text(
+              "프로필",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            rightActions: GestureDetector(
+              onTap: () {
+                //로그아웃 다이얼로그
+                showDialog(
+                  context: context,
+                  builder: (context) => showDialog1(
+                    context,
+                    height: 240.0,
+                    iconBackgroundColor: Color(0xFFDBE9FE),
+                    icon: Icons.logout_outlined,
+                    iconColor: Color(0xFF3C82F6),
+                    title: "로그아웃",
+                    message: "정말 로그아웃 하시겠습니까?",
+                    allow: "로그아웃",
+                    goto: '/login',
+                  ),
+                );
+              },
+              child: Icon(Icons.logout, color: Color(0xFF545D6A)),
             ),
           ),
           body: Container(
@@ -62,7 +55,8 @@ class _ProfileScreen extends StatelessWidget {
             child: SafeArea(
               child: Column(
                 children: [
-                  Divider(),
+                  const SizedBox(height: 10),
+
                   //프로필쪽
                   Row(
                     children: [
@@ -150,11 +144,11 @@ class _ProfileScreen extends StatelessWidget {
                           children: [
                             Container(
                               width: double.infinity,
-                              child: SizedBox(height: 50),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: Color(0xFFF9FAFB),
                               ),
+                              child: SizedBox(height: 50),
                             ),
                             Column(
                               children: [
@@ -209,6 +203,14 @@ class _ProfileScreen extends StatelessWidget {
                           ),
                         ],
                       ),
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Color(0xFFE5E7EB), width: 2.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      collapsedShape: RoundedRectangleBorder(
+                        side: BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                       children: viewModel.themeList.map((option) {
                         return RadioListTile<String>(
                           title: Text(option, style: TextStyle(fontSize: 12)),
@@ -219,14 +221,6 @@ class _ProfileScreen extends StatelessWidget {
                           },
                         );
                       }).toList(),
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(color: Color(0xFFE5E7EB), width: 2.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      collapsedShape: RoundedRectangleBorder(
-                        side: BorderSide(color: Color(0xFFE5E7EB), width: 1.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
                     ),
                   ),
 
@@ -407,28 +401,28 @@ Widget showDialog1(
                     onPressed: () {
                       context.pop();
                     },
-                    child: Text("   취소   ", style: TextStyle(fontSize: 12)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFF3F4F6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
+                    child: Text("   취소   ", style: TextStyle(fontSize: 12)),
                   ),
                   Padding(padding: EdgeInsets.all(10)),
                   ElevatedButton(
                     onPressed: () {
                       context.push(goto);
                     },
-                    child: Text(
-                      allow,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
+                    ),
+                    child: Text(
+                      allow,
+                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
                 ],
@@ -441,7 +435,7 @@ Widget showDialog1(
   );
 }
 
-///프로필스크린에 있는 각 설정 항목
+/// 프로필 스크린에 있는 각 설정 항목
 Widget profileButton({
   /// 항목에 들어갈 아이콘
   required icon,
@@ -464,11 +458,11 @@ Widget profileButton({
             Container(
               width: double.infinity,
               height: 50,
-              child: SizedBox(height: 50),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Color(0xFFE5E7EB)),
               ),
+              child: SizedBox(height: 50),
             ),
             Column(
               children: [
@@ -495,19 +489,5 @@ Widget profileButton({
       ),
       Padding(padding: EdgeInsets.only(left: 20)),
     ],
-  );
-}
-
-OverlayEntry _customDropdown() {
-  return OverlayEntry(
-    builder: (context) => Positioned(
-      width: double.infinity,
-      child: Container(
-        width: double.infinity,
-        height: 20,
-        color: Colors.red,
-        child: Column(children: [Text("1"), Text("2"), Text("3")]),
-      ),
-    ),
   );
 }
