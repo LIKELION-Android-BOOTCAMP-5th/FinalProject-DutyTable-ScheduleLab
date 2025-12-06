@@ -1,4 +1,3 @@
-import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,28 +28,8 @@ class _CalendarSettingScreen extends StatelessWidget {
     return Consumer<CalendarSettingViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          appBar: BackActionsAppBar(
-            title: Text(
-              "캘린더 설정",
-              style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800),
-            ),
-            actions: [
-              // 리플 없는 버튼
-              GestureDetector(
-                onTap: () {
-                  print("수정 버튼 눌림");
-                },
-                child: const Text(
-                  "수정",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          // 커스텀 캘린더 설정 앱바 사용
+          appBar: _CustomCalendarSettingAppBar(),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -140,6 +119,40 @@ class _CalendarSettingScreen extends StatelessWidget {
       },
     );
   }
+}
+
+class _CustomCalendarSettingAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  /// 커스텀 캘린더 설정 앱바(local)
+  const _CustomCalendarSettingAppBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: const Text("캘린더 설정"),
+      centerTitle: true,
+      actions: [
+        // 리플 없는 버튼
+        GestureDetector(
+          onTap: () {
+            print("수정 버튼 눌림");
+          },
+          child: const Text(
+            "수정",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+      ],
+      actionsPadding: EdgeInsets.all(16),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class CustomCalendarSettingContentBox extends StatelessWidget {

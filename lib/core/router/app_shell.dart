@@ -86,20 +86,11 @@ class AppShell extends StatelessWidget {
                 label: "내 캘린더",
               ),
 
+              // TODO: 프로필 미 연결 추후 연결 필요
               // 프로필 - active: false(클릭되지 않은) / true(클릭된)
               BottomNavigationBarItem(
-                icon: _buildSharedCalendarIcon(
-                  active: false,
-                  icon: Icon(
-                    Icons.person_outline,
-                    size: 22,
-                    color: Colors.white,
-                  ),
-                ),
-                activeIcon: _buildSharedCalendarIcon(
-                  active: true,
-                  icon: Icon(Icons.person, size: 22, color: Colors.white),
-                ),
+                icon: Icon(Icons.person_outline, color: Colors.grey),
+                activeIcon: Icon(Icons.person, color: Colors.blue),
                 label: "프로필",
               ),
             ],
