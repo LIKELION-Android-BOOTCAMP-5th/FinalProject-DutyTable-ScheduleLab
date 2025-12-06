@@ -18,23 +18,20 @@ class NotificationScreen extends StatelessWidget {
           style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: GestureDetector(
-              onTap: () {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (_) => AllDeleteDialog(),
-                );
-              },
-              child: Text(
-                "전체삭제",
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 12.0,
-                  fontWeight: FontWeight.w800,
-                ),
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (_) => AllDeleteDialog(),
+              );
+            },
+            child: Text(
+              "전체삭제",
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 12.0,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),
