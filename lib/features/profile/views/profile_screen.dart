@@ -1,8 +1,9 @@
-import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
 import 'package:dutytable/features/profile/viewmodels/profile_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+import '../../../core/widgets/logo_actions_app_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -10,7 +11,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ProfileViewmodel(),
+      create: (context) => ProfileViewmodel()..init(),
       child: _ProfileScreen(),
     );
   }
@@ -91,7 +92,7 @@ class _ProfileScreen extends StatelessWidget {
                           ? Expanded(
                               // 닉네임 텍스트 필드
                               child: TextField(
-                                controller: viewModel.nicknameContoller,
+                                controller: viewModel.nicknameController,
                                 decoration: InputDecoration(
                                   hintText: "닉네임을 입력해주세요",
                                   border: OutlineInputBorder(),
@@ -118,8 +119,12 @@ class _ProfileScreen extends StatelessWidget {
                           : Spacer(),
                       GestureDetector(
                         onTap: () {
+                          viewModel.nickname =
+                              viewModel.nicknameController.text;
+                          viewModel.updateNickname(
+                            viewModel.updateNickname(viewModel.user!.id),
+                          );
                           viewModel.setProfileEdit();
-                          viewModel.nickname = viewModel.nicknameContoller.text;
                         },
                         child: Text(
                           (viewModel.is_edit) ? "  저장  " : "수정  ",
@@ -154,7 +159,9 @@ class _ProfileScreen extends StatelessWidget {
                               children: [
                                 Padding(padding: EdgeInsets.all(7)),
                                 Text(
-                                  "    내 계정 : casper118412@gmail.com",
+                                  // "    내 계정 : casper118412@gmail.com",
+                                  "   내 계정 : ${viewModel.email}",
+
                                   textAlign: TextAlign.center,
                                   style: TextStyle(fontSize: 12),
                                 ),
@@ -401,28 +408,28 @@ Widget showDialog1(
                     onPressed: () {
                       context.pop();
                     },
+                    child: Text("   취소   ", style: TextStyle(fontSize: 12)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFF3F4F6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text("   취소   ", style: TextStyle(fontSize: 12)),
                   ),
                   Padding(padding: EdgeInsets.all(10)),
                   ElevatedButton(
                     onPressed: () {
                       context.push(goto);
                     },
+                    child: Text(
+                      allow,
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                    ),
-                    child: Text(
-                      allow,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
                 ],
@@ -435,7 +442,7 @@ Widget showDialog1(
   );
 }
 
-/// 프로필 스크린에 있는 각 설정 항목
+///프로필스크린에 있는 각 설정 항목
 Widget profileButton({
   /// 항목에 들어갈 아이콘
   required icon,
