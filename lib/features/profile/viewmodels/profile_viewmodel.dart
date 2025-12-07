@@ -2,6 +2,10 @@ import 'package:dutytable/main.dart';
 import 'package:flutter/cupertino.dart';
 
 class ProfileViewmodel extends ChangeNotifier {
+  ProfileViewmodel() {
+    init();
+  }
+
   /// 현재 로그인 유저
   final user = supabase.auth.currentUser;
 
