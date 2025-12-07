@@ -1,4 +1,5 @@
 import 'package:dutytable/features/calendar/presentation/views/add_calendar_screen.dart';
+import 'package:dutytable/features/calendar/presentation/views/calendar_edit_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/views/profile_screen.dart';
@@ -14,7 +15,7 @@ import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/calendar/edit',
     routes: [
       // 로그인
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
@@ -30,6 +31,10 @@ GoRouter createRouter(BuildContext context) {
       GoRoute(
         path: '/calendar/setting',
         builder: (_, __) => const CalendarSettingScreen(),
+      ),
+      GoRoute(
+        path: '/calendar/edit',
+        builder: (_, __) => const CalendarEditScreen(),
       ),
 
       // 공유 캘린더 - 알림
