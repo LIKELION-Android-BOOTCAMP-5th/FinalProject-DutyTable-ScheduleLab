@@ -1,6 +1,9 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/cupertino.dart';
 
-class CalendarSettingViewModel extends ChangeNotifier {
+class CalendarEditViewModel extends ChangeNotifier {
+  TextEditingController _controller = TextEditingController();
+  TextEditingController get controller => _controller;
+
   /// 캘린더 이름(local)
   final String _calendarName = "멋사 파이널 2조";
 
@@ -18,4 +21,10 @@ class CalendarSettingViewModel extends ChangeNotifier {
   List<String> get calendarMember => _calendarMember;
 
   final List<bool> isAdmin = [true, false, false, false, false];
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
