@@ -119,12 +119,17 @@ class _ProfileScreen extends StatelessWidget {
                           : Spacer(),
                       GestureDetector(
                         onTap: () {
-                          viewModel.nickname =
-                              viewModel.nicknameController.text;
-                          viewModel.updateNickname(
-                            viewModel.updateNickname(viewModel.user!.id),
-                          );
                           viewModel.setProfileEdit();
+                          //닉네임 2~10글자 체크
+                          if (viewModel.nicknameController.text.length < 2 ||
+                              viewModel.nicknameController.text.length > 10) {
+                            // 조건에 안맞으면 텍스트 필드에서 다시 전 닉네임 보이게 하기
+                            viewModel.nicknameController.text =
+                                viewModel.nickname;
+                          } else {
+                            viewModel.updateNickname(viewModel.user!.id);
+                            viewModel.editNickname();
+                          }
                         },
                         child: Text(
                           (viewModel.is_edit) ? "  저장  " : "수정  ",
@@ -182,6 +187,7 @@ class _ProfileScreen extends StatelessWidget {
                     addWidget: GestureDetector(
                       onTap: () {
                         viewModel.googleSync();
+                        viewModel.updateGoogleSync(viewModel.user!.id);
                       },
                       child: Text(
                         (viewModel.is_sync) ? "연결해제    " : "   연결    ",
@@ -240,9 +246,10 @@ class _ProfileScreen extends StatelessWidget {
                     addWidget: Transform.scale(
                       scale: 0.7,
                       child: Switch(
-                        value: viewModel.is_active,
+                        value: viewModel.is_active_notification,
                         onChanged: (value) {
-                          viewModel.activeAlram();
+                          viewModel.activeNotification();
+                          viewModel.updateNotification(viewModel.user!.id);
                         },
                         activeThumbColor: Colors.white,
                         activeTrackColor: Color(0xFF3C82F6),

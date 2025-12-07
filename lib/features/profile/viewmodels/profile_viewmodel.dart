@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 
 class ProfileViewmodel extends ChangeNotifier {
   ProfileViewmodel() {
-    init();
+    _init();
   }
 
   /// 현재 로그인 유저
@@ -25,7 +25,7 @@ class ProfileViewmodel extends ChangeNotifier {
   bool is_sync = true;
 
   /// 알림 활성화
-  bool is_active = true;
+  bool is_active_notification = true;
 
   /// 테마 드롭다운 리스트
   List<String> themeList = ["라이트모드", "다크모드", "시스템모드"];
@@ -34,14 +34,14 @@ class ProfileViewmodel extends ChangeNotifier {
   String selectedOption = "option1";
 
   // 시작할때 닉네임,이메일 호출
-  void init() {
+  void _init() {
     fetchNickname();
     fetchEmail();
   }
 
   //프로필 수정
   void setProfileEdit() {
-    is_edit = !is_edit;
+    nickname.length < 2 ? null : is_edit = !is_edit;
     notifyListeners();
   }
 
@@ -53,13 +53,13 @@ class ProfileViewmodel extends ChangeNotifier {
 
   // 닉네임 텍스트 수정
   void editNickname() {
-    final nickname = nicknameController.text.trim();
+    this.nickname = nicknameController.text.trim();
     notifyListeners();
   }
 
   //알림 토글
-  void activeAlram() {
-    is_active = !is_active;
+  void activeNotification() {
+    is_active_notification = !is_active_notification;
     notifyListeners();
   }
 
@@ -98,6 +98,26 @@ class ProfileViewmodel extends ChangeNotifier {
         .eq('id', user!.id)
         .maybeSingle();
     email = data!['email'];
+    notifyListeners();
+  }
+
+  // 구글 연동하기
+  Future<void> updateGoogleSync(userId) async {
+    await supabase
+        .from('users')
+        .update({'is_google_calendar_connect': is_sync})
+        .eq('id', userId);
+    this.is_sync = is_sync;
+    notifyListeners();
+  }
+
+  //알림 on/off하기
+  Future<void> updateNotification(userId) async {
+    await supabase
+        .from('users')
+        .update({'allowed_notification': is_active_notification})
+        .eq('id', userId);
+    this.is_active_notification = is_active_notification;
     notifyListeners();
   }
 }
