@@ -24,6 +24,39 @@ class _CalendarEditScreen extends StatelessWidget {
   /// 캘린더 수정 화면(private)
   const _CalendarEditScreen({super.key});
 
+  // Widget 클래스 밖이나 _ScreenState 안에 정의
+  void _showCustomConfirmationDialog(
+    BuildContext context, {
+    required String title,
+    required String content,
+    required VoidCallback onConfirm, // 버튼 클릭 시 실행할 함수
+  }) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            // 취소 버튼
+            TextButton(
+              child: const Text('취소'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            // 기능 실행 버튼
+            TextButton(
+              child: const Text('확인'),
+              onPressed: () {
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+                onConfirm(); // 전달받은 함수 실행
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // 캘린더 수정 뷰모델 주입
@@ -125,15 +158,28 @@ class _CalendarEditScreen extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadiusGeometry.all(Radius.circular(12)),
-                child: BottomAppBar(
-                  color: Colors.blue,
-                  height: 52,
-                  child: Center(
-                    child: Text(
-                      "수정 완료",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    _showCustomConfirmationDialog(
+                      context,
+                      title: "title",
+                      content: "content",
+                      onConfirm: () {
+                        print("확인 눌림");
+                      },
+                    );
+                  },
+                  child: BottomAppBar(
+                    color: Colors.blue,
+                    height: 52,
+                    child: Center(
+                      child: Text(
+                        "수정 완료",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
