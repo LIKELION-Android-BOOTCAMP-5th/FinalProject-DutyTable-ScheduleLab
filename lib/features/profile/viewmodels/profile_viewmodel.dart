@@ -1,6 +1,23 @@
+import 'package:dutytable/main.dart';
 import 'package:flutter/cupertino.dart';
 
 class ProfileViewmodel extends ChangeNotifier {
+  ProfileViewmodel() {
+    init();
+  }
+
+  /// 현재 로그인 유저
+  final user = supabase.auth.currentUser;
+
+  /// 닉네임 수정
+  final nicknameController = TextEditingController();
+
+  /// 이메일
+  String email = "";
+
+  /// 닉네임
+  String nickname = "닉네임";
+
   /// 수정버튼
   bool is_edit = false;
 
@@ -16,11 +33,11 @@ class ProfileViewmodel extends ChangeNotifier {
   /// 사용자가 테마 선택
   String selectedOption = "option1";
 
-  /// 닉네임 수정
-  final nicknameContoller = TextEditingController();
-
-  /// 닉네임 기본값
-  var nickname = "닉네임";
+  // 시작할때 닉네임,이메일 호출
+  void init() {
+    fetchNickname();
+    fetchEmail();
+  }
 
   //프로필 수정
   void setProfileEdit() {
@@ -36,7 +53,7 @@ class ProfileViewmodel extends ChangeNotifier {
 
   // 닉네임 텍스트 수정
   void editNickname() {
-    final nickname = nicknameContoller.text.trim();
+    final nickname = nicknameController.text.trim();
     notifyListeners();
   }
 
@@ -49,6 +66,38 @@ class ProfileViewmodel extends ChangeNotifier {
   // 사용자가 테마 선택하면 업데이트
   void updateThmem(value) {
     selectedOption = value;
+    notifyListeners();
+  }
+
+  //닉네임 수정한거 수파베이스에 반영하기
+  Future<void> updateNickname(userId) async {
+    await supabase
+        .from('users')
+        .update({'nickname': nicknameController.text})
+        .eq('id', userId);
+    this.nickname = nicknameController.text;
+    notifyListeners();
+  }
+
+  // 닉네임 불러오기
+  Future<void> fetchNickname() async {
+    final data = await supabase
+        .from('users')
+        .select()
+        .eq('id', user!.id)
+        .maybeSingle();
+    nickname = data!['nickname'];
+    notifyListeners();
+  }
+
+  // 이메일 불러오기
+  Future<void> fetchEmail() async {
+    final data = await supabase
+        .from('users')
+        .select()
+        .eq('id', user!.id)
+        .maybeSingle();
+    email = data!['email'];
     notifyListeners();
   }
 }
