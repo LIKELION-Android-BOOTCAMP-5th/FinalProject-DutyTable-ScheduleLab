@@ -1,6 +1,7 @@
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/chat_tab.dart';
@@ -39,6 +40,7 @@ class _CalendarSettingScreen extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   print("수정 버튼 눌림");
+                  context.push("/calendar/edit");
                 },
                 child: const Text(
                   "수정",
