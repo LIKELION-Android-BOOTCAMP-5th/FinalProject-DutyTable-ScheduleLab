@@ -15,6 +15,10 @@ class ProfileViewmodel extends ChangeNotifier {
   /// 이메일
   String email = "";
 
+  /// 프로필 url
+  String image =
+      "https://eexkppotdipyrzzjakur.supabase.co/storage/v1/object/public/profile-images/1b7bd4ec-2112-415b-a6f6-8805d6b79db5/profile.jpg";
+
   /// 닉네임
   String nickname = "닉네임";
 
@@ -33,10 +37,9 @@ class ProfileViewmodel extends ChangeNotifier {
   /// 사용자가 테마 선택
   String selectedOption = "option1";
 
-  // 시작할때 닉네임,이메일 호출
+  // 시작할때 닉네임,이메일,프로필 이미지 호출
   void _init() {
-    fetchNickname();
-    fetchEmail();
+    fetchUser();
   }
 
   //프로필 수정
@@ -79,25 +82,16 @@ class ProfileViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 닉네임 불러오기
-  Future<void> fetchNickname() async {
+  // 닉네임,이메일, 프로필 사진 불러오기
+  Future<void> fetchUser() async {
     final data = await supabase
         .from('users')
         .select()
         .eq('id', user!.id)
         .maybeSingle();
     nickname = data!['nickname'];
-    notifyListeners();
-  }
-
-  // 이메일 불러오기
-  Future<void> fetchEmail() async {
-    final data = await supabase
-        .from('users')
-        .select()
-        .eq('id', user!.id)
-        .maybeSingle();
-    email = data!['email'];
+    email = data['email'];
+    image = data['profileurl'];
     notifyListeners();
   }
 

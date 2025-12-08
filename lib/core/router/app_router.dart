@@ -2,7 +2,7 @@ import 'package:dutytable/features/calendar/presentation/views/add_calendar_scre
 import 'package:dutytable/features/calendar/presentation/views/calendar_edit_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
-import 'package:dutytable/features/profile/views/profile_screen.dart';
+import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
