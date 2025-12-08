@@ -9,7 +9,10 @@ import 'package:go_router/go_router.dart';
 // UI
 import '../../features/auth/presentation/views/login_screen.dart';
 import '../../features/auth/presentation/views/signup_screen.dart';
+<<<<<<< Updated upstream
 import '../../features/calendar/presentation/views/calendar_setting_screen.dart';
+=======
+>>>>>>> Stashed changes
 import '../../features/calendar/presentation/views/shared/shared_calendar_list_screen.dart';
 import 'app_shell.dart';
 
@@ -19,10 +22,15 @@ GoRouter createRouter(BuildContext context) {
     routes: [
       // 로그인
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+<<<<<<< Updated upstream
 
       // 회원가입
       GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
 
+=======
+      // 회원가입
+      GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
+>>>>>>> Stashed changes
       // 공유 캘린더 - 캘린더 추가
       GoRoute(
         path: '/shared/add',
