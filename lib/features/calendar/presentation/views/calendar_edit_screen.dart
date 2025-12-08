@@ -24,7 +24,6 @@ class _CalendarEditScreen extends StatelessWidget {
   /// 캘린더 수정 화면(private)
   const _CalendarEditScreen({super.key});
 
-  // Widget 클래스 밖이나 _ScreenState 안에 정의
   void _showCustomConfirmationDialog(
     BuildContext context, {
     required String title,

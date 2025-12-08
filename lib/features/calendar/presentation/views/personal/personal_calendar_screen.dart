@@ -2,6 +2,7 @@ import 'package:dutytable/features/calendar/presentation/widgets/calendar_tab.da
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../core/widgets/logo_actions_app_bar.dart';
@@ -37,14 +38,20 @@ class _PersonalCalendarScreen extends StatelessWidget {
               children: [
                 //TODO : 공유 캘린더만 초대 아이콘 나오게 하기
                 // 커스텀 캘린더 앱바 아이콘 사용
-                CustomAppBarIcon(icon: Icons.person_add, debugComment: "초대 클릭"),
+                CustomAppBarIcon(
+                  icon: Icons.person_add,
+                  onTap: () => print("초대 클릭"),
+                ),
                 // 커스텀 캘린더 앱바 아이콘 사용
                 CustomAppBarIcon(
                   icon: Icons.notifications,
-                  debugComment: "알림 클릭",
+                  onTap: () => context.push("/notification"),
                 ),
                 // 커스텀 캘린더 앱바 아이콘 사용
-                CustomAppBarIcon(icon: Icons.menu, debugComment: "매뉴 클릭"),
+                CustomAppBarIcon(
+                  icon: Icons.menu,
+                  onTap: () => context.push("/calendar/setting"),
+                ),
               ],
             ),
           ),
@@ -81,14 +88,10 @@ class CustomAppBarIcon extends StatelessWidget {
   final IconData icon;
 
   /// 디버깅 커멘트
-  final String debugComment;
+  final void Function() onTap;
 
   /// 커스텀 캘린더 앱바 아이콘
-  const CustomAppBarIcon({
-    super.key,
-    required this.icon,
-    required this.debugComment,
-  });
+  const CustomAppBarIcon({super.key, required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +99,7 @@ class CustomAppBarIcon extends StatelessWidget {
     return GestureDetector(
       // 전체 영역 터치 가능
       behavior: HitTestBehavior.opaque,
-      onTap: () {
-        print(debugComment);
-      },
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Icon(icon, size: 28),
