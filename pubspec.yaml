@@ -43,7 +43,7 @@ dependencies:
   url_launcher: ^6.3.2
   image_picker: ^1.1.0
   fluttertoast: ^9.0.0
-
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

@@ -28,10 +28,12 @@ GoRouter createRouter(BuildContext context) {
         path: '/shared/add',
         builder: (_, __) => const AddCalendarScreen(),
       ),
+
       GoRoute(
         path: '/calendar/setting',
         builder: (_, __) => const CalendarSettingScreen(),
       ),
+
       GoRoute(
         path: '/calendar/edit',
         builder: (_, __) => const CalendarEditScreen(),
