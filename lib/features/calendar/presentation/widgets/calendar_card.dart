@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CalendarCard extends StatelessWidget {
@@ -24,10 +25,13 @@ class CalendarCard extends StatelessWidget {
       children: [
         Card(
           elevation: 2,
+          color: AppColors.card(context),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: isSelected && !applyBlur ? Colors.red : Colors.grey,
+              color: isSelected && !applyBlur
+                  ? AppColors.commonRed
+                  : AppColors.cardBorder(context),
               width: isSelected && !applyBlur ? 2 : 1,
             ),
           ),
@@ -40,6 +44,7 @@ class CalendarCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
+                    /// 카드 아바타 이미지 배경색
                     color: const Color(0xFF3A7BFF),
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -64,19 +69,22 @@ class CalendarCard extends StatelessWidget {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
+
                           const SizedBox(width: 8),
+
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
+                              color: AppColors.chip(context),
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Text(
+                            child: Text(
                               "99+명",
                               style: TextStyle(
+                                color: AppColors.chipText(context),
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -91,7 +99,7 @@ class CalendarCard extends StatelessWidget {
                         "다음 일정: 12월 5일",
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade600,
+                          color: AppColors.commonGrey,
                         ),
                       ),
                     ],
@@ -121,7 +129,7 @@ class CalendarCard extends StatelessWidget {
                   !isAdmin
                       ? Checkbox(
                           value: isSelected,
-                          activeColor: Colors.red,
+                          activeColor: AppColors.commonRed,
                           onChanged: (_) => onChangeSelected(),
                         )
                       : Container(
@@ -130,15 +138,15 @@ class CalendarCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
+                            color: AppColors.chip(context),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: const Text(
+                          child: Text(
                             "삭제 불가",
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black54,
+                              color: AppColors.chipText(context),
                             ),
                           ),
                         ),
@@ -153,7 +161,7 @@ class CalendarCard extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: Colors.white.withOpacity(0.6),
+                  color: AppColors.cardBlur(context),
                 ),
               ),
             ),

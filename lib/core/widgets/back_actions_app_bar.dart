@@ -28,11 +28,11 @@ class BackActionsAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       child: AppBar(
-        backgroundColor: Colors.white,
-        leading: const BackButton(),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: title,
         titleSpacing: 0,
         actions: actions,
+        actionsPadding: EdgeInsets.only(right: 20.0),
       ),
     );
   }

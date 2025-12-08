@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,8 +7,6 @@ import 'package:provider/provider.dart';
 import '../../../../../core/widgets/logo_actions_app_bar.dart';
 import '../../widgets/calendar_card.dart';
 
-/// TODO
-/// 캘린더 목록 API 연결 시 하드코딩 삭제 필요
 class SharedCalendarListScreen extends StatelessWidget {
   const SharedCalendarListScreen({super.key});
 
@@ -28,7 +27,7 @@ class _SharedCalendarListScreen extends StatelessWidget {
     final viewModel = context.watch<SharedCalendarViewModel>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: LogoActionsAppBar(
         leftActions: _LeftActions(),
         rightActions: _RightActions(),
@@ -90,9 +89,13 @@ class _LeftActions extends StatelessWidget {
           fit: BoxFit.fill,
         ),
         const SizedBox(width: 4),
-        const Text(
+        Text(
           "DutyTable",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: AppColors.text(context),
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ],
     );
@@ -125,13 +128,13 @@ class _RightActions extends StatelessWidget {
               Container(
                 width: 42,
                 height: 42,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF3A7BFF),
+                decoration: BoxDecoration(
+                  color: AppColors.commonBlue,
                   shape: BoxShape.circle,
                 ),
                 child: GestureDetector(
                   onTap: () => context.push("/shared/add"),
-                  child: Icon(Icons.add, color: Colors.white),
+                  child: Icon(Icons.add, color: AppColors.commonWhite),
                 ),
               ),
 
@@ -149,8 +152,8 @@ class _RightActions extends StatelessWidget {
                       child: Container(
                         width: 10,
                         height: 10,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
+                        decoration: BoxDecoration(
+                          color: AppColors.commonRed,
                           shape: BoxShape.circle,
                         ),
                       ),

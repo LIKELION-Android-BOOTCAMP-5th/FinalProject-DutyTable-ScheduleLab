@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../configs/app_colors.dart';
+
 class LogoActionsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leftActions;
   final Widget? rightActions;
@@ -15,8 +17,8 @@ class LogoActionsAppBar extends StatelessWidget implements PreferredSizeWidget {
         right: 20,
       ),
       height: preferredSize.height + MediaQuery.of(context).padding.top,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppColors.background(context),
         border: Border(bottom: BorderSide(color: Colors.grey, width: 1)),
       ),
       child: Row(
