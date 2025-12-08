@@ -27,7 +27,6 @@ class LoginViewModel extends ChangeNotifier {
       // 구글 로그인 시 요청할 권한 범위
       final scopes = ['email', 'profile'];
 
-<<<<<<< Updated upstream
       // 구글 로그인 인스턴스 생성 및 초기화
       final googleSignIn = GoogleSignIn.instance;
       await googleSignIn.initialize(
@@ -39,19 +38,6 @@ class LoginViewModel extends ChangeNotifier {
 
       // 구글 인증 UI를 통해 사용자 계정 정보 가져오기
       _googleUser = await googleSignIn.authenticate();
-=======
-    // 구글 프로바이더 작동
-    final googleSignIn = GoogleSignIn.instance;
-    await googleSignIn.initialize(
-      serverClientId:
-          '174693600398-vng406q0u208sbnonb5hc3va8u9384u9.apps.googleusercontent.com',
-      clientId:
-          '174693600398-dnhnb2j1l6bhkl2g3r1goj7lcj3e53d8.apps.googleusercontent.com',
-    );
-
-    // 구글에서 유저 정보 _googleUser로 전달
-    _googleUser = await googleSignIn.authenticate();
->>>>>>> Stashed changes
 
       // 사용자가 구글 로그인을 취소한 경우
       if (_googleUser == null) {
@@ -87,10 +73,7 @@ class LoginViewModel extends ChangeNotifier {
         context.pop();
       }
     }
-<<<<<<< Updated upstream
   }
-=======
->>>>>>> Stashed changes
 
   // 로그인 성공 후 공통 로직을 처리하는 함수
   // 사용자 프로필 존재 여부를 확인하고, 없으면 회원가입 화면으로, 있으면 메인 화면으로 이동
@@ -101,7 +84,6 @@ class LoginViewModel extends ChangeNotifier {
       throw AuthException('Failed to get user from Supabase.');
     }
 
-<<<<<<< Updated upstream
     try {
       // 'users' 테이블에서 현재 사용자 ID와 일치하는 프로필 정보 조회
       final response = await supabase
@@ -112,19 +94,6 @@ class LoginViewModel extends ChangeNotifier {
 
       // 위젯이 화면에 마운트되어 있는지 확인
       if (!context.mounted) return;
-=======
-    await supabase.auth.signInWithIdToken(
-      provider: OAuthProvider.google,
-      idToken: idToken,
-      accessToken: authorization?.accessToken,
-    );
-    await _handlePostSignIn(context);
-    // supabase public 테이블에 _googleUser로 받은 이메일이 있는지 확인
-    // userAccount = await CoreDataSource.instance.fetchPublicUser(
-    //   _googleUser!.email,
-    // );
-    // supabase public 테이블에 _googleUser로 받은 이메일이 있는지 확인
->>>>>>> Stashed changes
 
       // 프로필 정보가 없으면 (신규 사용자) 회원가입 화면으로 이동
       if (response == null) {
@@ -149,17 +118,5 @@ class LoginViewModel extends ChangeNotifier {
         ),
       );
     }
-  }
-
-  // 로그인 후 공통 로직: 프로필 확인 및 화면 이동
-  Future<void> _handlePostSignIn(BuildContext context) async {
-    final currentUser = supabase.auth.currentUser;
-    if (currentUser == null) {
-      throw AuthException('Failed to get user from Supabase.');
-    }
-
-    // 로그인 후 프로필 유무 상관없이 공유 캘린더로 이동
-    // 추후 프로필 유무 확인 후 이동 경로 바꿀 예정
-    GoRouter.of(context).go('/shared');
   }
 }
