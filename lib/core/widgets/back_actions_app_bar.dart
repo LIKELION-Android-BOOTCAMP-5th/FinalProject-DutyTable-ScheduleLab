@@ -28,7 +28,7 @@ class BackActionsAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       child: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: title,
         titleSpacing: 0,
         actions: actions,

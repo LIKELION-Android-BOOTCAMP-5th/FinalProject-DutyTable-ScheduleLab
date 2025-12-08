@@ -28,17 +28,12 @@ class _SignupScreenUI extends StatelessWidget {
 
   // 프로필 이미지 선택 위젯을 빌드하는 함수
   Widget _buildImagePicker(BuildContext context, SignupViewModel viewModel) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final Color cardBgColor = isDarkMode
-        ? AppColors.cardBackgroundDark
-        : AppColors.cardBackgroundLight;
-    final Color subTextColor = isDarkMode ? Colors.white70 : Colors.grey;
-
     ImageProvider? imageProvider;
+
+    // 회원가입 화면에서는 기존 이미지 URL이 없으므로 FileImage만 처리
     if (viewModel.selectedImage != null) {
       imageProvider = FileImage(viewModel.selectedImage!);
     }
-    // 회원가입 화면에서는 기존 이미지 URL이 없으므로 FileImage만 처리
 
     return Stack(
       children: [
@@ -50,7 +45,7 @@ class _SignupScreenUI extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: isDarkMode ? Colors.black45 : Colors.black12,
+                color: AppColors.boxShadow(context),
                 blurRadius: 15,
                 spreadRadius: 2,
                 offset: const Offset(0, 5),
@@ -59,10 +54,10 @@ class _SignupScreenUI extends StatelessWidget {
           ),
           child: CircleAvatar(
             radius: 50,
-            backgroundColor: cardBgColor,
+            backgroundColor: AppColors.card(context),
             backgroundImage: imageProvider,
             child: imageProvider == null
-                ? Icon(Icons.photo, size: 40, color: subTextColor)
+                ? Icon(Icons.photo, size: 40, color: AppColors.subText(context))
                 : null,
           ),
         ),

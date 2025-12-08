@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../configs/app_colors.dart';
+
 class AppShell extends StatelessWidget {
   final Widget child;
 
@@ -19,8 +21,10 @@ class AppShell extends StatelessWidget {
       child: Scaffold(
         body: child,
         bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: Colors.grey, width: 1)),
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: AppColors.commonGrey, width: 1),
+            ),
           ),
           child: BottomNavigationBar(
             currentIndex: currentIndex,
@@ -37,7 +41,7 @@ class AppShell extends StatelessWidget {
                   break;
               }
             },
-            backgroundColor: Colors.white,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             type: BottomNavigationBarType.fixed,
             // 클릭된 바텀 네비게이션 탭 라벨
             showSelectedLabels: true,
@@ -48,9 +52,9 @@ class AppShell extends StatelessWidget {
             // 클릭되지 않은 바텀 네비게이션 라벨 텍스트 스타일
             unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
             // 클릭된 바텀 네비게이션 탭 색
-            selectedItemColor: Colors.blue,
+            selectedItemColor: AppColors.commonBlue,
             // 클릭되지 않은 바텀 네비게이션 탭 색
-            unselectedItemColor: Colors.grey,
+            unselectedItemColor: AppColors.commonGrey,
             items: [
               // 공유 캘린더 - active: false(클릭되지 않은) / true(클릭된)
               BottomNavigationBarItem(
@@ -72,7 +76,7 @@ class AppShell extends StatelessWidget {
                   icon: const Icon(
                     Icons.calendar_month,
                     size: 22,
-                    color: Colors.white,
+                    color: AppColors.commonWhite,
                   ),
                 ),
                 activeIcon: _buildSharedCalendarIcon(
@@ -80,7 +84,7 @@ class AppShell extends StatelessWidget {
                   icon: const Icon(
                     Icons.calendar_month,
                     size: 22,
-                    color: Colors.white,
+                    color: AppColors.commonWhite,
                   ),
                 ),
                 label: "내 캘린더",
@@ -93,12 +97,16 @@ class AppShell extends StatelessWidget {
                   icon: Icon(
                     Icons.person_outline,
                     size: 22,
-                    color: Colors.white,
+                    color: AppColors.commonWhite,
                   ),
                 ),
                 activeIcon: _buildSharedCalendarIcon(
                   active: true,
-                  icon: Icon(Icons.person, size: 22, color: Colors.white),
+                  icon: Icon(
+                    Icons.person,
+                    size: 22,
+                    color: AppColors.commonWhite,
+                  ),
                 ),
                 label: "프로필",
               ),
@@ -126,8 +134,9 @@ class AppShell extends StatelessWidget {
 
 // 공유 캘린더 아이콘 - 원(캘린더 + 유저 그룹 아이콘 합침)
 Widget _buildSharedCalendarInnerIcon({required bool active}) {
-  final Color bgColor = active ? Colors.blue : Colors.grey.shade400;
-  final Color iconColor = Colors.white;
+  final Color bgColor = active
+      ? AppColors.commonBlue
+      : AppColors.commonGreyShade400;
 
   return Container(
     width: 48,
@@ -139,15 +148,15 @@ Widget _buildSharedCalendarInnerIcon({required bool active}) {
     child: Stack(
       alignment: Alignment.center,
       children: [
-        Icon(Icons.calendar_month, size: 22, color: iconColor),
+        Icon(Icons.calendar_month, size: 22, color: AppColors.commonWhite),
         Positioned(
-          right: -2,
-          bottom: -2,
+          right: 0,
+          bottom: 0,
           child: Container(
             width: 16,
             height: 16,
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: AppColors.commonWhite,
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.group, size: 10, color: bgColor),
@@ -160,7 +169,9 @@ Widget _buildSharedCalendarInnerIcon({required bool active}) {
 
 // 내 캘린더 및 프로필 아이콘 - 원(캘린더 또는 유저 아이콘)
 Widget _buildSharedCalendarIcon({required bool active, required Widget icon}) {
-  final bgColor = active ? Colors.blue : Colors.grey.shade400;
+  final Color bgColor = active
+      ? AppColors.commonBlue
+      : AppColors.commonGreyShade400;
 
   return Padding(
     padding: const EdgeInsets.all(4.0),
