@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/widgets/custom_confirm_dialog.dart';
 import '../widgets/chat_tab.dart';
 
 class CalendarSettingScreen extends StatelessWidget {
@@ -127,10 +128,10 @@ class _CalendarSettingScreen extends StatelessWidget {
                                           // 전체 영역 터치 가능
                                           behavior: HitTestBehavior.opaque,
                                           onTap: () {
-                                            _showCustomConfirmationDialog(
+                                            showCustomConfirmationDialog(
                                               context,
-                                              title: "title",
-                                              content: "content",
+                                              content: "추방하시겠습니까?",
+                                              color: Colors.red,
                                               onConfirm: () => print("확인"),
                                             );
                                             print("추방");
@@ -202,10 +203,10 @@ class _CalendarSettingScreen extends StatelessWidget {
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () {
-                          _showCustomConfirmationDialog(
+                          showCustomConfirmationDialog(
                             context,
-                            title: "title",
-                            content: "content",
+                            content: "캘린더를 삭제하시겠습니까?",
+                            color: Colors.red,
                             onConfirm: () {
                               print("확인 눌림");
                             },
@@ -236,38 +237,6 @@ class _CalendarSettingScreen extends StatelessWidget {
       },
     );
   }
-}
-
-void _showCustomConfirmationDialog(
-  BuildContext context, {
-  required String title,
-  required String content,
-  required VoidCallback onConfirm, // 버튼 클릭 시 실행할 함수
-}) async {
-  return showDialog<void>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: <Widget>[
-          // 취소 버튼
-          TextButton(
-            child: const Text('취소'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          // 기능 실행 버튼
-          TextButton(
-            child: const Text('확인'),
-            onPressed: () {
-              Navigator.of(context).pop(); // 다이얼로그 닫기
-              onConfirm(); // 전달받은 함수 실행
-            },
-          ),
-        ],
-      );
-    },
-  );
 }
 
 class CustomCalendarSettingContentBox extends StatelessWidget {
