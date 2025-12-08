@@ -102,17 +102,64 @@ class _CalendarSettingScreen extends StatelessWidget {
                             return CustomCalendarSettingContentBox(
                               title: null,
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // 방장 표시
-                                  ...adminWidgets,
-                                  // 커스텀 프로필 이미지 박스 사용
-                                  CustomChatProfileImageBox(
-                                    width: 24,
-                                    height: 24,
+                                  Row(
+                                    children: [
+                                      // 방장 표시
+                                      ...adminWidgets,
+                                      // 커스텀 프로필 이미지 박스 사용
+                                      CustomChatProfileImageBox(
+                                        width: 24,
+                                        height: 24,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      // 멤버 닉네임
+                                      Text(viewModel.calendarMember[index]),
+                                    ],
                                   ),
-                                  const SizedBox(width: 4),
-                                  // 멤버 닉네임
-                                  Text(viewModel.calendarMember[index]),
+                                  viewModel.calendarType
+                                      ? SizedBox.shrink()
+                                      : viewModel.isAdmin[index]
+                                      ? SizedBox.shrink()
+                                      : GestureDetector(
+                                          // 전체 영역 터치 가능
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () {
+                                            _showCustomConfirmationDialog(
+                                              context,
+                                              title: "title",
+                                              content: "content",
+                                              onConfirm: () => print("확인"),
+                                            );
+                                            print("추방");
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.red,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadiusGeometry.circular(
+                                                    8,
+                                                  ),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(
+                                                8.0,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  "추방",
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                 ],
                               ),
                             );
@@ -138,10 +185,89 @@ class _CalendarSettingScreen extends StatelessWidget {
               ),
             ),
           ),
+          // 공유 캘린더만 표시
+          bottomNavigationBar: viewModel.calendarType
+              ? null
+              : SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 8.0,
+                      right: 8.0,
+                      left: 8.0,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadiusGeometry.all(
+                        Radius.circular(12),
+                      ),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          _showCustomConfirmationDialog(
+                            context,
+                            title: "title",
+                            content: "content",
+                            onConfirm: () {
+                              print("확인 눌림");
+                            },
+                          );
+                        },
+                        child: BottomAppBar(
+                          color: Colors.red,
+                          height: 52,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.delete_outline, color: Colors.white),
+                              Text(
+                                "캘린더 삭제",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
         );
       },
     );
   }
+}
+
+void _showCustomConfirmationDialog(
+  BuildContext context, {
+  required String title,
+  required String content,
+  required VoidCallback onConfirm, // 버튼 클릭 시 실행할 함수
+}) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: <Widget>[
+          // 취소 버튼
+          TextButton(
+            child: const Text('취소'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          // 기능 실행 버튼
+          TextButton(
+            child: const Text('확인'),
+            onPressed: () {
+              Navigator.of(context).pop(); // 다이얼로그 닫기
+              onConfirm(); // 전달받은 함수 실행
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class CustomCalendarSettingContentBox extends StatelessWidget {
