@@ -119,7 +119,9 @@ class _CalendarSettingScreen extends StatelessWidget {
                                       Text(viewModel.calendarMember[index]),
                                     ],
                                   ),
-                                  viewModel.isAdmin[index]
+                                  viewModel.calendarType
+                                      ? SizedBox.shrink()
+                                      : viewModel.isAdmin[index]
                                       ? SizedBox.shrink()
                                       : GestureDetector(
                                           // 전체 영역 터치 가능
@@ -183,6 +185,53 @@ class _CalendarSettingScreen extends StatelessWidget {
               ),
             ),
           ),
+          // 공유 캘린더만 표시
+          bottomNavigationBar: viewModel.calendarType
+              ? null
+              : SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 8.0,
+                      right: 8.0,
+                      left: 8.0,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadiusGeometry.all(
+                        Radius.circular(12),
+                      ),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          _showCustomConfirmationDialog(
+                            context,
+                            title: "title",
+                            content: "content",
+                            onConfirm: () {
+                              print("확인 눌림");
+                            },
+                          );
+                        },
+                        child: BottomAppBar(
+                          color: Colors.red,
+                          height: 52,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.delete_outline, color: Colors.white),
+                              Text(
+                                "캘린더 삭제",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
         );
       },
     );

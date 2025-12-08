@@ -14,6 +14,9 @@ class CalendarSettingViewModel extends ChangeNotifier {
   /// 캘린더 설명(public)
   String get calendarDescription => _calendarDescription;
 
+  /// 캘린더 타입(임시)(true면 개인)
+  bool calendarType = false;
+
   final List<String> _calendarMember = ["권영진", "권양하", "서연우", "오민석", "이가은"];
   List<String> get calendarMember => _calendarMember;
 
