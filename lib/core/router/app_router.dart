@@ -3,6 +3,7 @@ import 'package:dutytable/features/calendar/presentation/views/calendar_edit_scr
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
+import 'package:dutytable/features/schedule/presentation/views/schedule_add_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -61,6 +62,12 @@ GoRouter createRouter(BuildContext context) {
           GoRoute(
             path: '/personal',
             builder: (_, __) => const PersonalCalendarScreen(),
+            routes: [
+              GoRoute(
+                path: "add",
+                builder: (_, __) => const ScheduleAddScreen(),
+              ),
+            ],
           ),
 
           // 프로필
