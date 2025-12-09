@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/widgets/loading_dialog.dart';
@@ -20,7 +21,10 @@ class LoginViewModel extends ChangeNotifier {
   SupabaseUserModel? userAccount;
 
   // 구글 로그인을 처리하는 메인 함수
-  Future<void> googleSignIn(BuildContext context) async {
+  Future<void> googleSignIn(
+    BuildContext context, {
+    required bool isAutoLogin,
+  }) async {
     // 전체 화면 로딩 인디케이터 표시
     showFullScreenLoading(context);
     try {
@@ -37,46 +41,68 @@ class LoginViewModel extends ChangeNotifier {
       );
 
       // 구글 인증 UI를 통해 사용자 계정 정보 가져오기
-      _googleUser = await googleSignIn.authenticate();
+      final user = await googleSignIn.authenticate();
 
-      // 사용자가 구글 로그인을 취소한 경우
-      if (_googleUser == null) {
-        throw AuthException('Failed to sign in with Google.');
+      // 사용자 정보가 Null이면 즉시 오류 처리
+      if (user == null) {
+        throw AuthException(
+          'Failed to sign in with Google or sign in cancelled.',
+        );
       }
+      _googleUser = user; // 널 체크 후 _googleUser에 할당
 
-      // 구글 API 접근을 위한 인증 정보 가져오기
-      final authorization =
-          await _googleUser?.authorizationClient.authorizationForScopes(
-            scopes,
-          ) ??
-          await _googleUser?.authorizationClient.authorizeScopes(scopes);
+      final authorization = await _googleUser!.authorizationClient
+          .authorizationForScopes(scopes)
+          .catchError((_) async {
+            // 첫 번째 시도가 실패하면 authorizeScopes로 다시 시도
+            return await _googleUser!.authorizationClient.authorizeScopes(
+              scopes,
+            );
+          });
 
       // Supabase 인증에 필요한 ID 토큰 가져오기
-      final idToken = googleUser?.authentication.idToken;
+      final idToken = _googleUser!.authentication.idToken;
 
-      // ID 토큰이 없는 경우 오류 발생
       if (idToken == null) {
-        throw AuthException('No ID Token found.');
+        throw AuthException(
+          'No ID Token found after successful Google sign-in.',
+        );
       }
 
       // ID 토큰을 사용하여 Supabase에 로그인
-      await supabase.auth.signInWithIdToken(
+      final response = await supabase.auth.signInWithIdToken(
         provider: OAuthProvider.google,
         idToken: idToken,
         accessToken: authorization?.accessToken,
       );
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('auto_login', isAutoLogin);
+
       // 로그인 후 프로필 확인 및 화면 이동 로직 처리
       await _handlePostSignIn(context);
+    } catch (e) {
+      // 오류 발생 시 스낵바로 오류 메시지 표시
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('로그인 처리 중 오류 발생: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
       // 로딩 인디케이터 닫기
       if (context.mounted) {
-        context.pop();
+        // Pop하기 전에 context가 여전히 화면에 마운트되어 있는지 다시 확인
+        if (ModalRoute.of(context)?.isCurrent == true) {
+          GoRouter.of(context).pop();
+        }
       }
     }
   }
 
   // 로그인 성공 후 공통 로직을 처리하는 함수
-  // 사용자 프로필 존재 여부를 확인하고, 없으면 회원가입 화면으로, 있으면 메인 화면으로 이동
   Future<void> _handlePostSignIn(BuildContext context) async {
     // 현재 Supabase에 로그인된 사용자 정보 가져오기
     final currentUser = supabase.auth.currentUser;

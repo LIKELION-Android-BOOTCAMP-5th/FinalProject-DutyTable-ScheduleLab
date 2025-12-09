@@ -17,8 +17,15 @@ class LoginScreen extends StatelessWidget {
 }
 
 // UI 구조와 이벤트를 담당하는 위젯
-class _LoginScreenUI extends StatelessWidget {
+class _LoginScreenUI extends StatefulWidget {
   const _LoginScreenUI({super.key});
+
+  @override
+  State<_LoginScreenUI> createState() => _LoginScreenUIState();
+}
+
+class _LoginScreenUIState extends State<_LoginScreenUI> {
+  bool _isAutoLogin = true;
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +46,7 @@ class _LoginScreenUI extends StatelessWidget {
                       width: 180,
                       height: 180,
                     ),
-
                     const SizedBox(height: 10),
-
                     Text(
                       'DutyTable',
                       style: TextStyle(
@@ -50,9 +55,7 @@ class _LoginScreenUI extends StatelessWidget {
                         color: AppColors.text(context),
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     Text(
                       "DutyTable에 오신걸 환영합니다!",
                       style: TextStyle(
@@ -64,6 +67,34 @@ class _LoginScreenUI extends StatelessWidget {
                 ),
               ),
 
+              // 자동로그인
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Checkbox(
+                        value: _isAutoLogin,
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() {
+                            _isAutoLogin = value;
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('자동 로그인'),
+                  ],
+                ),
+              ),
+
               // 버튼 섹션
               Consumer<LoginViewModel>(
                 builder: (context, viewmodel, child) {
@@ -71,7 +102,10 @@ class _LoginScreenUI extends StatelessWidget {
                     width: double.infinity,
                     height: 50,
                     child: GestureDetector(
-                      onTap: () => viewmodel.googleSignIn(context),
+                      onTap: () => viewmodel.googleSignIn(
+                        context,
+                        isAutoLogin: _isAutoLogin,
+                      ),
                       child: Container(
                         decoration: BoxDecoration(
                           color: AppColors.actionPositive(context),

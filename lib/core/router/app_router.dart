@@ -9,14 +9,16 @@ import 'package:go_router/go_router.dart';
 // UI
 import '../../features/auth/presentation/views/login_screen.dart';
 import '../../features/auth/presentation/views/signup_screen.dart';
+import '../../features/auth/presentation/views/splash_screen.dart';
 import '../../features/calendar/presentation/views/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/shared_calendar_list_screen.dart';
 import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/splash',
     routes: [
+      GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
       // 로그인
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
 
