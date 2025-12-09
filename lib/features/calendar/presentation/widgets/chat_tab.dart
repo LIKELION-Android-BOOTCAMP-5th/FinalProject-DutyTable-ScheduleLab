@@ -17,7 +17,7 @@ class ChatTab extends StatelessWidget {
 }
 
 class _ChatTab extends StatelessWidget {
-  /// 채팅 탭(local)
+  /// 채팅 탭(private)
   const _ChatTab({super.key});
   @override
   Widget build(BuildContext context) {
