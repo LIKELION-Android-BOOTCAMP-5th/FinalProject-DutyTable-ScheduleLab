@@ -1,9 +1,10 @@
-import 'package:dutytable/features/profile/viewmodels/profile_viewmodel.dart';
+import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
+import 'package:dutytable/features/profile/presentation/viewmodels/profile_viewmodel.dart';
+import 'package:dutytable/features/profile/presentation/widgets/dialog.dart';
+import 'package:dutytable/features/profile/presentation/widgets/profile_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import '../../../core/widgets/logo_actions_app_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -35,7 +36,7 @@ class _ProfileScreen extends StatelessWidget {
                 //로그아웃 다이얼로그
                 showDialog(
                   context: context,
-                  builder: (context) => showDialog1(
+                  builder: (context) => CustomDialog(
                     context,
                     height: 240.0,
                     iconBackgroundColor: Color(0xFFDBE9FE),
@@ -64,7 +65,19 @@ class _ProfileScreen extends StatelessWidget {
                       Padding(padding: EdgeInsets.only(left: 10)),
                       Stack(
                         children: [
-                          Icon(Icons.account_circle, size: 60),
+                          SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: (viewModel.image != null)
+                                ? Image.network(
+                                    '${viewModel.image}',
+                                    width: double.infinity,
+                                    height: 350,
+                                    fit: BoxFit.fill,
+                                  )
+                                : Icon(Icons.account_circle, size: 60),
+                          ),
+                          // Icon(Icons.account_circle, size: 60),
                           // 프로필 수정 버튼 누를 시
                           (viewModel.is_edit)
                               ? Padding(
@@ -77,8 +90,8 @@ class _ProfileScreen extends StatelessWidget {
                                     onTap: () {},
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                        left: 10.0,
-                                        top: 10,
+                                        left: 20.0,
+                                        top: 20,
                                       ),
                                       child: Icon(Icons.camera_alt_outlined),
                                     ),
@@ -180,7 +193,7 @@ class _ProfileScreen extends StatelessWidget {
                   ),
                   //구글 캘린더 동기화
                   Padding(padding: EdgeInsets.all(7)),
-                  profileButton(
+                  CustomTab(
                     icon: Icons.settings_outlined,
                     buttonText: "  구글 캘린더 동기화",
                     padding: 7.0,
@@ -239,7 +252,7 @@ class _ProfileScreen extends StatelessWidget {
 
                   Padding(padding: EdgeInsets.all(5)),
                   //알림
-                  profileButton(
+                  CustomTab(
                     icon: Icons.notifications_active_outlined,
                     buttonText: "  알림",
                     padding: 0.0,
@@ -262,7 +275,7 @@ class _ProfileScreen extends StatelessWidget {
                     onTap: () {
                       context.push("/login");
                     },
-                    child: profileButton(
+                    child: CustomTab(
                       icon: Icons.lightbulb_outline_rounded,
                       buttonText: "  앱 소개 다시보기",
                       padding: 7.0,
@@ -283,7 +296,7 @@ class _ProfileScreen extends StatelessWidget {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => showDialog1(
+                        builder: (context) => CustomDialog(
                           context,
                           height: 280.0,
                           iconBackgroundColor: Color(0xFFFBE7F3),
@@ -334,174 +347,4 @@ class _ProfileScreen extends StatelessWidget {
       },
     );
   }
-}
-
-/// 다이얼로그
-Widget showDialog1(
-  BuildContext context, {
-
-  /// 다이얼로그 높이
-  required height,
-
-  /// 아이콘배경색
-  required iconBackgroundColor,
-
-  /// 아이콘
-  required icon,
-
-  /// 아이콘 색
-  required iconColor,
-
-  /// 다이얼로그 이름
-  required title,
-
-  /// 다이얼로그 설명
-  required message,
-
-  /// 확인버튼
-  required allow,
-
-  /// 버튼 선택 시 경로
-  required goto,
-
-  ///더 추가할 위젯
-  Widget? announcement,
-}) {
-  return Dialog(
-    child: Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
-          ),
-          width: 300,
-          height: height,
-          child: Column(
-            children: [
-              Padding(padding: EdgeInsets.all(13)),
-              Stack(
-                children: [
-                  SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: iconBackgroundColor,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Icon(icon, color: iconColor),
-                  ),
-                ],
-              ),
-              Padding(padding: EdgeInsets.all(5)),
-              Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-              Padding(padding: EdgeInsets.all(5)),
-              Text(message, style: TextStyle(fontSize: 12, color: Colors.grey)),
-              Padding(padding: EdgeInsets.all(5)),
-              (announcement != null)
-                  ? announcement
-                  : Padding(padding: EdgeInsets.all(1)),
-
-              Padding(padding: EdgeInsets.all(10)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      context.pop();
-                    },
-                    child: Text("   취소   ", style: TextStyle(fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFF3F4F6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.all(10)),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.push(goto);
-                    },
-                    child: Text(
-                      allow,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-///프로필스크린에 있는 각 설정 항목
-Widget profileButton({
-  /// 항목에 들어갈 아이콘
-  required icon,
-
-  /// 항목에 들어갈 텍스트
-  required buttonText,
-
-  /// 항목 텍스트 가운데 정렬
-  required padding,
-
-  ///더 추가할 위젯
-  Widget? addWidget,
-}) {
-  return Row(
-    children: [
-      Padding(padding: EdgeInsets.only(left: 20)),
-      Expanded(
-        child: Stack(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Color(0xFFE5E7EB)),
-              ),
-              child: SizedBox(height: 50),
-            ),
-            Column(
-              children: [
-                Padding(padding: EdgeInsets.all(padding)),
-                Row(
-                  children: [
-                    Padding(padding: EdgeInsets.all(7)),
-                    Icon(icon, size: 25),
-                    Text(
-                      buttonText,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Spacer(),
-                    (addWidget == null) ? Container() : addWidget,
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      Padding(padding: EdgeInsets.only(left: 20)),
-    ],
-  );
 }
