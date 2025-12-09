@@ -1,22 +1,26 @@
-import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
+import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_edit_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/back_actions_app_bar.dart';
 import '../../../../core/widgets/custom_confirm_dialog.dart';
+import '../../data/models/calendar_model.dart';
 import '../widgets/chat_tab.dart';
 import 'calendar_setting_screen.dart';
 
 class CalendarEditScreen extends StatelessWidget {
+  final CalendarModel? initialCalendarData;
+
   /// 캘린더 수정 화면(provider 주입)
-  const CalendarEditScreen({super.key});
+  const CalendarEditScreen({super.key, this.initialCalendarData});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       // 캘린더 수정 뷰모델 주입
-      create: (context) => CalendarSettingViewModel(),
+      create: (context) =>
+          CalendarEditViewModel(initialCalendarData: initialCalendarData),
       child: _CalendarEditScreen(),
     );
   }
@@ -26,42 +30,10 @@ class _CalendarEditScreen extends StatelessWidget {
   /// 캘린더 수정 화면(private)
   const _CalendarEditScreen({super.key});
 
-  void _showCustomConfirmationDialog(
-    BuildContext context, {
-    required String title,
-    required String content,
-    required VoidCallback onConfirm, // 버튼 클릭 시 실행할 함수
-  }) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actions: <Widget>[
-            // 취소 버튼
-            TextButton(
-              child: const Text('취소'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            // 기능 실행 버튼
-            TextButton(
-              child: const Text('확인'),
-              onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
-                onConfirm(); // 전달받은 함수 실행
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     // 캘린더 수정 뷰모델 주입
-    return Consumer<CalendarSettingViewModel>(
+    return Consumer<CalendarEditViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
           appBar: BackActionsAppBar(
@@ -79,12 +51,12 @@ class _CalendarEditScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 캘린더 이름
-                    // 커스텀 캘린더 수정 텍스트 필드 사용
                     CustomCalendarEditTextField(
                       title: const Text(
                         "캘린더 이름",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      controller: viewModel.titleController,
                     ),
                     const SizedBox(height: 40),
                     // 캘린더 멤버 목록
@@ -99,18 +71,50 @@ class _CalendarEditScreen extends StatelessWidget {
                         ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: viewModel.calendarMember.length,
+                          // 멤버 목록이 비었을 경우(개인 캘린더의 경우) 방장만 표시하기위해 1을 반환
+                          itemCount:
+                              viewModel
+                                      .calendarResponse
+                                      .calendarMemberModel
+                                      ?.isEmpty ??
+                                  true
+                              ? 1
+                              : viewModel
+                                    .calendarResponse
+                                    .calendarMemberModel!
+                                    .length,
                           itemBuilder: (context, index) {
-                            // 방장 표시
-                            final List<Widget> adminWidgets =
-                                viewModel.isAdmin[index]
-                                ? [
-                                    const Text("👑"),
-                                    const SizedBox(width: 4),
-                                    const Text("방장"),
-                                    const SizedBox(width: 4),
-                                  ]
-                                : [];
+                            final members =
+                                viewModel.calendarResponse.calendarMemberModel;
+                            // 개인 캘린더일 때(멤버 목록이 없을 때)
+                            if (members == null || members.isEmpty) {
+                              return CustomCalendarSettingContentBox(
+                                title: null,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const CustomChatProfileImageBox(
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          viewModel
+                                              .calendarResponse
+                                              .ownerNickname,
+                                        ),
+                                        const Text("👑"), // 방장 표시
+                                      ],
+                                    ),
+                                    const SizedBox.shrink(),
+                                  ],
+                                ),
+                              );
+                            }
+                            final member = members[index];
 
                             return CustomCalendarSettingContentBox(
                               title: null,
@@ -120,8 +124,6 @@ class _CalendarEditScreen extends StatelessWidget {
                                 children: [
                                   Row(
                                     children: [
-                                      // 방장 표시
-                                      ...adminWidgets,
                                       // 커스텀 프로필 이미지 박스 사용
                                       CustomChatProfileImageBox(
                                         width: 24,
@@ -129,13 +131,20 @@ class _CalendarEditScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 4),
                                       // 멤버 닉네임
-                                      Text(viewModel.calendarMember[index]),
+                                      Text(member.nickname),
                                     ],
                                   ),
-                                  viewModel.calendarType
+                                  // 개인 캘린더는 추방 버튼 안나옴
+                                  viewModel.calendarResponse.type == "personal"
                                       ? SizedBox.shrink()
-                                      : viewModel.isAdmin[index]
-                                      ? SizedBox.shrink()
+                                      // 공유 캘린더는 방장만 추방 버튼 안나옴
+                                      : viewModel
+                                            .calendarResponse
+                                            .calendarMemberModel![index]
+                                            .is_admin
+                                      // 방장 표시
+                                      ? const Text("👑")
+                                      // 추방 버튼
                                       : GestureDetector(
                                           // 전체 영역 터치 가능
                                           behavior: HitTestBehavior.opaque,
@@ -146,7 +155,7 @@ class _CalendarEditScreen extends StatelessWidget {
                                               color: Colors.blue,
                                               onConfirm: () => print("확인"),
                                             );
-                                            print("추방");
+                                            print("권한");
                                           },
                                           child: Container(
                                             decoration: BoxDecoration(
@@ -191,6 +200,7 @@ class _CalendarEditScreen extends StatelessWidget {
                         "캘린더 설명",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      controller: viewModel.descController,
                     ),
                   ],
                 ),
@@ -245,9 +255,14 @@ class _CalendarEditScreen extends StatelessWidget {
 class CustomCalendarEditTextField extends StatelessWidget {
   /// 박스 위에 표시할 내용
   final Widget title;
+  final TextEditingController controller;
 
   /// 커스텀 캘린더 수정 텍스트 필드
-  const CustomCalendarEditTextField({super.key, required this.title});
+  const CustomCalendarEditTextField({
+    super.key,
+    required this.title,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -255,11 +270,11 @@ class CustomCalendarEditTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         title,
-        // Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         TextField(
           minLines: 1,
           maxLines: null, // 높이 제한 없음
+          controller: controller,
           keyboardType: TextInputType.multiline,
           decoration: InputDecoration(
             border: OutlineInputBorder(

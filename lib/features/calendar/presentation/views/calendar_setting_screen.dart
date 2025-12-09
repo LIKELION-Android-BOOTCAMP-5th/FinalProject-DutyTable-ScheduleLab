@@ -5,24 +5,28 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/custom_confirm_dialog.dart';
+import '../../data/models/calendar_model.dart';
 import '../widgets/chat_tab.dart';
 
 class CalendarSettingScreen extends StatelessWidget {
+  final CalendarModel? initialCalendarData;
+
   /// 캘린더 설정 화면(provider 주입)
-  const CalendarSettingScreen({super.key});
+  const CalendarSettingScreen({super.key, this.initialCalendarData});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       // 캘린더 설정 뷰모델 주입
-      create: (context) => CalendarSettingViewModel(),
+      create: (context) =>
+          CalendarSettingViewModel(initialCalendarData: initialCalendarData),
       child: _CalendarSettingScreen(),
     );
   }
 }
 
 class _CalendarSettingScreen extends StatelessWidget {
-  /// 캘린더 설정 화면(local)
+  /// 캘린더 설정 화면(private)
   const _CalendarSettingScreen({super.key});
 
   @override
@@ -41,7 +45,10 @@ class _CalendarSettingScreen extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   print("수정 버튼 눌림");
-                  context.push("/calendar/edit");
+                  context.push(
+                    "/calendar/edit",
+                    extra: viewModel.calendarResponse,
+                  );
                 },
                 child: const Text(
                   "수정",
@@ -63,7 +70,6 @@ class _CalendarSettingScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 캘린더 이름
-                    // 커스텀 캘린더 설정 컨텐츠 박스 사용
                     CustomCalendarSettingContentBox(
                       title: const Text(
                         "캘린더 이름",
@@ -71,7 +77,7 @@ class _CalendarSettingScreen extends StatelessWidget {
                       ),
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(viewModel.calendarName),
+                        child: Text(viewModel.calendarResponse.title),
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -87,18 +93,51 @@ class _CalendarSettingScreen extends StatelessWidget {
                         ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: viewModel.calendarMember.length,
+                          // 멤버 목록이 비었을 경우(개인 캘린더의 경우) 방장만 표시하기위해 1을 반환
+                          itemCount:
+                              viewModel
+                                      .calendarResponse
+                                      .calendarMemberModel
+                                      ?.isEmpty ??
+                                  true
+                              ? 1
+                              : viewModel
+                                    .calendarResponse
+                                    .calendarMemberModel!
+                                    .length,
                           itemBuilder: (context, index) {
-                            // 방장 표시
-                            final List<Widget> adminWidgets =
-                                viewModel.isAdmin[index]
-                                ? [
-                                    const Text("👑"),
-                                    const SizedBox(width: 4),
-                                    const Text("방장"),
-                                    const SizedBox(width: 4),
-                                  ]
-                                : [];
+                            final members =
+                                viewModel.calendarResponse.calendarMemberModel;
+                            // 개인 캘린더일 때(멤버 목록이 없을 때)
+                            if (members == null || members.isEmpty) {
+                              return CustomCalendarSettingContentBox(
+                                title: null,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const CustomChatProfileImageBox(
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          viewModel
+                                              .calendarResponse
+                                              .ownerNickname,
+                                        ),
+                                        const Text("👑"), // 방장 표시
+                                      ],
+                                    ),
+                                    const SizedBox.shrink(),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            final member = members[index];
 
                             return CustomCalendarSettingContentBox(
                               title: null,
@@ -108,8 +147,6 @@ class _CalendarSettingScreen extends StatelessWidget {
                                 children: [
                                   Row(
                                     children: [
-                                      // 방장 표시
-                                      ...adminWidgets,
                                       // 커스텀 프로필 이미지 박스 사용
                                       CustomChatProfileImageBox(
                                         width: 24,
@@ -117,13 +154,20 @@ class _CalendarSettingScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 4),
                                       // 멤버 닉네임
-                                      Text(viewModel.calendarMember[index]),
+                                      Text(member.nickname),
                                     ],
                                   ),
-                                  viewModel.calendarType
+                                  // 개인 캘린더는 추방 버튼 안나옴
+                                  viewModel.calendarResponse.type == "personal"
                                       ? SizedBox.shrink()
-                                      : viewModel.isAdmin[index]
-                                      ? SizedBox.shrink()
+                                      // 공유 캘린더는 방장만 추방 버튼 안나옴
+                                      : viewModel
+                                            .calendarResponse
+                                            .calendarMemberModel![index]
+                                            .is_admin
+                                      // 방장 표시
+                                      ? const Text("👑")
+                                      // 추방 버튼
                                       : GestureDetector(
                                           // 전체 영역 터치 가능
                                           behavior: HitTestBehavior.opaque,
@@ -173,13 +217,12 @@ class _CalendarSettingScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 40),
                     // 캘린더 설명
-                    // 커스텀 캘린더 설정 컨텐츠 박스 사용
                     CustomCalendarSettingContentBox(
                       title: const Text(
                         "캘린더 설명",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      child: Text(viewModel.calendarDescription),
+                      child: Text(viewModel.calendarResponse.description ?? ""),
                     ),
                   ],
                 ),
@@ -187,7 +230,7 @@ class _CalendarSettingScreen extends StatelessWidget {
             ),
           ),
           // 공유 캘린더만 표시
-          bottomNavigationBar: viewModel.calendarType
+          bottomNavigationBar: viewModel.calendarResponse.type == "personal"
               ? null
               : SafeArea(
                   child: Padding(

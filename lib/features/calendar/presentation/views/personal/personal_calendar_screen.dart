@@ -24,7 +24,7 @@ class PersonalCalendarScreen extends StatelessWidget {
 }
 
 class _PersonalCalendarScreen extends StatelessWidget {
-  /// 개인 캘린더 화면(local)
+  /// 개인 캘린더 화면(private)
   const _PersonalCalendarScreen({super.key});
 
   @override
@@ -36,12 +36,6 @@ class _PersonalCalendarScreen extends StatelessWidget {
           appBar: LogoActionsAppBar(
             rightActions: Row(
               children: [
-                //TODO : 공유 캘린더만 초대 아이콘 나오게 하기
-                // 커스텀 캘린더 앱바 아이콘 사용
-                CustomAppBarIcon(
-                  icon: Icons.person_add,
-                  onTap: () => print("초대 클릭"),
-                ),
                 // 커스텀 캘린더 앱바 아이콘 사용
                 CustomAppBarIcon(
                   icon: Icons.notifications,
@@ -50,7 +44,10 @@ class _PersonalCalendarScreen extends StatelessWidget {
                 // 커스텀 캘린더 앱바 아이콘 사용
                 CustomAppBarIcon(
                   icon: Icons.menu,
-                  onTap: () => context.push("/calendar/setting"),
+                  onTap: () => context.push(
+                    "/calendar/setting",
+                    extra: viewModel.calendarResponse,
+                  ),
                 ),
               ],
             ),
@@ -64,8 +61,6 @@ class _PersonalCalendarScreen extends StatelessWidget {
               tabNameList: viewModel.tabNames
                   .map((e) => Tab(child: Text(e)))
                   .toList(),
-              // 각 탭 눌렀을 때 실행 할 함수
-              onTap: viewModel.onTabChanged,
               // 각 탭에 들어갈 위젯 리스트
               tabViewWidgetList: [
                 // 캘린더 탭

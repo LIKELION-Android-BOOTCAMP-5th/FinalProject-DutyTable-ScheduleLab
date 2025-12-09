@@ -23,7 +23,7 @@ class CalendarTab extends StatelessWidget {
 }
 
 class _CalendarTab extends StatelessWidget {
-  /// 캘린더 탭(local)
+  /// 캘린더 탭(private)
   const _CalendarTab({super.key});
 
   @override
