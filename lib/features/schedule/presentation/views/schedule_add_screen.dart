@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_theme.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_add_view_model.dart';
 import 'package:dutytable/features/schedule/presentation/widgets/address_section.dart';
@@ -12,6 +13,8 @@ import 'package:dutytable/features/schedule/presentation/widgets/start_and_end_t
 import 'package:dutytable/features/schedule/presentation/widgets/title_section.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../../core/configs/app_colors.dart';
 
 class ScheduleAddScreen extends StatelessWidget {
   const ScheduleAddScreen({super.key});
@@ -99,6 +102,62 @@ class _ScheduleAddScreen extends StatelessWidget {
 
                       /// 메모 - 선택 사항(300자 제한)
                       MemoSection(),
+
+                      const SizedBox(height: 16),
+
+                      /// 취소 & 저장 버튼
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.card(context),
+                                border: Border.all(
+                                  color: AppColors.commonGrey,
+                                  width: 1,
+                                ),
+                              ),
+                              child: GestureDetector(
+                                onTap: () {},
+                                child: Text(
+                                  "취소",
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 10),
+
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColors.actionPositive(context),
+                              ),
+                              child: GestureDetector(
+                                onTap: () {},
+                                child: Text(
+                                  "저장",
+                                  style: TextStyle(
+                                    color: AppColors.commonWhite,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
 
                       const SizedBox(height: 16),
                     ],

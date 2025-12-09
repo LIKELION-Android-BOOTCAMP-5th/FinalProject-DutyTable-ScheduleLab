@@ -17,7 +17,7 @@ import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/personal',
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
       // 로그인
