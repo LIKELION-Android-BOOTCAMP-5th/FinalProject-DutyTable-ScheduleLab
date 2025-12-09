@@ -1,8 +1,10 @@
-import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_edit_view_model.dart';
+import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/back_actions_app_bar.dart';
+import '../../../../core/widgets/custom_confirm_dialog.dart';
 import '../widgets/chat_tab.dart';
 import 'calendar_setting_screen.dart';
 
@@ -14,7 +16,7 @@ class CalendarEditScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       // 캘린더 수정 뷰모델 주입
-      create: (context) => CalendarEditViewModel(),
+      create: (context) => CalendarSettingViewModel(),
       child: _CalendarEditScreen(),
     );
   }
@@ -59,7 +61,7 @@ class _CalendarEditScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 캘린더 수정 뷰모델 주입
-    return Consumer<CalendarEditViewModel>(
+    return Consumer<CalendarSettingViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
           appBar: BackActionsAppBar(
@@ -113,17 +115,64 @@ class _CalendarEditScreen extends StatelessWidget {
                             return CustomCalendarSettingContentBox(
                               title: null,
                               child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // 방장 표시
-                                  ...adminWidgets,
-                                  // 커스텀 프로필 이미지 박스 사용
-                                  CustomChatProfileImageBox(
-                                    width: 24,
-                                    height: 24,
+                                  Row(
+                                    children: [
+                                      // 방장 표시
+                                      ...adminWidgets,
+                                      // 커스텀 프로필 이미지 박스 사용
+                                      CustomChatProfileImageBox(
+                                        width: 24,
+                                        height: 24,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      // 멤버 닉네임
+                                      Text(viewModel.calendarMember[index]),
+                                    ],
                                   ),
-                                  const SizedBox(width: 4),
-                                  // 멤버 닉네임
-                                  Text(viewModel.calendarMember[index]),
+                                  viewModel.calendarType
+                                      ? SizedBox.shrink()
+                                      : viewModel.isAdmin[index]
+                                      ? SizedBox.shrink()
+                                      : GestureDetector(
+                                          // 전체 영역 터치 가능
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () {
+                                            showCustomConfirmationDialog(
+                                              context,
+                                              content: "방장 권한을 넘기시겠습니까?",
+                                              color: Colors.blue,
+                                              onConfirm: () => print("확인"),
+                                            );
+                                            print("추방");
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.blue,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadiusGeometry.circular(
+                                                    8,
+                                                  ),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(
+                                                8.0,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  "권한",
+                                                  style: TextStyle(
+                                                    color: Colors.blue,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                 ],
                               ),
                             );
@@ -160,13 +209,14 @@ class _CalendarEditScreen extends StatelessWidget {
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
-                    _showCustomConfirmationDialog(
+                    showCustomConfirmationDialog(
                       context,
-                      title: "title",
-                      content: "content",
+                      content: "수정 완료하시겠습니까?",
                       onConfirm: () {
                         print("확인 눌림");
+                        context.pop();
                       },
+                      color: Colors.blue,
                     );
                   },
                   child: BottomAppBar(
