@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/widgets/loading_dialog.dart';
 import '../../../../main.dart';
+import '../../../../supabase_manager.dart';
 import '../../../../supabase_user_model.dart';
 
 // LoginScreen의 비즈니스 로직을 관리하는 ViewModel
@@ -125,6 +126,12 @@ class LoginViewModel extends ChangeNotifier {
       if (response == null) {
         GoRouter.of(context).go('/signup');
       } else {
+        // 데이터 가져오기
+        try {
+          final calendars = await SupabaseManager.shared.getCalendars();
+          final tasks = await SupabaseManager.shared.getTasks();
+        } catch (e) {}
+
         // 프로필 정보가 있으면 (기존 사용자) 로그인 성공 스낵바 표시 후 메인 화면으로 이동
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
