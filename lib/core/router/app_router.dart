@@ -1,6 +1,7 @@
 import 'package:dutytable/features/calendar/presentation/views/add_calendar_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/calendar_edit_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
+import 'package:dutytable/features/calendar/presentation/views/schedule_detail_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/schedule_add_screen.dart';
@@ -17,7 +18,7 @@ import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
   return GoRouter(
-    initialLocation: '/personal',
+    initialLocation: '/splash',
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
       // 로그인
@@ -56,6 +57,16 @@ GoRouter createRouter(BuildContext context) {
           GoRoute(
             path: '/shared',
             builder: (_, __) => const SharedCalendarListScreen(),
+            routes: [
+              GoRoute(
+                path: "add",
+                builder: (_, __) => const ScheduleAddScreen(),
+              ),
+              GoRoute(
+                path: "detail",
+                builder: (_, __) => const ScheduleDetailScreen(),
+              ),
+            ],
           ),
 
           // 내 캘린더
@@ -66,6 +77,10 @@ GoRouter createRouter(BuildContext context) {
               GoRoute(
                 path: "add",
                 builder: (_, __) => const ScheduleAddScreen(),
+              ),
+              GoRoute(
+                path: "detail",
+                builder: (_, __) => const ScheduleDetailScreen(),
               ),
             ],
           ),
