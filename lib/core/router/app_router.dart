@@ -66,10 +66,17 @@ GoRouter createRouter(BuildContext context) {
       ShellRoute(
         builder: (_, _, child) => AppShell(child: child),
         routes: [
-          // 공유 캘린더
           GoRoute(
             path: '/shared',
-            builder: (_, __) => const SharedCalendarListScreen(),
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              final List<CalendarModel>? initialCalendars =
+                  extra?['sharedCalendars'] as List<CalendarModel>?;
+
+              return SharedCalendarListScreen(
+                initialCalendars: initialCalendars,
+              );
+            },
             routes: [
               GoRoute(
                 path: "add",
