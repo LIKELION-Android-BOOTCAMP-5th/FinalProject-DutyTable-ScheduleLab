@@ -2,7 +2,7 @@ class CalendarMemberModel {
   final int calendar_id;
   final String user_id;
   final bool is_admin;
-  final DateTime last_read_at;
+  final DateTime? last_read_at;
   final String nickname;
 
   CalendarMemberModel({

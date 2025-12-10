@@ -3,15 +3,17 @@ import 'calendar_member_model.dart';
 class CalendarModel {
   final int id;
   final String type;
+  final String user_id;
   final String ownerNickname;
   final String title;
   final String? description;
   final String? imageURL;
-  final List<CalendarMemberModel>? calendarMemberModel;
+  List<CalendarMemberModel>? calendarMemberModel;
 
   CalendarModel({
     required this.id,
     required this.type,
+    required this.user_id,
     required this.ownerNickname,
     required this.title,
     this.description,
@@ -28,14 +30,16 @@ class CalendarModel {
     final List<CalendarMemberModel> members = membersJson
         .map((m) => CalendarMemberModel.fromJson(m as Map<String, dynamic>))
         .toList();
+
     return CalendarModel(
       id: json["id"] as int,
       type: json["type"] as String,
+      user_id: json["user_id"] as String,
       ownerNickname: ownerNickname,
       title: json["title"] as String,
       description: json["description"] as String?,
       imageURL: json["imageURL"] as String?,
-      calendarMemberModel: members,
+      calendarMemberModel: members.isNotEmpty ? members : null,
     );
   }
 }

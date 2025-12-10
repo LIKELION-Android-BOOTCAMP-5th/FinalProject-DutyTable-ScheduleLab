@@ -13,7 +13,9 @@ void showFullScreenLoading(BuildContext context) {
       );
     },
   );
+}
 
-  // 비동기 작업 후 다이얼로그 닫기
-  // Navigator.of(context).pop(); 호출
+// 다이얼로그를 닫는 함수
+void hideLoading(BuildContext context) {
+  Navigator.of(context).pop();
 }
