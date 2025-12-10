@@ -46,6 +46,7 @@ class _ProfileScreen extends StatelessWidget {
                     title: "로그아웃",
                     message: "정말 로그아웃 하시겠습니까?",
                     allow: "로그아웃",
+                    viewmodel: viewModel.logout(),
                     goto: '/login',
                   ),
                 );

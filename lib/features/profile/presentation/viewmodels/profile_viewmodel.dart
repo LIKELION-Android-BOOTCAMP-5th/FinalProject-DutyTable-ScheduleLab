@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileViewmodel extends ChangeNotifier {
@@ -205,5 +206,12 @@ class ProfileViewmodel extends ChangeNotifier {
       editNickname();
     }
     notifyListeners();
+  }
+
+  //로그아웃 하기
+  Future<void> logout() async {
+    await supabase.auth.signOut();
+    final googleSignIn = GoogleSignIn.instance;
+    await googleSignIn.signOut();
   }
 }

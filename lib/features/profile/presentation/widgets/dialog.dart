@@ -24,6 +24,9 @@ class CustomDialog extends StatelessWidget {
   /// 확인버튼
   final allow;
 
+  /// 뷰모델 호출
+  final viewmodel;
+
   /// 버튼 선택 시 경로
   final goto;
 
@@ -40,6 +43,7 @@ class CustomDialog extends StatelessWidget {
     this.title,
     this.message,
     this.allow,
+    this.viewmodel,
     this.goto,
     this.announcement,
   });
@@ -108,6 +112,8 @@ class CustomDialog extends StatelessWidget {
                     Padding(padding: EdgeInsets.all(10)),
                     ElevatedButton(
                       onPressed: () {
+                        viewmodel;
+                        context.pop();
                         context.push(goto);
                       },
                       child: Text(
