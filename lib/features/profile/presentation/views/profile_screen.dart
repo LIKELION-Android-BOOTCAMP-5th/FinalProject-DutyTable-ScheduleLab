@@ -1,6 +1,6 @@
 import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
 import 'package:dutytable/features/profile/presentation/viewmodels/profile_viewmodel.dart';
-import 'package:dutytable/features/profile/presentation/widgets/dialog.dart';
+import 'package:dutytable/features/profile/presentation/widgets/custom_dialog.dart';
 import 'package:dutytable/features/profile/presentation/widgets/profile_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -46,8 +46,12 @@ class _ProfileScreen extends StatelessWidget {
                     title: "로그아웃",
                     message: "정말 로그아웃 하시겠습니까?",
                     allow: "로그아웃",
-                    viewmodel: viewModel.logout(),
-                    goto: '/login',
+                    onChangeSelected: () => {
+                      viewModel.logout(),
+                      context.pop(),
+                      context.push('/login'),
+                    },
+                    onClosed: () => context.pop(),
                   ),
                 );
               },
@@ -249,6 +253,7 @@ class _ProfileScreen extends StatelessWidget {
                           groupValue: viewModel.selectedOption,
                           onChanged: (String? value) {
                             viewModel.updateThmem(value);
+                            viewModel.saveTheme();
                           },
                         );
                       }).toList(),
@@ -310,7 +315,6 @@ class _ProfileScreen extends StatelessWidget {
                           title: "회원탈퇴",
                           message: "정말 회원탈퇴 하시겠습니까?",
                           allow: "회원탈퇴",
-                          goto: '/login',
                           announcement: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
@@ -330,6 +334,11 @@ class _ProfileScreen extends StatelessWidget {
                               ),
                             ),
                           ),
+                          onChangeSelected: () => {
+                            context.pop(),
+                            context.push('/login'),
+                          },
+                          onClosed: () => context.pop(),
                         ),
                       );
                     },

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 /// 다이얼로그
 class CustomDialog extends StatelessWidget {
@@ -24,11 +23,10 @@ class CustomDialog extends StatelessWidget {
   /// 확인버튼
   final allow;
 
-  /// 뷰모델 호출
-  final viewmodel;
+  final onClosed;
 
-  /// 버튼 선택 시 경로
-  final goto;
+  /// 뷰모델 호출
+  final onChangeSelected;
 
   ///더 추가할 위젯
   Widget? announcement;
@@ -43,9 +41,9 @@ class CustomDialog extends StatelessWidget {
     this.title,
     this.message,
     this.allow,
-    this.viewmodel,
-    this.goto,
+    this.onChangeSelected,
     this.announcement,
+    this.onClosed,
   });
 
   @override
@@ -97,33 +95,37 @@ class CustomDialog extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        context.pop();
-                      },
-                      child: Text("   취소   ", style: TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFF3F4F6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    GestureDetector(
+                      onTap: () => onClosed(),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Color(0xFFF3F4F6),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(13.0),
+                          child: Text(
+                            "   취소   ",
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
                       ),
                     ),
                     Padding(padding: EdgeInsets.all(10)),
-                    ElevatedButton(
-                      onPressed: () {
-                        viewmodel;
-                        context.pop();
-                        context.push(goto);
-                      },
-                      child: Text(
-                        allow,
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    GestureDetector(
+                      onTap: () => onChangeSelected(),
+                      child: Container(
+                        // color: Colors.red,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Colors.red,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(13.0),
+                          child: Text(
+                            allow,
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
                         ),
                       ),
                     ),
