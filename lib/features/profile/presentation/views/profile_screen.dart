@@ -1,6 +1,6 @@
 import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
 import 'package:dutytable/features/profile/presentation/viewmodels/profile_viewmodel.dart';
-import 'package:dutytable/features/profile/presentation/widgets/dialog.dart';
+import 'package:dutytable/features/profile/presentation/widgets/custom_dialog.dart';
 import 'package:dutytable/features/profile/presentation/widgets/profile_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -46,7 +46,7 @@ class _ProfileScreen extends StatelessWidget {
                     title: "로그아웃",
                     message: "정말 로그아웃 하시겠습니까?",
                     allow: "로그아웃",
-                    viewmodel: viewModel.logout(),
+                    onChangeSelected: () => viewModel.logout(),
                     goto: '/login',
                   ),
                 );
@@ -249,6 +249,7 @@ class _ProfileScreen extends StatelessWidget {
                           groupValue: viewModel.selectedOption,
                           onChanged: (String? value) {
                             viewModel.updateThmem(value);
+                            viewModel.saveTheme();
                           },
                         );
                       }).toList(),

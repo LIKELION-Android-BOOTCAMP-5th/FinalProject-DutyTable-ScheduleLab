@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileViewmodel extends ChangeNotifier {
   ProfileViewmodel() {
@@ -39,7 +40,7 @@ class ProfileViewmodel extends ChangeNotifier {
   List<String> themeList = ["라이트모드", "다크모드", "시스템모드"];
 
   /// 사용자가 테마 선택
-  String selectedOption = "option1";
+  String selectedOption = "라이트모드";
 
   /// 닉네임 중복 여부
   bool is_overlapping = true;
@@ -47,6 +48,7 @@ class ProfileViewmodel extends ChangeNotifier {
   // 시작할때 닉네임,이메일,프로필 이미지 호출
   void _init() {
     fetchUser();
+    loadTheme(); // 로컬저장한 테마 불러오기
   }
 
   //프로필 수정
@@ -75,8 +77,13 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   // 사용자가 테마 선택하면 업데이트
-  void updateThmem(value) {
+  Future<dynamic> updateThmem(value) async {
     selectedOption = value;
+    // if (selectedOption == "라이트모드") {
+    //   AppTheme.lightTheme;
+    // } else {
+    //   AppTheme.darkTheme;
+    // }
     notifyListeners();
   }
 
@@ -212,6 +219,19 @@ class ProfileViewmodel extends ChangeNotifier {
   Future<void> logout() async {
     await supabase.auth.signOut();
     final googleSignIn = GoogleSignIn.instance;
+    await googleSignIn.disconnect();
     await googleSignIn.signOut();
+  }
+
+  //테마 로컬 저장하기
+  Future<void> saveTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(user!.id, selectedOption);
+  }
+
+  //테마 로컬 가져오기
+  Future<void> loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    selectedOption = prefs.getString(user!.id)!;
   }
 }

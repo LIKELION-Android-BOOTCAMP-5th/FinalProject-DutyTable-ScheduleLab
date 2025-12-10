@@ -25,7 +25,7 @@ class CustomDialog extends StatelessWidget {
   final allow;
 
   /// 뷰모델 호출
-  final viewmodel;
+  final onChangeSelected;
 
   /// 버튼 선택 시 경로
   final goto;
@@ -43,7 +43,7 @@ class CustomDialog extends StatelessWidget {
     this.title,
     this.message,
     this.allow,
-    this.viewmodel,
+    this.onChangeSelected,
     this.goto,
     this.announcement,
   });
@@ -112,7 +112,8 @@ class CustomDialog extends StatelessWidget {
                     Padding(padding: EdgeInsets.all(10)),
                     ElevatedButton(
                       onPressed: () {
-                        viewmodel;
+                        onChanged:
+                        (_) => onChangeSelected();
                         context.pop();
                         context.push(goto);
                       },
