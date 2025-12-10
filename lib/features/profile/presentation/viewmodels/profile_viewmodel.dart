@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:dutytable/main.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileViewmodel extends ChangeNotifier {
   ProfileViewmodel() {
@@ -16,8 +20,7 @@ class ProfileViewmodel extends ChangeNotifier {
   String email = "";
 
   /// 프로필 url
-  String image =
-      "https://eexkppotdipyrzzjakur.supabase.co/storage/v1/object/public/profile-images/1b7bd4ec-2112-415b-a6f6-8805d6b79db5/profile.jpg";
+  String? image = "";
 
   /// 닉네임
   String nickname = "닉네임";
@@ -37,6 +40,9 @@ class ProfileViewmodel extends ChangeNotifier {
   /// 사용자가 테마 선택
   String selectedOption = "option1";
 
+  /// 닉네임 중복 여부
+  bool is_overlapping = true;
+
   // 시작할때 닉네임,이메일,프로필 이미지 호출
   void _init() {
     fetchUser();
@@ -44,7 +50,8 @@ class ProfileViewmodel extends ChangeNotifier {
 
   //프로필 수정
   void setProfileEdit() {
-    nickname.length < 2 ? null : is_edit = !is_edit;
+    is_edit = !is_edit;
+    is_overlapping = true;
     notifyListeners();
   }
 
@@ -91,7 +98,7 @@ class ProfileViewmodel extends ChangeNotifier {
         .maybeSingle();
     nickname = data!['nickname'];
     email = data['email'];
-    image = data['profileurl'];
+    image = (data['profileurl'] ?? "");
     notifyListeners();
   }
 
@@ -112,6 +119,91 @@ class ProfileViewmodel extends ChangeNotifier {
         .update({'allowed_notification': is_active_notification})
         .eq('id', userId);
     this.is_active_notification = is_active_notification;
+    notifyListeners();
+  }
+
+  // 이미지 피커로 갤러리에서 사진 가져오기
+  XFile? _image;
+  final ImagePicker picker = ImagePicker();
+
+  //이미지를 가져오기
+  Future getImage(ImageSource imageSource) async {
+    // 갤러리에서 선택된 이미지
+    final XFile? pickedFile = await picker.pickImage(source: imageSource);
+    if (pickedFile != null) {
+      _image = XFile(pickedFile.path); //이미지 가져와서 _image에 로컬 경로 저장
+    }
+    notifyListeners();
+  }
+
+  // 이미지 수파베이스 스토리지에 업로드 하기
+  Future<String?> uploadStorage() async {
+    // 선택한 사진이 없을때
+    if (_image == null) {
+      return null;
+    }
+    final file = File(_image!.path); // 스토리지에 올릴 이미지 로컬 경로
+    final timestamp = DateTime.now().millisecondsSinceEpoch; // 타임스탬프
+
+    await supabase.storage
+        .from('profile-images')
+        .upload('${user!.id}/profile_$timestamp.jpg', file); //사용자 폴더에 이미지 넣기
+    final filePath =
+        "${user!.id}/profile_$timestamp.jpg"; //파일 경로 : 유저아이디/프로필_타임스탬프.jpg
+
+    // 테이블에 업데이트 할 public url 만들기
+    final publicUrl = supabase.storage
+        .from('profile-images')
+        .getPublicUrl('${filePath}');
+    notifyListeners();
+    return publicUrl;
+  }
+
+  // 수파베이스에 저장
+  Future<void> updateImage(userId, String? publicUrl) async {
+    await supabase
+        .from('users')
+        .update({'profileurl': publicUrl}) // 사진 경로 업데이트
+        .eq('id', userId);
+    this.image = publicUrl;
+    notifyListeners();
+  }
+
+  // 스토리지올리기 + 테이블 업데이트
+  Future<void> upload() async {
+    final publicUrl = await uploadStorage();
+    await updateImage(user!.id, publicUrl);
+    notifyListeners();
+  }
+
+  //  닉네임 조건 체크
+  void nicknameCheck() {
+    if (nicknameController.text.length > 1 &&
+        nicknameController.text.length < 11 &&
+        is_overlapping == false) {
+      setProfileEdit();
+    } else {}
+    notifyListeners();
+  }
+
+  //  닉네임 중복
+  Future<void> nicknameOverlapping() async {
+    final count = await supabase
+        .from('users')
+        .select()
+        .eq('nickname', nicknameController.text);
+    if (count.length > 0) {
+      is_overlapping = true;
+      Fluttertoast.showToast(msg: '중복된 닉네임입니다.');
+    } else if (nicknameController.text.length < 2 ||
+        nicknameController.text.length > 10) {
+      Fluttertoast.showToast(msg: "닉네임은 2~10글자로 입력해야 합니다.");
+    } else {
+      is_overlapping = false;
+      Fluttertoast.showToast(msg: "사용가능한 닉네임입니다.");
+      updateNickname(user!.id);
+      editNickname();
+    }
     notifyListeners();
   }
 }

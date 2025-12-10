@@ -4,6 +4,7 @@ import 'package:dutytable/features/profile/presentation/widgets/dialog.dart';
 import 'package:dutytable/features/profile/presentation/widgets/profile_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -68,16 +69,18 @@ class _ProfileScreen extends StatelessWidget {
                           SizedBox(
                             width: 60,
                             height: 60,
-                            child: (viewModel.image != null)
-                                ? Image.network(
-                                    '${viewModel.image}',
+                            child:
+                                // image가 없거나 비어있을때
+                                (viewModel.image == null ||
+                                    viewModel.image!.isEmpty)
+                                ? Icon(Icons.account_circle, size: 60)
+                                : Image.network(
+                                    '${viewModel.image!}',
                                     width: double.infinity,
                                     height: 350,
                                     fit: BoxFit.fill,
-                                  )
-                                : Icon(Icons.account_circle, size: 60),
+                                  ),
                           ),
-                          // Icon(Icons.account_circle, size: 60),
                           // 프로필 수정 버튼 누를 시
                           (viewModel.is_edit)
                               ? Padding(
@@ -87,7 +90,13 @@ class _ProfileScreen extends StatelessWidget {
                                   ),
                                   // 카메라 아이콘 추가
                                   child: GestureDetector(
-                                    onTap: () {},
+                                    onTap: () async {
+                                      await viewModel.getImage(
+                                        ImageSource.gallery,
+                                      );
+                                      await viewModel.upload();
+                                    },
+
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         left: 20.0,
@@ -126,22 +135,18 @@ class _ProfileScreen extends StatelessWidget {
                       (viewModel.is_edit)
                           // 중복체크 버튼 추가
                           ? GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                viewModel.nicknameOverlapping();
+                              },
                               child: Text("   중복체크  "),
                             )
                           : Spacer(),
                       GestureDetector(
-                        onTap: () {
-                          viewModel.setProfileEdit();
-                          //닉네임 2~10글자 체크
-                          if (viewModel.nicknameController.text.length < 2 ||
-                              viewModel.nicknameController.text.length > 10) {
-                            // 조건에 안맞으면 텍스트 필드에서 다시 전 닉네임 보이게 하기
-                            viewModel.nicknameController.text =
-                                viewModel.nickname;
+                        onTap: () async {
+                          if (viewModel.is_edit == false) {
+                            viewModel.setProfileEdit(); //수정으로 들어가기
                           } else {
-                            viewModel.updateNickname(viewModel.user!.id);
-                            viewModel.editNickname();
+                            viewModel.nicknameCheck(); // 닉네임 중복, 글자수 체크 후 저장
                           }
                         },
                         child: Text(
@@ -177,7 +182,6 @@ class _ProfileScreen extends StatelessWidget {
                               children: [
                                 Padding(padding: EdgeInsets.all(7)),
                                 Text(
-                                  // "    내 계정 : casper118412@gmail.com",
                                   "   내 계정 : ${viewModel.email}",
 
                                   textAlign: TextAlign.center,
@@ -330,13 +334,7 @@ class _ProfileScreen extends StatelessWidget {
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "회원탈퇴",
-                        style: TextStyle(
-                          color: Colors.red,
-                          // fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Text("회원탈퇴", style: TextStyle(color: Colors.red)),
                     ),
                   ),
                 ],
