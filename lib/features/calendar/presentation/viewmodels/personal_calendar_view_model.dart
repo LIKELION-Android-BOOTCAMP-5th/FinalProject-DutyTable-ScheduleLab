@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 
 import '../../data/datasources/calendar_data_source.dart';
 
-/// 개인 캘린더 뷰모델
 class PersonalCalendarViewModel extends ChangeNotifier {
+  /// 개인 캘린더 뷰모델
+  PersonalCalendarViewModel() {
+    _init();
+  }
+
   /// 개인 캘린더 탭 이름 리스트(private)
   final List<String> _tabNames = ["캘린더", "리스트", "나와의 채팅"];
 
@@ -26,14 +30,11 @@ class PersonalCalendarViewModel extends ChangeNotifier {
   /// 캘린더 데이터(public)
   CalendarModel? get calendarResponse => _calendarResponse;
 
-  PersonalCalendarViewModel() {
-    _init();
-  }
-
   void _init() {
     fetchCalendar();
   }
 
+  /// 개인 캘린더 정보 가져오기
   Future<void> fetchCalendar() async {
     _calendarResponse = await CalendarDataSource.shared.fetchCalendar(
       "personal",

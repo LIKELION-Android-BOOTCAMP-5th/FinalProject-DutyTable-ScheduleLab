@@ -7,9 +7,11 @@ import '../models/calendar_member_model.dart';
 import '../models/calendar_model.dart';
 
 class CalendarDataSource {
+  /// 싱글턴
   static final CalendarDataSource _shared = CalendarDataSource();
   static CalendarDataSource get shared => _shared;
 
+  /// supabase apiKey
   static const apiKey =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVleGtwcG90ZGlweXJ6empha3VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODcwNzksImV4cCI6MjA3NDk2MzA3OX0.HFGirj_JSIZB5bkgwm8CnQAqE9kBoRMOlcG8dl6-vyw';
 

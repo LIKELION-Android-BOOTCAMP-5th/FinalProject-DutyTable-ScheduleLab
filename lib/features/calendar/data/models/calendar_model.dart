@@ -8,7 +8,6 @@ class CalendarModel {
   final String? description;
   final String? imageURL;
   final List<CalendarMemberModel>? calendarMemberModel;
-  // final ChatMessageModel? chatMessageModel;
 
   CalendarModel({
     required this.id,
@@ -18,7 +17,6 @@ class CalendarModel {
     this.description,
     this.imageURL,
     this.calendarMemberModel,
-    // this.chatMessageModel,
   });
 
   factory CalendarModel.fromJson(Map<String, dynamic> json) {

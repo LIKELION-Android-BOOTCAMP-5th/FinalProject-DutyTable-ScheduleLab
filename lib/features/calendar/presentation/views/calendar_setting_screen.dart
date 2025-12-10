@@ -9,6 +9,7 @@ import '../../data/models/calendar_model.dart';
 import '../widgets/chat_tab.dart';
 
 class CalendarSettingScreen extends StatelessWidget {
+  /// 캘린더 데이터
   final CalendarModel? initialCalendarData;
 
   /// 캘린더 설정 화면(provider 주입)
@@ -19,6 +20,7 @@ class CalendarSettingScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       // 캘린더 설정 뷰모델 주입
       create: (context) =>
+          // 캘린더 데이터 함께 주입
           CalendarSettingViewModel(initialCalendarData: initialCalendarData),
       child: _CalendarSettingScreen(),
     );
@@ -137,8 +139,8 @@ class _CalendarSettingScreen extends StatelessWidget {
                               );
                             }
 
+                            // 공유 캘린더일 때
                             final member = members[index];
-
                             return CustomCalendarSettingContentBox(
                               title: null,
                               child: Row(

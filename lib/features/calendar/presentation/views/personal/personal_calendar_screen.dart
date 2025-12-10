@@ -46,6 +46,7 @@ class _PersonalCalendarScreen extends StatelessWidget {
                   icon: Icons.menu,
                   onTap: () => context.push(
                     "/calendar/setting",
+                    // 캘린더 데이터 함께 보냄
                     extra: viewModel.calendarResponse,
                   ),
                 ),
@@ -82,7 +83,7 @@ class CustomAppBarIcon extends StatelessWidget {
   /// 아이콘
   final IconData icon;
 
-  /// 디버깅 커멘트
+  /// 실행 함수
   final void Function() onTap;
 
   /// 커스텀 캘린더 앱바 아이콘
