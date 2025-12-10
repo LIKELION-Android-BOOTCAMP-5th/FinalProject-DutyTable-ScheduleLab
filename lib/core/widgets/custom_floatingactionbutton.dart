@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
   /// 커스텀 플로팅 액션 버튼(제스처 디텍터 사용)
@@ -7,7 +8,9 @@ class CustomFloatingActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        context.push("/personal/add");
+      },
       child: Container(
         width: 56.0,
         height: 56.0,
