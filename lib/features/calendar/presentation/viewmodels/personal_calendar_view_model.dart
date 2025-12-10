@@ -38,5 +38,6 @@ class PersonalCalendarViewModel extends ChangeNotifier {
     _calendarResponse = await CalendarDataSource.shared.fetchCalendar(
       "personal",
     );
+    notifyListeners();
   }
 }
