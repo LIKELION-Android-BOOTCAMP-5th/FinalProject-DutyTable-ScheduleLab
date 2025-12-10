@@ -37,11 +37,7 @@ GoRouter createRouter(BuildContext context) {
       GoRoute(
         path: '/calendar/setting',
         builder: (context, state) {
-          // 1. extra에서 데이터 추출 및 캐스팅 (CalendarModel 타입으로)
           final CalendarModel? calendarData = state.extra as CalendarModel?;
-
-          // 2. CalendarSettingView에 데이터를 전달하여 ViewModel 초기화에 사용
-          // 데이터를 받은 View를 리턴합니다.
           return CalendarSettingScreen(initialCalendarData: calendarData);
         },
       ),
@@ -49,10 +45,7 @@ GoRouter createRouter(BuildContext context) {
       GoRoute(
         path: '/calendar/edit',
         builder: (context, state) {
-          // 1. extra에서 데이터 추출 및 캐스팅 (CalendarModel 타입으로)
           final CalendarModel? calendarData = state.extra as CalendarModel?;
-          // 2. CalendarSettingView에 데이터를 전달하여 ViewModel 초기화에 사용
-          // 데이터를 받은 View를 리턴합니다.
           return CalendarEditScreen(initialCalendarData: calendarData);
         },
       ),

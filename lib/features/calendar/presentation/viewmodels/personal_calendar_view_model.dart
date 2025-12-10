@@ -36,9 +36,7 @@ class PersonalCalendarViewModel extends ChangeNotifier {
 
   /// 개인 캘린더 정보 가져오기
   Future<void> fetchCalendar() async {
-    _calendarResponse = await CalendarDataSource.shared.fetchCalendar(
-      "personal",
-    );
+    _calendarResponse = await CalendarDataSource.shared.fetchPersonalCalendar();
     notifyListeners();
   }
 }

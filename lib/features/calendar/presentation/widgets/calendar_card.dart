@@ -6,6 +6,7 @@ class CalendarCard extends StatelessWidget {
   final bool deleteMode;
   final bool isAdmin;
   final bool isSelected;
+  final int members;
   final VoidCallback onChangeSelected;
 
   const CalendarCard({
@@ -15,6 +16,7 @@ class CalendarCard extends StatelessWidget {
     required this.isAdmin,
     required this.isSelected,
     required this.onChangeSelected,
+    required this.members,
   });
 
   @override
@@ -82,7 +84,7 @@ class CalendarCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Text(
-                              "99+명",
+                              "$members 명",
                               style: TextStyle(
                                 color: AppColors.chipText(context),
                                 fontSize: 10,

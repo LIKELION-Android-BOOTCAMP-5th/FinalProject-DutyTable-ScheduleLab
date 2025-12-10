@@ -25,48 +25,69 @@ class _SharedCalendarListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<SharedCalendarViewModel>();
+    // 로딩, 에러, 성공 상태에 따른 분기 처리
+    Widget bodyContent;
+
+    switch (viewModel.state) {
+      case ViewState.loading:
+        // 데이터 로드 중일 때 로딩 인디케이터 표시
+        bodyContent = const Center(child: CircularProgressIndicator());
+        break;
+
+      case ViewState.error:
+        // 오류 발생 시 에러 메시지 표시
+        bodyContent = Center(
+          child: Text(
+            "데이터 로드 실패: ${viewModel.errorMessage ?? '알 수 없는 오류'}",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.red),
+          ),
+        );
+        break;
+
+      case ViewState.success:
+        // 로드 성공 시 ListView 표시
+        final calendars = viewModel.calendarResponse;
+
+        if (calendars == null || calendars.isEmpty) {
+          // 데이터가 비어있을 경우
+          bodyContent = const Center(child: Text("공유 캘린더가 없습니다."));
+        } else {
+          // 데이터가 있을 경우 ListView 출력
+          bodyContent = ListView.separated(
+            itemCount: calendars.length,
+            itemBuilder: (BuildContext context, int index) {
+              final calendar = calendars[index];
+              return CalendarCard(
+                title: calendar.title,
+                deleteMode: viewModel.deleteMode,
+                isAdmin:
+                    viewModel.calendarResponse?[index].user_id ==
+                    viewModel.currentUserId,
+                members: calendar.calendarMemberModel?.length ?? 0,
+                isSelected: viewModel.isSelected(calendar.id.toString()),
+                onChangeSelected: () =>
+                    viewModel.toggleSelected(calendar.id.toString()),
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return const SizedBox(height: 12);
+            },
+          );
+        }
+        break;
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: LogoActionsAppBar(
-        leftActions: _LeftActions(),
-        rightActions: _RightActions(),
+        leftActions: const _LeftActions(),
+        rightActions: const _RightActions(),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-
-            CalendarCard(
-              title: "팀 프로젝트",
-              deleteMode: viewModel.deleteMode,
-              isAdmin: viewModel.isAdmin,
-              isSelected: viewModel.isSelected("team_project_1"),
-              onChangeSelected: () =>
-                  viewModel.toggleSelected("team_project_1"),
-            ),
-
-            const SizedBox(height: 12),
-
-            CalendarCard(
-              title: "부서 공지",
-              deleteMode: viewModel.deleteMode,
-              isAdmin: !viewModel.isAdmin,
-              isSelected: viewModel.isSelected("dept_notice"),
-              onChangeSelected: () => viewModel.toggleSelected("dept_notice"),
-            ),
-
-            const SizedBox(height: 12),
-
-            CalendarCard(
-              title: "운동",
-              deleteMode: viewModel.deleteMode,
-              isAdmin: viewModel.isAdmin,
-              isSelected: viewModel.isSelected("exercise"),
-              onChangeSelected: () => viewModel.toggleSelected("exercise"),
-            ),
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: bodyContent,
         ),
       ),
     );
