@@ -111,7 +111,10 @@ class _CalendarTab extends StatelessWidget {
                   },
                   child: Column(
                     children: [
-                      Text('${day.day}', style: TextStyle(color: Colors.white)),
+                      Text(
+                        '${day.day}',
+                        style: TextStyle(color: AppColors.text(context)),
+                      ),
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
@@ -226,7 +229,7 @@ class _ScheduleDialogContent extends StatelessWidget {
               onTap: () {
                 // 다이얼로그 끄기
                 context.pop();
-                context.push("/personal/detail");
+                context.push("/schedule/detail");
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(
