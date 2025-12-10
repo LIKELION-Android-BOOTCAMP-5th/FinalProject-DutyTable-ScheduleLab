@@ -7,8 +7,16 @@ enum ViewState { loading, success, error }
 
 class SharedCalendarViewModel extends ChangeNotifier {
   /// 공유 캘린더 목록 뷰모델
-  SharedCalendarViewModel() {
-    _init();
+  SharedCalendarViewModel({List<CalendarModel>? initialCalendars}) {
+    if (initialCalendars != null) {
+      // splash 화면에서 받아온 데이터 있을 때
+      _calendarResponse = initialCalendars;
+      _state = ViewState.success;
+    } else {
+      // splash 화면에서 받아온 데이터 없을 때
+      _state = ViewState.loading;
+      fetchCalendars();
+    }
   }
 
   /// 데이터 로딩 상태(private)
@@ -37,6 +45,21 @@ class SharedCalendarViewModel extends ChangeNotifier {
 
   final String currentUserId =
       SupabaseManager.shared.supabase.auth.currentUser?.id ?? "";
+
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_isDisposed) {
+      super.notifyListeners();
+    }
+  }
 
   void toggleDeleteMode() {
     deleteMode = !deleteMode;
@@ -69,28 +92,29 @@ class SharedCalendarViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _init() {
-    fetchCalendars();
-  }
-
   void fetchCalendars() async {
-    // 로드 시작 시 상태를 loading으로 설정
+    if (_isDisposed) return;
+
     _state = ViewState.loading;
     notifyListeners();
 
     try {
       _calendarResponse = await CalendarDataSource.shared
           .fetchCalendarFinalList("group");
-      // 로드 성공 시 상태를 success로 설정
+
+      if (_isDisposed) return;
+
       _state = ViewState.success;
     } catch (e) {
-      // 로드 실패 시 상태를 error로 설정
+      if (_isDisposed) return;
+
       _state = ViewState.error;
       _errorMessage = e.toString();
-      // 오류 디버깅을 위해 콘솔에 출력
       debugPrint("Error loading calendars: $e");
     } finally {
-      notifyListeners();
+      if (!_isDisposed) {
+        notifyListeners();
+      }
     }
   }
 }

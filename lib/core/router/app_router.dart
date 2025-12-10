@@ -66,10 +66,19 @@ GoRouter createRouter(BuildContext context) {
       ShellRoute(
         builder: (_, _, child) => AppShell(child: child),
         routes: [
-          // 공유 캘린더
+          // 📢 **수정된 부분: SplashScreen에서 전달된 데이터를 SharedCalendarListScreen에 전달**
           GoRoute(
             path: '/shared',
-            builder: (_, __) => const SharedCalendarListScreen(),
+            builder: (context, state) {
+              // SplashScreen에서 context.go('/shared', extra: {'sharedCalendars': data})로 전달됨
+              final extra = state.extra as Map<String, dynamic>?;
+              final List<CalendarModel>? initialCalendars =
+                  extra?['sharedCalendars'] as List<CalendarModel>?;
+
+              return SharedCalendarListScreen(
+                initialCalendars: initialCalendars,
+              );
+            },
             routes: [
               GoRoute(
                 path: "add",

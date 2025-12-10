@@ -1,4 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,13 +9,16 @@ import '../../../../../core/widgets/logo_actions_app_bar.dart';
 import '../../widgets/calendar_card.dart';
 
 class SharedCalendarListScreen extends StatelessWidget {
-  const SharedCalendarListScreen({super.key});
+  final List<CalendarModel>? initialCalendars;
+
+  const SharedCalendarListScreen({super.key, this.initialCalendars});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SharedCalendarViewModel(),
-      child: _SharedCalendarListScreen(),
+      create: (_) =>
+          SharedCalendarViewModel(initialCalendars: initialCalendars),
+      child: const _SharedCalendarListScreen(),
     );
   }
 }
@@ -40,7 +44,7 @@ class _SharedCalendarListScreen extends StatelessWidget {
           child: Text(
             "데이터 로드 실패: ${viewModel.errorMessage ?? '알 수 없는 오류'}",
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.red),
+            style: const TextStyle(color: Colors.red),
           ),
         );
         break;
@@ -61,9 +65,7 @@ class _SharedCalendarListScreen extends StatelessWidget {
               return CalendarCard(
                 title: calendar.title,
                 deleteMode: viewModel.deleteMode,
-                isAdmin:
-                    viewModel.calendarResponse?[index].user_id ==
-                    viewModel.currentUserId,
+                isAdmin: calendar.user_id == viewModel.currentUserId,
                 members: calendar.calendarMemberModel?.length ?? 0,
                 isSelected: viewModel.isSelected(calendar.id.toString()),
                 onChangeSelected: () =>
@@ -80,9 +82,9 @@ class _SharedCalendarListScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: LogoActionsAppBar(
-        leftActions: const _LeftActions(),
-        rightActions: const _RightActions(),
+      appBar: const LogoActionsAppBar(
+        leftActions: _LeftActions(),
+        rightActions: _RightActions(),
       ),
       body: SafeArea(
         child: Padding(
@@ -137,10 +139,10 @@ class _RightActions extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () => viewModel.cancelDeleteMode(),
-                child: Text("취소"),
+                child: const Text("취소"),
               ),
               const SizedBox(width: 16),
-              Text("삭제"),
+              const Text("삭제"),
             ],
           )
         : Row(
