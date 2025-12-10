@@ -27,9 +27,6 @@ class CustomDialog extends StatelessWidget {
   /// 뷰모델 호출
   final onChangeSelected;
 
-  /// 버튼 선택 시 경로
-  final goto;
-
   ///더 추가할 위젯
   Widget? announcement;
 
@@ -44,7 +41,6 @@ class CustomDialog extends StatelessWidget {
     this.message,
     this.allow,
     this.onChangeSelected,
-    this.goto,
     this.announcement,
   });
 
@@ -97,34 +93,39 @@ class CustomDialog extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         context.pop();
                       },
-                      child: Text("   취소   ", style: TextStyle(fontSize: 12)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFF3F4F6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Color(0xFFF3F4F6),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(13.0),
+                          child: Text(
+                            "   취소   ",
+                            style: TextStyle(fontSize: 12),
+                          ),
                         ),
                       ),
                     ),
                     Padding(padding: EdgeInsets.all(10)),
-                    ElevatedButton(
-                      onPressed: () {
-                        onChanged:
-                        (_) => onChangeSelected();
-                        context.pop();
-                        context.push(goto);
-                      },
-                      child: Text(
-                        allow,
-                        style: TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    GestureDetector(
+                      onTap: () => onChangeSelected(),
+                      child: Container(
+                        // color: Colors.red,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Colors.red,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(13.0),
+                          child: Text(
+                            allow,
+                            style: TextStyle(color: Colors.white, fontSize: 12),
+                          ),
                         ),
                       ),
                     ),

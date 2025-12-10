@@ -46,8 +46,11 @@ class _ProfileScreen extends StatelessWidget {
                     title: "로그아웃",
                     message: "정말 로그아웃 하시겠습니까?",
                     allow: "로그아웃",
-                    onChangeSelected: () => viewModel.logout(),
-                    goto: '/login',
+                    onChangeSelected: () => {
+                      viewModel.logout(),
+                      context.pop(),
+                      context.push('/login'),
+                    },
                   ),
                 );
               },
@@ -311,7 +314,6 @@ class _ProfileScreen extends StatelessWidget {
                           title: "회원탈퇴",
                           message: "정말 회원탈퇴 하시겠습니까?",
                           allow: "회원탈퇴",
-                          goto: '/login',
                           announcement: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
@@ -331,6 +333,10 @@ class _ProfileScreen extends StatelessWidget {
                               ),
                             ),
                           ),
+                          onChangeSelected: () => {
+                            context.pop(),
+                            context.push('/login'),
+                          },
                         ),
                       );
                     },
