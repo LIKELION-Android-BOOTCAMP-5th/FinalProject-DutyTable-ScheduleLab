@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 /// 스케쥴 뷰모델
 class ScheduleViewModel extends ChangeNotifier {
-  /// 불러온 일정 리스트(local)
+  /// 불러온 일정 리스트(private)
   List<Task> _tasks = [];
 
   /// 불러온 일정 리스트(public)
   List<Task> get tasks => _tasks;
 
-  /// 일정 날짜만 담을 리스트(local)
+  /// 일정 날짜만 담을 리스트(private)
   List<DateTime?> _tasksDate = [];
 
   /// 일정 날짜만 담을 리스트(public)
@@ -21,7 +21,7 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 필터 드롭다운 버튼 종료 년도
   static const int endYear = 2100;
 
-  /// 필터 드롭다운 연도 리스트(local)
+  /// 필터 드롭다운 연도 리스트(private)
   List<int> _filterYears = [];
 
   /// 필터 드롭다운 연도 리스트(public)
@@ -30,7 +30,7 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 선택된 필터 드롭다운 연도
   int? selectedFilterYears;
 
-  /// 필터 드롭다운 월 리스트(local)
+  /// 필터 드롭다운 월 리스트(private)
   List<int> _filterMonths = [];
 
   /// 필터 드롭다운 월 리스트(public)
@@ -39,7 +39,7 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 선택된 필터 드롭다운 월
   int? selectedFilterMonth;
 
-  /// 필터 드롭다운 컬러 리스트(local)
+  /// 필터 드롭다운 컬러 리스트(private)
   List<String> _filterColors = [];
 
   /// 필터 드롭다운 컬러 리스트(public)

@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/views/login_screen.dart';
 import '../../features/auth/presentation/views/signup_screen.dart';
 import '../../features/auth/presentation/views/splash_screen.dart';
+import '../../features/calendar/data/models/calendar_model.dart';
 import '../../features/calendar/presentation/views/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/shared_calendar_list_screen.dart';
 import 'app_shell.dart';
@@ -35,12 +36,25 @@ GoRouter createRouter(BuildContext context) {
 
       GoRoute(
         path: '/calendar/setting',
-        builder: (_, __) => const CalendarSettingScreen(),
+        builder: (context, state) {
+          // 1. extra에서 데이터 추출 및 캐스팅 (CalendarModel 타입으로)
+          final CalendarModel? calendarData = state.extra as CalendarModel?;
+
+          // 2. CalendarSettingView에 데이터를 전달하여 ViewModel 초기화에 사용
+          // 데이터를 받은 View를 리턴합니다.
+          return CalendarSettingScreen(initialCalendarData: calendarData);
+        },
       ),
 
       GoRoute(
         path: '/calendar/edit',
-        builder: (_, __) => const CalendarEditScreen(),
+        builder: (context, state) {
+          // 1. extra에서 데이터 추출 및 캐스팅 (CalendarModel 타입으로)
+          final CalendarModel? calendarData = state.extra as CalendarModel?;
+          // 2. CalendarSettingView에 데이터를 전달하여 ViewModel 초기화에 사용
+          // 데이터를 받은 View를 리턴합니다.
+          return CalendarEditScreen(initialCalendarData: calendarData);
+        },
       ),
 
       // 공유 캘린더 - 알림

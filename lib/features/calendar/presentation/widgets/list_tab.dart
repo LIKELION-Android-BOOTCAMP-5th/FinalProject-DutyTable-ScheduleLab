@@ -19,7 +19,7 @@ class ListTab extends StatelessWidget {
 }
 
 class _ListTab extends StatelessWidget {
-  /// 리스트 탭(local)
+  /// 리스트 탭(private)
   const _ListTab({super.key});
 
   @override
