@@ -1,4 +1,3 @@
-import 'package:dutytable/features/auth/presentation/views/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,7 +6,9 @@ import '../widgets/onboarding_indicator.dart';
 import '../widgets/onboarding_page_item.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final VoidCallback onFinished;
+
+  const OnboardingScreen({super.key, required this.onFinished});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -43,10 +44,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _goToLogin() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool("isOnboardingDone", true);
-
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
+    widget.onFinished();
   }
 
   @override
