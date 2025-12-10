@@ -6,19 +6,6 @@ import 'package:flutter/material.dart';
 enum ViewState { loading, success, error }
 
 class SharedCalendarViewModel extends ChangeNotifier {
-  /// 공유 캘린더 목록 뷰모델
-  SharedCalendarViewModel({List<CalendarModel>? initialCalendars}) {
-    if (initialCalendars != null) {
-      // splash 화면에서 받아온 데이터 있을 때
-      _calendarResponse = initialCalendars;
-      _state = ViewState.success;
-    } else {
-      // splash 화면에서 받아온 데이터 없을 때
-      _state = ViewState.loading;
-      fetchCalendars();
-    }
-  }
-
   /// 데이터 로딩 상태(private)
   ViewState _state = ViewState.loading;
 
@@ -32,6 +19,8 @@ class SharedCalendarViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   bool deleteMode = false;
+
+  //TODO: 민석님 확인 해주세요
   bool isAdmin = false;
 
   /// 선택된 카드 id들
@@ -47,6 +36,19 @@ class SharedCalendarViewModel extends ChangeNotifier {
       SupabaseManager.shared.supabase.auth.currentUser?.id ?? "";
 
   bool _isDisposed = false;
+
+  /// 공유 캘린더 목록 뷰모델
+  SharedCalendarViewModel({List<CalendarModel>? initialCalendars}) {
+    if (initialCalendars != null) {
+      // splash 화면에서 받아온 데이터 있을 때
+      _calendarResponse = initialCalendars;
+      _state = ViewState.success;
+    } else {
+      // splash 화면에서 받아온 데이터 없을 때
+      _state = ViewState.loading;
+      fetchCalendars();
+    }
+  }
 
   @override
   void dispose() {
@@ -87,11 +89,13 @@ class SharedCalendarViewModel extends ChangeNotifier {
     return selectedIds.contains(id);
   }
 
+  //TODO: 민석님 확인 해주세요
   void setAdmin(bool value) {
     isAdmin = value;
     notifyListeners();
   }
 
+  /// 캘린더 목록 가져오기
   void fetchCalendars() async {
     if (_isDisposed) return;
 
