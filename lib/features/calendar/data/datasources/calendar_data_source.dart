@@ -1,7 +1,6 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
+import 'package:flutter/foundation.dart'; // debugPrint를 위해 추가
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../../main.dart';
 import '../models/calendar_member_model.dart';
@@ -12,22 +11,34 @@ class CalendarDataSource {
   static final CalendarDataSource _shared = CalendarDataSource();
   static CalendarDataSource get shared => _shared;
 
-  /// supabase apiKey
-  static final apiKey = dotenv.env['SUPABASE_ANON_KEY']!;
+  static const String _baseUrl = 'https://eexkppotdipyrzzjakur.supabase.co';
 
-  /// 개인 캘린더 정보 가져오기
+  static final String apiKey = dotenv.env['SUPABASE_ANON_KEY']!;
+
+  // 인스턴스 초기화
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: _baseUrl,
+      headers: {'apikey': apiKey, 'Content-Type': 'application/json'},
+    ),
+  );
+
+  /// 개인 캘린더 가져오기
   Future<CalendarModel> fetchPersonalCalendar() async {
     final userId = supabase.auth.currentUser?.id ?? "";
 
-    final response = await http.get(
-      Uri.parse(
-        'https://eexkppotdipyrzzjakur.supabase.co/rest/v1/calendars?select=*,calendars_user_id_fkey(nickname)&user_id=eq.$userId&type=eq.personal&limit=1',
-      ),
-      headers: {'apikey': apiKey},
+    final response = await _dio.get(
+      '/rest/v1/calendars',
+      queryParameters: {
+        'select': '*,calendars_user_id_fkey(nickname)',
+        'user_id': 'eq.$userId',
+        'type': 'eq.personal',
+        'limit': 1,
+      },
     );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
+    if (response.statusCode == 200 && response.data is List) {
+      final List<dynamic> jsonData = response.data;
 
       if (jsonData.isNotEmpty) {
         return CalendarModel.fromJson(jsonData.first as Map<String, dynamic>);
@@ -43,15 +54,16 @@ class CalendarDataSource {
   Future<List<CalendarMemberModel>?> fetchCalendarMembers(
     int calendarId,
   ) async {
-    final response = await http.get(
-      Uri.parse(
-        'https://eexkppotdipyrzzjakur.supabase.co/rest/v1/calendar_members?select=*,users(nickname)&calendar_id=eq.$calendarId',
-      ),
-      headers: {'apikey': apiKey},
+    final response = await _dio.get(
+      '/rest/v1/calendar_members',
+      queryParameters: {
+        'select': '*,users(nickname)',
+        'calendar_id': 'eq.$calendarId',
+      },
     );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
+    if (response.statusCode == 200 && response.data is List) {
+      final List<dynamic> jsonData = response.data;
 
       if (jsonData.isNotEmpty) {
         return jsonData.map((jsonItem) {
@@ -71,60 +83,67 @@ class CalendarDataSource {
   Future<List<CalendarModel>> fetchCalendarFinalList(String type) async {
     final userId = supabase.auth.currentUser?.id ?? "";
 
-    // 현재 유저가 포함된 캘린더 ID 목록 가져오기
-    final Uri filterUri = Uri.https(
-      'eexkppotdipyrzzjakur.supabase.co',
-      '/rest/v1/calendar_members',
-      {
-        'select': 'calendar_id,calendars(type)',
+    // 1단계: 현재 유저가 포함된 캘린더 ID 목록 가져오기
+    Response filterResponse;
+    try {
+      filterResponse = await _dio.get(
+        '/rest/v1/calendar_members',
+        queryParameters: {
+          'select': 'calendar_id,calendars(type)',
+          'user_id': 'eq.$userId',
+          'calendars.type': 'eq.$type',
+        },
+      );
+    } on DioException catch (e) {
+      debugPrint('1단계 DioException: ${e.message}');
+      throw Exception('Failed to filter calendar IDs: ${e.message}');
+    }
 
-        'user_id': 'eq.$userId',
-
-        'calendars.type': 'eq.$type',
-      },
-    );
-
-    final filterResponse = await http.get(
-      filterUri,
-      headers: {'apikey': apiKey},
-    );
-
-    if (filterResponse.statusCode != 200) {
+    if (filterResponse.statusCode != 200 || !(filterResponse.data is List)) {
       throw Exception(
-        'Failed to filter calendar IDs: Status ${filterResponse.statusCode}, Body: ${filterResponse.body}',
+        'Failed to filter calendar IDs: Status ${filterResponse.statusCode}, Body: ${filterResponse.data}',
       );
     }
 
-    final List<dynamic> idData = json.decode(filterResponse.body);
+    final List<dynamic> idData = filterResponse.data;
     if (idData.isEmpty) {
       return [];
     }
 
     final List<int> calendarIds = idData
-        .map((item) => item['calendar_id'] as int)
+        .map((item) => item['calendar_id'] as int?)
+        .whereType<int>()
         .toList();
+
+    if (calendarIds.isEmpty) {
+      return [];
+    }
     final String idsQuery = calendarIds.join(',');
 
-    // 필터링된 ID 목록으로 캘린더 기본 데이터 목록 가져오기
-    final Uri calendarUri =
-        Uri.https('eexkppotdipyrzzjakur.supabase.co', '/rest/v1/calendars', {
+    // 2단계: 필터링된 ID 목록으로 캘린더 기본 데이터 목록 가져오기
+    Response calendarResponse;
+    try {
+      calendarResponse = await _dio.get(
+        '/rest/v1/calendars',
+        queryParameters: {
           'select': '*,calendars_user_id_fkey(nickname)',
           'id': 'in.($idsQuery)',
           'type': 'eq.$type',
-        });
+        },
+      );
+    } on DioException catch (e) {
+      debugPrint('2단계 DioException: ${e.message}');
+      throw Exception('Failed to load calendars: ${e.message}');
+    }
 
-    final calendarResponse = await http.get(
-      calendarUri,
-      headers: {'apikey': apiKey},
-    );
-
-    if (calendarResponse.statusCode != 200) {
+    if (calendarResponse.statusCode != 200 ||
+        !(calendarResponse.data is List)) {
       throw Exception(
         'Failed to load calendars: Status ${calendarResponse.statusCode}',
       );
     }
 
-    final List<dynamic> calendarJsonData = json.decode(calendarResponse.body);
+    final List<dynamic> calendarJsonData = calendarResponse.data;
     final List<CalendarModel> calendars = calendarJsonData
         .map(
           (jsonItem) =>
@@ -132,7 +151,7 @@ class CalendarDataSource {
         )
         .toList();
 
-    // 각 캘린더의 멤버 목록을 비동기적으로 가져와 병합
+    // 3단계: 각 캘린더의 멤버 목록을 비동기적으로 가져와 병합
     final List<Future<List<CalendarMemberModel>?>> memberFutures = calendars
         .map((calendar) => fetchCalendarMembers(calendar.id))
         .toList();
