@@ -51,16 +51,9 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 캘린더 선택된 날짜
   DateTime selectedDay = DateTime.now();
 
-  /// 캘린더 날짜 선택
-  void changeSelectedDay(DateTime select) {
-    selectedDay = select;
-    notifyListeners();
-  }
-
   /// 앱 실행될 때
   /// 초기화 함수 실행
   ScheduleViewModel() {
-    // _initTasks();
     _init();
   }
 
@@ -76,18 +69,14 @@ class ScheduleViewModel extends ChangeNotifier {
     selectedFilterMonth = DateTime.now().month;
   }
 
+  /// 캘린더 날짜 선택
+  void changeSelectedDay(DateTime select) {
+    selectedDay = select;
+    notifyListeners();
+  }
+
   void selectedYear(int value) {
     selectedFilterYears = value;
     notifyListeners();
   }
-
-  // 앱 실행될 때 supabase에서 데이터 가져오는 함수
-  // Future<void> _initTasks() async {
-  //   _tasks = await SupabaseManager.shared.fetchTasks();
-  //   _tasksDate = _tasks.map((e) {
-  //     return e.started_at?.toDateOnlyDateTimeOrNull();
-  //   }).toList();
-  //
-  //   notifyListeners();
-  // }
 }
