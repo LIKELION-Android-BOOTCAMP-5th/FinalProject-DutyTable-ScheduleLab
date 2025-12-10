@@ -51,6 +51,7 @@ class _ProfileScreen extends StatelessWidget {
                       context.pop(),
                       context.push('/login'),
                     },
+                    onClosed: () => context.pop(),
                   ),
                 );
               },
@@ -337,6 +338,7 @@ class _ProfileScreen extends StatelessWidget {
                             context.pop(),
                             context.push('/login'),
                           },
+                          onClosed: () => context.pop(),
                         ),
                       );
                     },

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 /// 다이얼로그
 class CustomDialog extends StatelessWidget {
@@ -24,6 +23,8 @@ class CustomDialog extends StatelessWidget {
   /// 확인버튼
   final allow;
 
+  final onClosed;
+
   /// 뷰모델 호출
   final onChangeSelected;
 
@@ -42,6 +43,7 @@ class CustomDialog extends StatelessWidget {
     this.allow,
     this.onChangeSelected,
     this.announcement,
+    this.onClosed,
   });
 
   @override
@@ -94,9 +96,7 @@ class CustomDialog extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        context.pop();
-                      },
+                      onTap: () => onClosed(),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10.0),
