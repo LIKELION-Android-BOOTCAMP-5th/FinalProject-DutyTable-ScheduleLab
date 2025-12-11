@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 extension NullableStringDateExtensions on String? {
   DateTime? toDateTimeOrNull() {
     if (this == null || this!.isEmpty) {
@@ -66,26 +64,5 @@ extension StringToDateTime on String {
   // "2022-10-23T00:00:00".toDateTime()
   DateTime toDateTime() {
     return DateTime.parse(this);
-  }
-}
-
-extension HexColorExtension on String {
-  Color toColor() {
-    String cleanString = this;
-
-    if (cleanString.startsWith('0x') || cleanString.startsWith('0X')) {
-      cleanString = cleanString.substring(2);
-    } else if (cleanString.startsWith('#')) {
-      cleanString = cleanString.substring(1);
-    }
-
-    if (cleanString.length == 6) {
-      cleanString = 'FF$cleanString';
-    }
-
-    final int parsedColorInt =
-        int.tryParse(cleanString, radix: 16) ?? 0xFFE0E0E0;
-
-    return Color(parsedColorInt);
   }
 }

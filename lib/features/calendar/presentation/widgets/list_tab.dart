@@ -1,4 +1,3 @@
-import 'package:dutytable/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -215,7 +214,6 @@ class CustomScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color scheduleColor = color.toColor();
     return Container(
       decoration: BoxDecoration(
         border: Border.all(width: 2, color: const Color(0xFFE5E7EB)),
@@ -233,7 +231,7 @@ class CustomScheduleCard extends StatelessWidget {
                 width: 6,
                 height: double.maxFinite,
                 decoration: BoxDecoration(
-                  color: scheduleColor,
+                  color: Color(int.parse(color)),
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
