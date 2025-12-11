@@ -1,5 +1,4 @@
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
-import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calendar_tab.dart';
@@ -64,9 +63,7 @@ class _SharedCalendarScreen extends StatelessWidget {
               // 탭 갯수
               tabLength: viewModel.tabLength,
               // 각 탭의 이름 리스트
-              tabNameList: viewModel.tabNames
-                  .map((e) => Tab(child: Text(e)))
-                  .toList(),
+              tabNameList: viewModel.tabNames.map((e) => e).toList(),
               // 각 탭에 들어갈 위젯 리스트
               tabViewWidgetList: [
                 // 캘린더 탭

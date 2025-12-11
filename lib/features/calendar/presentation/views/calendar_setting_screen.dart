@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/configs/app_colors.dart';
 import '../../../../core/widgets/custom_confirm_dialog.dart';
 import '../../data/models/calendar_model.dart';
 import '../widgets/chat_tab.dart';
@@ -177,7 +178,7 @@ class _CalendarSettingScreen extends StatelessWidget {
                                             showCustomConfirmationDialog(
                                               context,
                                               content: "추방하시겠습니까?",
-                                              color: Colors.red,
+                                              color: AppColors.commonRed,
                                               onConfirm: () => print("확인"),
                                             );
                                             print("추방");
@@ -185,7 +186,7 @@ class _CalendarSettingScreen extends StatelessWidget {
                                           child: Container(
                                             decoration: BoxDecoration(
                                               border: Border.all(
-                                                color: Colors.red,
+                                                color: AppColors.commonRed,
                                               ),
                                               borderRadius:
                                                   BorderRadiusGeometry.circular(
@@ -200,7 +201,7 @@ class _CalendarSettingScreen extends StatelessWidget {
                                                 child: Text(
                                                   "추방",
                                                   style: TextStyle(
-                                                    color: Colors.red,
+                                                    color: AppColors.commonRed,
                                                   ),
                                                 ),
                                               ),
@@ -251,24 +252,27 @@ class _CalendarSettingScreen extends StatelessWidget {
                           showCustomConfirmationDialog(
                             context,
                             content: "캘린더를 삭제하시겠습니까?",
-                            color: Colors.red,
+                            color: AppColors.commonRed,
                             onConfirm: () {
                               print("확인 눌림");
                             },
                           );
                         },
                         child: BottomAppBar(
-                          color: Colors.red,
+                          color: AppColors.commonRed,
                           height: 52,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.delete_outline, color: Colors.white),
+                              Icon(
+                                Icons.delete_outline,
+                                color: AppColors.commonWhite,
+                              ),
                               Text(
                                 "캘린더 삭제",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: AppColors.commonWhite,
                                 ),
                               ),
                             ],
