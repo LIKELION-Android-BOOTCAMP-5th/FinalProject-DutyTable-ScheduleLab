@@ -92,7 +92,6 @@ class ScheduleViewModel extends ChangeNotifier {
       _schedules = await ScheduleDataSource.shared.fetchSchedules(calendarId);
 
       _scheduleDate = _schedules.map((e) => e.startedAt.toPureDate()).toList();
-      print(_scheduleDate);
       notifyListeners();
     } catch (e) {
       debugPrint("❌ fetchSchedules error: $e");
