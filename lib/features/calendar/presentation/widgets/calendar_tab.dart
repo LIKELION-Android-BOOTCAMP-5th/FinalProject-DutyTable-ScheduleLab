@@ -115,7 +115,7 @@ class _CalendarTab extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Color(schedule.colorValue),
+                                color: Color(int.parse(schedule.colorValue)),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
