@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -300,7 +301,10 @@ class _ProfileScreen extends StatelessWidget {
                       Padding(padding: EdgeInsets.all(5)),
                       //온보딩 다시보기
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool("isOnboardingDone", false);
+                          viewModel.logout();
                           context.push("/login");
                         },
                         child: CustomTab(
