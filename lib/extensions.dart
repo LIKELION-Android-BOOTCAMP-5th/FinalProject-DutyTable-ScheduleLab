@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 extension NullableStringDateExtensions on String? {
   DateTime? toDateTimeOrNull() {
     if (this == null || this!.isEmpty) {
@@ -64,5 +66,37 @@ extension StringToDateTime on String {
   // "2022-10-23T00:00:00".toDateTime()
   DateTime toDateTime() {
     return DateTime.parse(this);
+  }
+}
+
+extension HexColorExtension on String {
+  /// 문자열을 ARGB int 값으로 변환하여 Color 객체를 반환합니다.
+  ///
+  /// - '0x' 접두사나 '#' 접두사가 있다면 제거합니다.
+  /// - 길이가 6자리(RRGGBB)면 불투명도(FF)를 추가합니다.
+  /// - 변환 실패 시 기본값 (0xFFE0E0E0)을 반환합니다.
+  Color toColor() {
+    String cleanString = this;
+
+    // 1. 0x 또는 # 접두사 제거 (DB에 0x, 웹에서는 #을 많이 사용)
+    if (cleanString.startsWith('0x') || cleanString.startsWith('0X')) {
+      cleanString = cleanString.substring(2);
+    } else if (cleanString.startsWith('#')) {
+      cleanString = cleanString.substring(1);
+    }
+
+    // 2. 길이가 6(RGB)이면 FF (불투명) 추가
+    // 이 로직은 필수적입니다. Flutter Color 생성자는 32비트 ARGB를 요구합니다.
+    if (cleanString.length == 6) {
+      cleanString = 'FF$cleanString';
+    }
+
+    // 3. 16진수 파싱 (tryParse를 사용하여 오류 방지 및 기본값 제공)
+    // 파싱 실패 또는 문자열이 비어있을 경우 0xFFE0E0E0 (연한 회색) 반환
+    final int parsedColorInt =
+        int.tryParse(cleanString, radix: 16) ?? 0xFFE0E0E0;
+
+    // 4. Color 객체 반환
+    return Color(parsedColorInt);
   }
 }

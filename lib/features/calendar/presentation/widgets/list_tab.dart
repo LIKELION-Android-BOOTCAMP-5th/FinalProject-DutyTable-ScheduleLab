@@ -1,4 +1,6 @@
+import 'package:dutytable/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/custom_floatingactionbutton.dart';
@@ -123,9 +125,15 @@ class _ListTab extends StatelessWidget {
                     vertical: 8.0,
                   ),
                   child: ListView.separated(
-                    itemCount: 10,
+                    itemCount: viewModel.schedules.length,
                     itemBuilder: (context, index) {
-                      return CustomScheduleCard();
+                      return CustomScheduleCard(
+                        emoji: viewModel.schedules[index].emotionTag ?? "",
+                        title: viewModel.schedules[index].title,
+                        color: viewModel.schedules[index].colorValue,
+                        startedAt: viewModel.schedules[index].startedAt,
+                        endedAt: viewModel.schedules[index].endedAt,
+                      );
                     },
                     separatorBuilder: (context, index) {
                       return const SizedBox(height: 12.0);
@@ -189,14 +197,28 @@ class CustomDropdownButton extends StatelessWidget {
 }
 
 class CustomScheduleCard extends StatelessWidget {
+  final String emoji;
+  final String title;
+  final String color;
+  final DateTime startedAt;
+  final DateTime endedAt;
+
   /// 커스텀 일정 카드 UI
-  const CustomScheduleCard({super.key});
+  const CustomScheduleCard({
+    super.key,
+    required this.emoji,
+    required this.title,
+    required this.color,
+    required this.startedAt,
+    required this.endedAt,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final Color scheduleColor = color.toColor();
     return Container(
       decoration: BoxDecoration(
-        border: BoxBorder.all(width: 2, color: Color(0xFFE5E7EB)),
+        border: Border.all(width: 2, color: const Color(0xFFE5E7EB)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
@@ -211,19 +233,19 @@ class CustomScheduleCard extends StatelessWidget {
                 width: 6,
                 height: double.maxFinite,
                 decoration: BoxDecoration(
-                  color: Colors.green,
+                  color: scheduleColor,
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
-              Text("😎", style: TextStyle(fontSize: 28)),
+              Text(emoji, style: TextStyle(fontSize: 28)),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("운동", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
                     Text(
-                      "2025년 12월 4일 · 09:00 ~ 18:00",
+                      formatScheduleDate(startedAt, endedAt),
                       style: TextStyle(
                         color: Colors.grey,
                         overflow: TextOverflow.ellipsis,
@@ -239,5 +261,36 @@ class CustomScheduleCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String formatScheduleDate(DateTime startedAt, DateTime endedAt) {
+  final start = startedAt;
+  final end = endedAt;
+
+  // '년 월 일' 포맷터 (예: 2025년 12월 4일)
+  final dateFormat = DateFormat('yyyy년 M월 d일', 'ko_KR');
+  // '시:분' 포맷터 (예: 09:00)
+  final timeFormat = DateFormat('HH:mm');
+
+  // 1. 시작일과 종료일이 같은 날짜인지 확인합니다.
+  final isSameDay =
+      start.year == end.year &&
+      start.month == end.month &&
+      start.day == end.day;
+
+  if (isSameDay) {
+    // 2. 같은 날짜일 경우: '2025년 12월 4일 · 09:00 ~ 18:00' 형식
+    final datePart = dateFormat.format(start);
+    final startTimePart = timeFormat.format(start);
+    final endTimePart = timeFormat.format(end);
+
+    return '$datePart · $startTimePart ~ $endTimePart';
+  } else {
+    // 3. 다른 날짜일 경우: '2025년 12월 4일 · 2025년 12월 5일' 형식
+    final startDatePart = dateFormat.format(start);
+    final endDatePart = dateFormat.format(end);
+
+    return '$startDatePart · $endDatePart';
   }
 }
