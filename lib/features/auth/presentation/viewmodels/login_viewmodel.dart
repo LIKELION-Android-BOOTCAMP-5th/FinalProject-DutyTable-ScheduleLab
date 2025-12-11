@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -31,14 +32,24 @@ class LoginViewModel extends ChangeNotifier {
     try {
       // 구글 로그인 시 요청할 권한 범위
       final scopes = ['email', 'profile'];
+      final String? platformClientId;
+
+      if (Platform.isIOS) {
+        platformClientId =
+            '174693600398-kt7o6r2jne782tkfbna9g5sl9b72vdjm.apps.googleusercontent.com';
+      } else if (Platform.isAndroid) {
+        platformClientId =
+            '174693600398-dnhnb2j1l6bhkl2g3r1goj7lcj3e53d8.apps.googleusercontent.com';
+      } else {
+        platformClientId = null;
+      }
 
       // 구글 로그인 인스턴스 생성 및 초기화
       final googleSignIn = GoogleSignIn.instance;
       await googleSignIn.initialize(
         serverClientId:
             '174693600398-vng406q0u208sbnonb5hc3va8u9384u9.apps.googleusercontent.com',
-        clientId:
-            '174693600398-dnhnb2j1l6bhkl2g3r1goj7lcj3e53d8.apps.googleusercontent.com',
+        clientId: platformClientId,
       );
 
       // 구글 인증 UI를 통해 사용자 계정 정보 가져오기
@@ -83,6 +94,7 @@ class LoginViewModel extends ChangeNotifier {
       // 로그인 후 프로필 확인 및 화면 이동 로직 처리
       await _handlePostSignIn(context);
     } catch (e) {
+      // TODO: 나중에 스낵바 제거
       // 오류 발생 시 스낵바로 오류 메시지 표시
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,6 +103,7 @@ class LoginViewModel extends ChangeNotifier {
             backgroundColor: Colors.red,
           ),
         );
+        GoRouter.of(context).pop();
       }
     } finally {
       // 로딩 인디케이터 닫기
