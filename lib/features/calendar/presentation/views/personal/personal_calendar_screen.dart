@@ -59,9 +59,9 @@ class _PersonalCalendarScreen extends StatelessWidget {
           // 각 탭에 들어갈 위젯 리스트
           tabViewWidgetList: [
             // 캘린더 탭
-            CalendarTab(calendarResponse: viewModel.calendarResponse!),
+            CalendarTab(calendar: viewModel.calendar!),
             // 리스트 탭
-            ListTab(calendarResponse: viewModel.calendarResponse!),
+            ListTab(calendar: viewModel.calendar!),
             // 채팅 탭
             ChatTab(),
           ],
@@ -84,7 +84,7 @@ class _PersonalCalendarScreen extends StatelessWidget {
               onTap: () => context.push(
                 "/calendar/setting",
                 // 캘린더 데이터 함께 보냄
-                extra: viewModel.calendarResponse,
+                extra: viewModel.calendar,
               ),
             ),
           ],

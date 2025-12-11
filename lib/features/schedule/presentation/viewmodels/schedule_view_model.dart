@@ -9,7 +9,8 @@ import '../../../calendar/data/models/calendar_model.dart';
 /// 스케쥴 뷰모델
 class ScheduleViewModel extends ChangeNotifier {
   /// 현재 캘린더 데이터
-  final CalendarModel? calendarResponse;
+  final CalendarModel? _calendar;
+  CalendarModel? get calendar => _calendar;
 
   final String _currentUserId =
       SupabaseManager.shared.supabase.auth.currentUser?.id ?? "";
@@ -73,7 +74,8 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 앱 실행될 때
   /// 초기화 함수 실행
-  ScheduleViewModel({this.calendarResponse}) {
+  ScheduleViewModel({CalendarModel? calendar}) : _calendar = calendar {
+    // 매개변수 이름을 받은 후 _calendar에 할당
     _init();
   }
 
@@ -129,17 +131,23 @@ class ScheduleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 캘린더 목록 가져오기
+  /// 일정 목록 가져오기
   void fetchSchedules() async {
-    try {
-      _schedules = await ScheduleDataSource.shared.fetchSchedules(
-        calendarResponse?.id ?? 0,
-      );
+    if (_calendar == null) {
+      return;
+    } else {
+      try {
+        _schedules = await ScheduleDataSource.shared.fetchSchedules(
+          _calendar.id,
+        );
 
-      _scheduleDate = _schedules.map((e) => e.startedAt.toPureDate()).toList();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("❌ fetchSchedules error: $e");
+        _scheduleDate = _schedules
+            .map((e) => e.startedAt.toPureDate())
+            .toList();
+        notifyListeners();
+      } catch (e) {
+        debugPrint("❌ fetchSchedules error: $e");
+      }
     }
   }
 }

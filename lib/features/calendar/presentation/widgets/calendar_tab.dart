@@ -10,17 +10,16 @@ import '../../../../core/widgets/custom_floatingactionbutton.dart';
 import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
 
 class CalendarTab extends StatelessWidget {
-  final CalendarModel? calendarResponse;
+  final CalendarModel? calendar;
 
   /// 캘린더 탭(provider 주입)
-  const CalendarTab({super.key, required this.calendarResponse});
+  const CalendarTab({super.key, required this.calendar});
 
   @override
   Widget build(BuildContext context) {
     // 스케쥴 뷰모델 주입
     return ChangeNotifierProvider(
-      create: (context) =>
-          ScheduleViewModel(calendarResponse: calendarResponse),
+      create: (context) => ScheduleViewModel(calendar: calendar),
       child: _CalendarTab(),
     );
   }

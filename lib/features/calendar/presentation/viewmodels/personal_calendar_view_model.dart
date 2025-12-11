@@ -28,10 +28,10 @@ class PersonalCalendarViewModel extends ChangeNotifier {
   int get tabLength => _tabNames.length;
 
   /// 캘린더 데이터(private)
-  CalendarModel? _calendarResponse;
+  CalendarModel? _calendar;
 
   /// 캘린더 데이터(public)
-  CalendarModel? get calendarResponse => _calendarResponse;
+  CalendarModel? get calendar => _calendar;
 
   /// 개인 캘린더 뷰모델
   PersonalCalendarViewModel() {
@@ -47,8 +47,7 @@ class PersonalCalendarViewModel extends ChangeNotifier {
     _state = ViewState.loading;
     notifyListeners();
     try {
-      _calendarResponse = await CalendarDataSource.shared
-          .fetchPersonalCalendar();
+      _calendar = await CalendarDataSource.shared.fetchPersonalCalendar();
       _state = ViewState.success;
     } catch (e) {
       _state = ViewState.error;

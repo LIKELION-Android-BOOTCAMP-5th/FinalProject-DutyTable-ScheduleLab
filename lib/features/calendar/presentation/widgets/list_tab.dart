@@ -10,16 +10,15 @@ import '../../data/models/calendar_model.dart';
 
 /// 리스트 탭(Provider 주입)
 class ListTab extends StatelessWidget {
-  final CalendarModel? calendarResponse;
+  final CalendarModel? calendar;
 
-  const ListTab({super.key, this.calendarResponse});
+  const ListTab({super.key, this.calendar});
 
   @override
   Widget build(BuildContext context) {
     // 스케쥴 뷰모델 주입
     return ChangeNotifierProvider(
-      create: (context) =>
-          ScheduleViewModel(calendarResponse: calendarResponse),
+      create: (context) => ScheduleViewModel(calendar: calendar),
       child: _ListTab(),
     );
   }
@@ -109,8 +108,7 @@ class _ListTab extends StatelessWidget {
                       ],
                     ),
                     // TODO: 방장만 표시
-                    viewModel.calendarResponse?.user_id ==
-                            viewModel.currentUserId
+                    viewModel.calendar?.user_id == viewModel.currentUserId
                         ? viewModel.deleteMode
                               ? Row(
                                   children: [

@@ -12,16 +12,15 @@ import 'package:provider/provider.dart';
 
 class SharedCalendarScreen extends StatelessWidget {
   // 3단계 : 데이터 받기
-  final CalendarModel calendarResponse;
+  final CalendarModel calendar;
 
-  const SharedCalendarScreen({super.key, required this.calendarResponse});
+  const SharedCalendarScreen({super.key, required this.calendar});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SharedCalendarViewModel(
-        calendarResponse: calendarResponse,
-      ), // 4단계 : 뷰모델로 전달
+      create: (_) =>
+          SharedCalendarViewModel(calendar: calendar), // 4단계 : 뷰모델로 전달
       child: _SharedCalendarScreen(),
     );
   }
@@ -51,7 +50,7 @@ class _SharedCalendarScreen extends StatelessWidget {
                     onTap: () => context.push(
                       "/calendar/setting",
                       // 캘린더 데이터 함께 보냄
-                      extra: viewModel.calendarResponses,
+                      extra: viewModel.calendarList,
                     ),
                   ),
                 ],
@@ -69,13 +68,9 @@ class _SharedCalendarScreen extends StatelessWidget {
               // 각 탭에 들어갈 위젯 리스트
               tabViewWidgetList: [
                 // 캘린더 탭
-                CalendarTab(
-                  calendarResponse: viewModel.calendarResponse,
-                ), // 6단계 : 데이터 전달
+                CalendarTab(calendar: viewModel.calendar), // 6단계 : 데이터 전달
                 // 리스트 탭
-                ListTab(
-                  calendarResponse: viewModel.calendarResponse,
-                ), // 6단계 : 데이터 전달
+                ListTab(calendar: viewModel.calendar), // 6단계 : 데이터 전달
                 // 채팅 탭
                 ChatTab(),
               ],
