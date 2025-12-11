@@ -335,6 +335,7 @@ class _ProfileScreen extends StatelessWidget {
                             ),
                           ),
                           onChangeSelected: () => {
+                            viewModel.deleteUser(),
                             context.pop(),
                             context.push('/login'),
                           },
