@@ -234,4 +234,9 @@ class ProfileViewmodel extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     selectedOption = prefs.getString(user!.id)!;
   }
+
+  // 회원탈퇴
+  Future<void> deleteUser() async {
+    await supabase.from('users').delete().eq('id', user!.id);
+  }
 }
