@@ -41,11 +41,14 @@ class SharedCalendarViewModel extends ChangeNotifier {
   /// 선택된 카드 id들
   final Set<String> selectedIds = {};
 
-  /// 캘린더 데이터(private)
-  List<CalendarModel>? _calendarResponse;
+  /// 공유 캘린더 데이터 목록(private)
+  List<CalendarModel>? _calendarResponses;
 
-  /// 캘린더 데이터(public)
-  List<CalendarModel>? get calendarResponse => _calendarResponse;
+  /// 공유 캘린더 데이터 목록(public)
+  List<CalendarModel>? get calendarResponses => _calendarResponses;
+
+  CalendarModel? _calendarResponse;
+  CalendarModel? get calendarResponse => _calendarResponse;
 
   final String currentUserId =
       SupabaseManager.shared.supabase.auth.currentUser?.id ?? "";
@@ -53,10 +56,17 @@ class SharedCalendarViewModel extends ChangeNotifier {
   bool _isDisposed = false;
 
   /// 공유 캘린더 목록 뷰모델
-  SharedCalendarViewModel({List<CalendarModel>? initialCalendars}) {
+  SharedCalendarViewModel({
+    List<CalendarModel>? initialCalendars,
+    CalendarModel? calendarResponse,
+  }) {
+    if (calendarResponse != null) {
+      // 5단계 : 데이터 받아서 입력
+      _calendarResponse = calendarResponse;
+    }
     if (initialCalendars != null) {
       // splash 화면에서 받아온 데이터 있을 때
-      _calendarResponse = initialCalendars;
+      _calendarResponses = initialCalendars;
       _state = ViewState.success;
     } else {
       // splash 화면에서 받아온 데이터 없을 때
@@ -119,7 +129,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _calendarResponse = await CalendarDataSource.shared
+      _calendarResponses = await CalendarDataSource.shared
           .fetchCalendarFinalList("group");
 
       if (_isDisposed) return;

@@ -89,8 +89,13 @@ GoRouter createRouter(BuildContext context) {
               GoRoute(
                 path: "schedule",
                 builder: (context, state) {
-                  final int calendarId = state.extra as int;
-                  return SharedCalendarScreen(calendarId: calendarId);
+                  // 2단계 : 데이터랑 같이 라우팅
+                  final CalendarModel calendarResponse =
+                      state.extra as CalendarModel;
+
+                  return SharedCalendarScreen(
+                    calendarResponse: calendarResponse,
+                  );
                 },
               ),
             ],

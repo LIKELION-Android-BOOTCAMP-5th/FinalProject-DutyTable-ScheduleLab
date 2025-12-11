@@ -8,8 +8,6 @@ import '../../../calendar/data/models/calendar_model.dart';
 
 /// 스케쥴 뷰모델
 class ScheduleViewModel extends ChangeNotifier {
-  final int? calendarId;
-
   /// 현재 캘린더 데이터
   final CalendarModel? calendarResponse;
 
@@ -75,7 +73,7 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 앱 실행될 때
   /// 초기화 함수 실행
-  ScheduleViewModel({this.calendarId, this.calendarResponse}) {
+  ScheduleViewModel({this.calendarResponse}) {
     _init();
   }
 
