@@ -61,7 +61,7 @@ class _PersonalCalendarScreen extends StatelessWidget {
             // 캘린더 탭
             CalendarTab(calendarId: viewModel.calendarResponse!.id),
             // 리스트 탭
-            ListTab(calendarId: viewModel.calendarResponse!.id),
+            ListTab(calendarResponse: viewModel.calendarResponse!),
             // 채팅 탭
             ChatTab(),
           ],

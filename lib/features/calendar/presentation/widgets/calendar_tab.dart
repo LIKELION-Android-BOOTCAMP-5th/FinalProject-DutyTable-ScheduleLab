@@ -18,7 +18,7 @@ class CalendarTab extends StatelessWidget {
   Widget build(BuildContext context) {
     // 스케쥴 뷰모델 주입
     return ChangeNotifierProvider(
-      create: (context) => ScheduleViewModel(calendarId),
+      create: (context) => ScheduleViewModel(calendarId: calendarId),
       child: _CalendarTab(),
     );
   }

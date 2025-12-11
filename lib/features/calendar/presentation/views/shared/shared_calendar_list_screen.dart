@@ -67,7 +67,6 @@ class _SharedCalendarListScreen extends StatelessWidget {
                 onTap: () =>
                     context.push("/shared/schedule", extra: calendar.id),
                 child: CalendarCard(
-                  calendarId: calendar.id,
                   imageUrl: calendar.imageURL,
                   title: calendar.title,
                   deleteMode: viewModel.deleteMode,
