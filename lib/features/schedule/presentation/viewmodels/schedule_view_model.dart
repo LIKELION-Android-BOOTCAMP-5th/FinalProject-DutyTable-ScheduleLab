@@ -1,12 +1,20 @@
 import 'package:dutytable/extensions.dart';
 import 'package:dutytable/features/schedule/datasources/schedule_data_source.dart';
 import 'package:dutytable/features/schedule/models/schedule_model.dart';
+import 'package:dutytable/supabase_manager.dart';
 import 'package:flutter/material.dart';
+
+import '../../../calendar/data/models/calendar_model.dart';
 
 /// 스케쥴 뷰모델
 class ScheduleViewModel extends ChangeNotifier {
-  /// 캘린더 아이디
-  final int calendarId;
+  /// 현재 캘린더 데이터
+  final CalendarModel? _calendar;
+  CalendarModel? get calendar => _calendar;
+
+  final String _currentUserId =
+      SupabaseManager.shared.supabase.auth.currentUser?.id ?? "";
+  String get currentUserId => _currentUserId;
 
   /// 불러온 일정 리스트(private)
   List<ScheduleModel> _schedules = [];
@@ -56,10 +64,47 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 캘린더 선택된 날짜
   DateTime selectedDay = DateTime.now();
 
+  /// 선택된 카드 id들
+  final Set<String> _selectedIds = {};
+  Set<String> get selectedIds => _selectedIds;
+
+  /// 선택 삭제 모드
+  bool _deleteMode = false;
+  bool get deleteMode => _deleteMode;
+
   /// 앱 실행될 때
   /// 초기화 함수 실행
-  ScheduleViewModel(this.calendarId) {
+  ScheduleViewModel({CalendarModel? calendar}) : _calendar = calendar {
+    // 매개변수 이름을 받은 후 _calendar에 할당
     _init();
+  }
+
+  /// 선택 삭제 모드
+  void toggleDeleteMode() {
+    _deleteMode = !_deleteMode;
+    notifyListeners();
+  }
+
+  /// 선택 삭제 모드 취소
+  void cancelDeleteMode() {
+    _deleteMode = false;
+    selectedIds.clear();
+    notifyListeners();
+  }
+
+  /// 특정 카드가 선택됐는지 여부
+  bool isSelected(String id) {
+    return _selectedIds.contains(id);
+  }
+
+  /// 특정 카드 선택 토글
+  void toggleSelected(String id) {
+    if (_selectedIds.contains(id)) {
+      _selectedIds.remove(id);
+    } else {
+      _selectedIds.add(id);
+    }
+    notifyListeners();
   }
 
   /// 초기화 함수
@@ -86,15 +131,23 @@ class ScheduleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 캘린더 목록 가져오기
+  /// 일정 목록 가져오기
   void fetchSchedules() async {
-    try {
-      _schedules = await ScheduleDataSource.shared.fetchSchedules(calendarId);
+    if (_calendar == null) {
+      return;
+    } else {
+      try {
+        _schedules = await ScheduleDataSource.shared.fetchSchedules(
+          _calendar.id,
+        );
 
-      _scheduleDate = _schedules.map((e) => e.startedAt.toPureDate()).toList();
-      notifyListeners();
-    } catch (e) {
-      debugPrint("❌ fetchSchedules error: $e");
+        _scheduleDate = _schedules
+            .map((e) => e.startedAt.toPureDate())
+            .toList();
+        notifyListeners();
+      } catch (e) {
+        debugPrint("❌ fetchSchedules error: $e");
+      }
     }
   }
 }

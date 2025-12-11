@@ -2,7 +2,6 @@ import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CalendarCard extends StatelessWidget {
-  final int calendarId;
   final String title;
   final String? imageUrl;
   final bool deleteMode;
@@ -13,7 +12,6 @@ class CalendarCard extends StatelessWidget {
 
   const CalendarCard({
     super.key,
-    required this.calendarId,
     this.imageUrl,
     required this.title,
     required this.deleteMode,

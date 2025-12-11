@@ -12,10 +12,10 @@ import 'calendar_setting_screen.dart';
 
 class CalendarEditScreen extends StatelessWidget {
   /// 캘린더 데이터
-  final CalendarModel? initialCalendarData;
+  final CalendarModel? calendar;
 
   /// 캘린더 수정 화면(provider 주입)
-  const CalendarEditScreen({super.key, this.initialCalendarData});
+  const CalendarEditScreen({super.key, this.calendar});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class CalendarEditScreen extends StatelessWidget {
       // 캘린더 수정 뷰모델 주입
       create: (context) =>
           // 캘린더 데이터 함께 주입
-          CalendarEditViewModel(initialCalendarData: initialCalendarData),
+          CalendarEditViewModel(initialCalendarData: calendar),
       child: _CalendarEditScreen(),
     );
   }
@@ -76,19 +76,13 @@ class _CalendarEditScreen extends StatelessWidget {
                           physics: const NeverScrollableScrollPhysics(),
                           // 멤버 목록이 비었을 경우(개인 캘린더의 경우) 방장만 표시하기위해 1을 반환
                           itemCount:
-                              viewModel
-                                      .calendarResponse
-                                      .calendarMemberModel
-                                      ?.isEmpty ??
+                              viewModel.calendar.calendarMemberModel?.isEmpty ??
                                   true
                               ? 1
-                              : viewModel
-                                    .calendarResponse
-                                    .calendarMemberModel!
-                                    .length,
+                              : viewModel.calendar.calendarMemberModel!.length,
                           itemBuilder: (context, index) {
                             final members =
-                                viewModel.calendarResponse.calendarMemberModel;
+                                viewModel.calendar.calendarMemberModel;
                             // 개인 캘린더일 때(멤버 목록이 없을 때)
                             if (members == null || members.isEmpty) {
                               return CustomCalendarSettingContentBox(
@@ -104,11 +98,7 @@ class _CalendarEditScreen extends StatelessWidget {
                                           height: 24,
                                         ),
                                         const SizedBox(width: 4),
-                                        Text(
-                                          viewModel
-                                              .calendarResponse
-                                              .ownerNickname,
-                                        ),
+                                        Text(viewModel.calendar.ownerNickname),
                                         const Text("👑"), // 방장 표시
                                       ],
                                     ),
@@ -138,11 +128,11 @@ class _CalendarEditScreen extends StatelessWidget {
                                     ],
                                   ),
                                   // 개인 캘린더는 추방 버튼 안나옴
-                                  viewModel.calendarResponse.type == "personal"
+                                  viewModel.calendar.type == "personal"
                                       ? SizedBox.shrink()
                                       // 공유 캘린더는 방장만 추방 버튼 안나옴
                                       : viewModel
-                                            .calendarResponse
+                                            .calendar
                                             .calendarMemberModel![index]
                                             .is_admin
                                       // 방장 표시

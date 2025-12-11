@@ -1,4 +1,5 @@
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
+import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calendar_tab.dart';
@@ -10,23 +11,23 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class SharedCalendarScreen extends StatelessWidget {
-  final int calendarId;
+  // 3단계 : 데이터 받기
+  final CalendarModel calendar;
 
-  const SharedCalendarScreen({super.key, required this.calendarId});
+  const SharedCalendarScreen({super.key, required this.calendar});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SharedCalendarViewModel(),
-      child: _SharedCalendarScreen(calendarId: calendarId),
+      create: (_) =>
+          SharedCalendarViewModel(calendar: calendar), // 4단계 : 뷰모델로 전달
+      child: _SharedCalendarScreen(),
     );
   }
 }
 
 class _SharedCalendarScreen extends StatelessWidget {
-  final int calendarId;
-
-  const _SharedCalendarScreen({super.key, required this.calendarId});
+  const _SharedCalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +50,7 @@ class _SharedCalendarScreen extends StatelessWidget {
                     onTap: () => context.push(
                       "/calendar/setting",
                       // 캘린더 데이터 함께 보냄
-                      extra: viewModel.calendarResponse,
+                      extra: viewModel.calendarList,
                     ),
                   ),
                 ],
@@ -67,9 +68,9 @@ class _SharedCalendarScreen extends StatelessWidget {
               // 각 탭에 들어갈 위젯 리스트
               tabViewWidgetList: [
                 // 캘린더 탭
-                CalendarTab(calendarId: calendarId),
+                CalendarTab(calendar: viewModel.calendar), // 6단계 : 데이터 전달
                 // 리스트 탭
-                ListTab(calendarId: calendarId),
+                ListTab(calendar: viewModel.calendar), // 6단계 : 데이터 전달
                 // 채팅 탭
                 ChatTab(),
               ],

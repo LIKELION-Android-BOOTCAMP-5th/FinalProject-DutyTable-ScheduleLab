@@ -16,8 +16,7 @@ class SharedCalendarListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) =>
-          SharedCalendarViewModel(initialCalendars: initialCalendars),
+      create: (_) => SharedCalendarViewModel(calendarList: initialCalendars),
       child: const _SharedCalendarListScreen(),
     );
   }
@@ -51,7 +50,7 @@ class _SharedCalendarListScreen extends StatelessWidget {
 
       case ViewState.success:
         // 로드 성공 시 ListView 표시
-        final calendars = viewModel.calendarResponse;
+        final calendars = viewModel.calendarList;
 
         if (calendars == null || calendars.isEmpty) {
           // 데이터가 비어있을 경우
@@ -64,15 +63,16 @@ class _SharedCalendarListScreen extends StatelessWidget {
               final calendar = calendars[index];
 
               return GestureDetector(
-                onTap: () =>
-                    context.push("/shared/schedule", extra: calendar.id),
+                onTap: () => context.push(
+                  "/shared/schedule",
+                  extra: calendar,
+                ), // 1단계 : 캘린더 정보 전달
                 child: CalendarCard(
-                  calendarId: calendar.id,
                   imageUrl: calendar.imageURL,
                   title: calendar.title,
                   deleteMode: viewModel.deleteMode,
                   isAdmin:
-                      viewModel.calendarResponse?[index].user_id ==
+                      viewModel.calendarList?[index].user_id ==
                       viewModel.currentUserId,
                   members: calendar.calendarMemberModel?.length ?? 0,
                   isSelected: viewModel.isSelected(calendar.id.toString()),

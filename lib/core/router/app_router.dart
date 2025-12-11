@@ -39,16 +39,16 @@ GoRouter createRouter(BuildContext context) {
       GoRoute(
         path: '/calendar/setting',
         builder: (context, state) {
-          final CalendarModel? calendarData = state.extra as CalendarModel?;
-          return CalendarSettingScreen(initialCalendarData: calendarData);
+          final CalendarModel? calendar = state.extra as CalendarModel?;
+          return CalendarSettingScreen(calendar: calendar);
         },
       ),
 
       GoRoute(
         path: '/calendar/edit',
         builder: (context, state) {
-          final CalendarModel? calendarData = state.extra as CalendarModel?;
-          return CalendarEditScreen(initialCalendarData: calendarData);
+          final CalendarModel? calendar = state.extra as CalendarModel?;
+          return CalendarEditScreen(calendar: calendar);
         },
       ),
 
@@ -89,8 +89,10 @@ GoRouter createRouter(BuildContext context) {
               GoRoute(
                 path: "schedule",
                 builder: (context, state) {
-                  final int calendarId = state.extra as int;
-                  return SharedCalendarScreen(calendarId: calendarId);
+                  // 2단계 : 데이터랑 같이 라우팅
+                  final CalendarModel calendar = state.extra as CalendarModel;
+
+                  return SharedCalendarScreen(calendar: calendar);
                 },
               ),
             ],

@@ -1,21 +1,24 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/widgets/custom_confirm_dialog.dart';
 import '../../../../core/widgets/custom_floatingactionbutton.dart';
 import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
+import '../../data/models/calendar_model.dart';
 
 /// 리스트 탭(Provider 주입)
 class ListTab extends StatelessWidget {
-  final int calendarId;
+  final CalendarModel? calendar;
 
-  const ListTab({super.key, required this.calendarId});
+  const ListTab({super.key, this.calendar});
 
   @override
   Widget build(BuildContext context) {
     // 스케쥴 뷰모델 주입
     return ChangeNotifierProvider(
-      create: (context) => ScheduleViewModel(calendarId),
+      create: (context) => ScheduleViewModel(calendar: calendar),
       child: _ListTab(),
     );
   }
@@ -104,16 +107,58 @@ class _ListTab extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // 리플 없는 버튼
-                    GestureDetector(
-                      onTap: () {
-                        print("선택삭제 눌림");
-                      },
-                      child: Text(
-                        "선택삭제",
-                        style: TextStyle(color: Color(0xFF3C82F6)),
-                      ),
-                    ),
+                    // TODO: 방장만 표시
+                    viewModel.calendar?.user_id == viewModel.currentUserId
+                        ? viewModel.deleteMode
+                              ? Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        viewModel.cancelDeleteMode();
+                                      },
+                                      child: Text(
+                                        "취소",
+                                        style: TextStyle(
+                                          color: AppColors.commonBlue,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 16),
+                                    GestureDetector(
+                                      onTap: () {
+                                        if (viewModel.selectedIds.isNotEmpty) {
+                                          showCustomConfirmationDialog(
+                                            context,
+                                            content: '정말 삭제 하시겠습니까?',
+                                            color: AppColors.commonRed,
+                                            onConfirm: () {
+                                              //TODO: 일정 삭제 구현
+                                            },
+                                          );
+                                        }
+                                      },
+                                      child: Text(
+                                        "삭제",
+                                        style: TextStyle(
+                                          color:
+                                              viewModel.selectedIds.isNotEmpty
+                                              ? AppColors.commonRed
+                                              : AppColors.commonGrey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : GestureDetector(
+                                  onTap: () {
+                                    viewModel.toggleDeleteMode();
+                                  },
+                                  child: Text(
+                                    "선택삭제",
+                                    style: TextStyle(color: Color(0xFF3C82F6)),
+                                  ),
+                                )
+                        : SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -132,6 +177,15 @@ class _ListTab extends StatelessWidget {
                         color: viewModel.schedules[index].colorValue,
                         startedAt: viewModel.schedules[index].startedAt,
                         endedAt: viewModel.schedules[index].endedAt,
+                        isDeleteMode: viewModel.deleteMode,
+                        isSelected: viewModel.isSelected(
+                          viewModel.schedules[index].id.toString(),
+                        ),
+                        onChangeSelected: () {
+                          viewModel.toggleSelected(
+                            viewModel.schedules[index].id.toString(),
+                          );
+                        },
                       );
                     },
                     separatorBuilder: (context, index) {
@@ -201,6 +255,9 @@ class CustomScheduleCard extends StatelessWidget {
   final String color;
   final DateTime startedAt;
   final DateTime endedAt;
+  final bool isDeleteMode;
+  final bool isSelected;
+  final VoidCallback onChangeSelected;
 
   /// 커스텀 일정 카드 UI
   const CustomScheduleCard({
@@ -210,13 +267,19 @@ class CustomScheduleCard extends StatelessWidget {
     required this.color,
     required this.startedAt,
     required this.endedAt,
+    required this.isDeleteMode,
+    required this.isSelected,
+    required this.onChangeSelected,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(width: 2, color: const Color(0xFFE5E7EB)),
+        border: Border.all(
+          width: isSelected ? 2 : 1,
+          color: isSelected ? AppColors.commonRed : Color(0xFFE5E7EB),
+        ),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
@@ -254,6 +317,13 @@ class CustomScheduleCard extends StatelessWidget {
                   ],
                 ),
               ),
+              isDeleteMode
+                  ? Checkbox(
+                      value: isSelected,
+                      activeColor: AppColors.commonRed,
+                      onChanged: (_) => onChangeSelected(),
+                    )
+                  : SizedBox.shrink(),
             ],
           ),
         ),
