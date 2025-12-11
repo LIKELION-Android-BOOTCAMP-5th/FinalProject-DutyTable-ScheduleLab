@@ -62,14 +62,23 @@ class _SharedCalendarListScreen extends StatelessWidget {
             itemCount: calendars.length,
             itemBuilder: (BuildContext context, int index) {
               final calendar = calendars[index];
-              return CalendarCard(
-                title: calendar.title,
-                deleteMode: viewModel.deleteMode,
-                isAdmin: calendar.user_id == viewModel.currentUserId,
-                members: calendar.calendarMemberModel?.length ?? 0,
-                isSelected: viewModel.isSelected(calendar.id.toString()),
-                onChangeSelected: () =>
-                    viewModel.toggleSelected(calendar.id.toString()),
+
+              return GestureDetector(
+                onTap: () =>
+                    context.push("/shared/schedule", extra: calendar.id),
+                child: CalendarCard(
+                  calendarId: calendar.id,
+                  imageUrl: calendar.imageURL,
+                  title: calendar.title,
+                  deleteMode: viewModel.deleteMode,
+                  isAdmin:
+                      viewModel.calendarResponse?[index].user_id ==
+                      viewModel.currentUserId,
+                  members: calendar.calendarMemberModel?.length ?? 0,
+                  isSelected: viewModel.isSelected(calendar.id.toString()),
+                  onChangeSelected: () =>
+                      viewModel.toggleSelected(calendar.id.toString()),
+                ),
               );
             },
             separatorBuilder: (BuildContext context, int index) {
@@ -88,7 +97,7 @@ class _SharedCalendarListScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: bodyContent,
         ),
       ),
@@ -156,7 +165,7 @@ class _RightActions extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: GestureDetector(
-                  onTap: () => context.push("/shared/add"),
+                  onTap: () => context.push("/calendar/add"),
                   child: Icon(Icons.add, color: AppColors.commonWhite),
                 ),
               ),

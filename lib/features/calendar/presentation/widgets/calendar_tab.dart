@@ -6,17 +6,19 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../core/widgets/custom_floatingactionbutton.dart';
-import '../viewmodels/schedule_view_model.dart';
+import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
 
 class CalendarTab extends StatelessWidget {
+  final int calendarId;
+
   /// 캘린더 탭(provider 주입)
-  const CalendarTab({super.key});
+  const CalendarTab({super.key, required this.calendarId});
 
   @override
   Widget build(BuildContext context) {
     // 스케쥴 뷰모델 주입
     return ChangeNotifierProvider(
-      create: (context) => ScheduleViewModel(),
+      create: (context) => ScheduleViewModel(calendarId),
       child: _CalendarTab(),
     );
   }
@@ -75,70 +77,79 @@ class _CalendarTab extends StatelessWidget {
 
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focusedDay) {
+                final viewModel = context.read<ScheduleViewModel>();
+
+                // 🔥 해당 날짜의 일정만 필터링
+                final daySchedules = viewModel.schedules.where((s) {
+                  return s.startedAt.toPureDate() == day.toPureDate();
+                }).toList();
+
+                // 🔥 표시할 일정 (첫 번째만)
+                final schedule = daySchedules.isNotEmpty
+                    ? daySchedules.first
+                    : null;
+
                 return Padding(
                   padding: const EdgeInsets.all(1.0),
                   child: ClipRRect(
-                    borderRadius: BorderRadiusGeometry.circular(16),
-                    child: SizedBox.expand(
-                      child: Container(
-                        color: viewModel.tasksDate.contains(day.toPureDate())
-                            ? Colors.grey
-                            : Colors.transparent,
-                        child: Column(children: [Text('${day.day}')]),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      alignment: Alignment.topCenter,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 6),
+
+                          // 날짜 숫자
+                          Text(
+                            '${day.day}',
+                            style: TextStyle(color: AppColors.text(context)),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          // 🔥 일정이 있으면 아래에 일정 표시
+                          if (schedule != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Color(schedule.colorValue),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                schedule.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
                 );
               },
-
               todayBuilder: (context, day, focusedDay) {
-                return GestureDetector(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => Dialog(
-                        backgroundColor: AppColors.background(context),
-                        insetPadding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 40,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: _ScheduleDialogContent(day: day),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Text(
+                return Padding(
+                  padding: const EdgeInsets.all(1.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      alignment: Alignment.topCenter,
+                      child: Text(
                         '${day.day}',
-                        style: TextStyle(color: AppColors.text(context)),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4.0,
-                            vertical: 2.0,
-                          ),
-                          child: Text(
-                            "헬스장 가기",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                        style: TextStyle(
+                          color: AppColors.text(context),
+                          fontSize: 14,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 );
               },

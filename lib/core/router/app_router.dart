@@ -1,6 +1,7 @@
 import 'package:dutytable/features/calendar/presentation/views/add_calendar_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/calendar_edit_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
+import 'package:dutytable/features/calendar/presentation/views/shared/shared_calendar_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/schedule_add_screen.dart';
@@ -22,6 +23,7 @@ GoRouter createRouter(BuildContext context) {
     initialLocation: '/splash',
     routes: [
       GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
+
       // 로그인
       GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
 
@@ -30,7 +32,7 @@ GoRouter createRouter(BuildContext context) {
 
       // 공유 캘린더 - 캘린더 추가
       GoRoute(
-        path: '/shared/add',
+        path: '/calendar/add',
         builder: (_, __) => const AddCalendarScreen(),
       ),
 
@@ -50,10 +52,16 @@ GoRouter createRouter(BuildContext context) {
         },
       ),
 
-      // 공유 캘린더 - 알림
+      // 알림
       GoRoute(
         path: '/notification',
         builder: (_, __) => const NotificationScreen(),
+      ),
+
+      // 캘린더 - 일정 - 추가
+      GoRoute(
+        path: "/schedule/add",
+        builder: (_, __) => const ScheduleAddScreen(),
       ),
 
       // 캘린더 - 일정 - 상세
@@ -79,8 +87,11 @@ GoRouter createRouter(BuildContext context) {
             },
             routes: [
               GoRoute(
-                path: "add",
-                builder: (_, __) => const ScheduleAddScreen(),
+                path: "schedule",
+                builder: (context, state) {
+                  final int calendarId = state.extra as int;
+                  return SharedCalendarScreen(calendarId: calendarId);
+                },
               ),
             ],
           ),
@@ -88,13 +99,10 @@ GoRouter createRouter(BuildContext context) {
           // 내 캘린더
           GoRoute(
             path: '/personal',
-            builder: (_, __) => const PersonalCalendarScreen(),
-            routes: [
-              GoRoute(
-                path: "add",
-                builder: (_, __) => const ScheduleAddScreen(),
-              ),
-            ],
+            builder: (context, state) {
+              final int calendarId = state.extra as int;
+              return SharedCalendarScreen(calendarId: calendarId);
+            },
           ),
 
           // 프로필

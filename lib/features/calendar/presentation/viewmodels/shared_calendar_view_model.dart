@@ -12,6 +12,21 @@ class SharedCalendarViewModel extends ChangeNotifier {
   /// 데이터 로딩 상태(public)
   ViewState get state => _state;
 
+  /// 개인 캘린더 탭 이름 리스트(private)
+  final List<String> _tabNames = ["캘린더", "리스트", "나와의 채팅"];
+
+  /// 개인 캘린더 탭 이름 리스트(public)
+  List<String> get tabNames => _tabNames;
+
+  /// 탭 갯수(public) = 탭 이름 리스트 길이
+  int get tabLength => _tabNames.length;
+
+  /// 현재 선택 된 탭의 인덱스(private)
+  int _currentIndex = 0;
+
+  /// 현재 선택 된 탭의 인덱스(public)
+  int get currentIndex => _currentIndex;
+
   /// 에러 메세지(private)
   String? _errorMessage;
 
@@ -68,10 +83,16 @@ class SharedCalendarViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 카드 삭제 모드 취소
   void cancelDeleteMode() {
     deleteMode = false;
     selectedIds.clear();
     notifyListeners();
+  }
+
+  /// 특정 카드가 선택됐는지 여부
+  bool isSelected(String id) {
+    return selectedIds.contains(id);
   }
 
   /// 특정 카드 선택 토글
@@ -82,11 +103,6 @@ class SharedCalendarViewModel extends ChangeNotifier {
       selectedIds.add(id);
     }
     notifyListeners();
-  }
-
-  /// 특정 카드가 선택됐는지 여부
-  bool isSelected(String id) {
-    return selectedIds.contains(id);
   }
 
   //TODO: 민석님 확인 해주세요

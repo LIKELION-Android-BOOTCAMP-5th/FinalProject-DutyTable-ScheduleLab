@@ -1,19 +1,24 @@
-import 'package:dutytable/task_model.dart';
+import 'package:dutytable/extensions.dart';
+import 'package:dutytable/features/schedule/datasources/schedule_data_source.dart';
+import 'package:dutytable/features/schedule/models/schedule_model.dart';
 import 'package:flutter/material.dart';
 
 /// 스케쥴 뷰모델
 class ScheduleViewModel extends ChangeNotifier {
+  /// 캘린더 아이디
+  final int calendarId;
+
   /// 불러온 일정 리스트(private)
-  List<Task> _tasks = [];
+  List<ScheduleModel> _schedules = [];
 
   /// 불러온 일정 리스트(public)
-  List<Task> get tasks => _tasks;
+  List<ScheduleModel> get schedules => _schedules;
 
   /// 일정 날짜만 담을 리스트(private)
-  List<DateTime?> _tasksDate = [];
+  List<DateTime?> _scheduleDate = [];
 
   /// 일정 날짜만 담을 리스트(public)
-  List<DateTime?> get tasksDate => _tasksDate;
+  List<DateTime?> get scheduleDate => _scheduleDate;
 
   /// 필터 드롭다운 버튼 시작 년도
   static const int startYear = 2000;
@@ -53,7 +58,7 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 앱 실행될 때
   /// 초기화 함수 실행
-  ScheduleViewModel() {
+  ScheduleViewModel(this.calendarId) {
     _init();
   }
 
@@ -67,6 +72,7 @@ class ScheduleViewModel extends ChangeNotifier {
 
     selectedFilterYears = DateTime.now().year;
     selectedFilterMonth = DateTime.now().month;
+    fetchSchedules();
   }
 
   /// 캘린더 날짜 선택
@@ -78,5 +84,18 @@ class ScheduleViewModel extends ChangeNotifier {
   void selectedYear(int value) {
     selectedFilterYears = value;
     notifyListeners();
+  }
+
+  /// 캘린더 목록 가져오기
+  void fetchSchedules() async {
+    try {
+      _schedules = await ScheduleDataSource.shared.fetchSchedules(calendarId);
+
+      _scheduleDate = _schedules.map((e) => e.startedAt.toPureDate()).toList();
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("❌ fetchSchedules error: $e");
+    }
   }
 }

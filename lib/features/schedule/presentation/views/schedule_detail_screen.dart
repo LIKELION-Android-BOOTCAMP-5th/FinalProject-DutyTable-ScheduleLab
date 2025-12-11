@@ -15,7 +15,7 @@ class ScheduleDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ScheduleDetailViewModeol(),
+      create: (_) => ScheduleDetailViewModel(),
       child: _ScheduleDetailScreen(),
     );
   }
@@ -30,7 +30,7 @@ class _ScheduleDetailScreen extends StatelessWidget {
       appBar: BackActionsAppBar(title: Text("병원예약")),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Consumer<ScheduleDetailViewModeol>(
+          child: Consumer<ScheduleDetailViewModel>(
             builder: (context, viewModel, child) {
               return Column(
                 children: [
