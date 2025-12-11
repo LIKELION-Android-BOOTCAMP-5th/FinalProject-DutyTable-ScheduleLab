@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_edit_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -154,7 +155,7 @@ class _CalendarEditScreen extends StatelessWidget {
                                             showCustomConfirmationDialog(
                                               context,
                                               content: "방장 권한을 넘기시겠습니까?",
-                                              color: Colors.blue,
+                                              color: AppColors.commonBlue,
                                               onConfirm: () => print("확인"),
                                             );
                                             print("권한");
@@ -162,7 +163,7 @@ class _CalendarEditScreen extends StatelessWidget {
                                           child: Container(
                                             decoration: BoxDecoration(
                                               border: Border.all(
-                                                color: Colors.blue,
+                                                color: AppColors.commonBlue,
                                               ),
                                               borderRadius:
                                                   BorderRadiusGeometry.circular(
@@ -177,7 +178,7 @@ class _CalendarEditScreen extends StatelessWidget {
                                                 child: Text(
                                                   "권한",
                                                   style: TextStyle(
-                                                    color: Colors.blue,
+                                                    color: AppColors.commonBlue,
                                                   ),
                                                 ),
                                               ),
@@ -228,18 +229,18 @@ class _CalendarEditScreen extends StatelessWidget {
                         print("확인 눌림");
                         context.pop();
                       },
-                      color: Colors.blue,
+                      color: AppColors.commonBlue,
                     );
                   },
                   child: BottomAppBar(
-                    color: Colors.blue,
+                    color: AppColors.commonBlue,
                     height: 52,
                     child: Center(
                       child: Text(
                         "수정 완료",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.commonWhite,
                         ),
                       ),
                     ),

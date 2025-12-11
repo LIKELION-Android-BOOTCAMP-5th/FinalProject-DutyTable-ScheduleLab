@@ -99,9 +99,8 @@ GoRouter createRouter(BuildContext context) {
           // 내 캘린더
           GoRoute(
             path: '/personal',
-            builder: (context, state) {
-              final int calendarId = state.extra as int;
-              return SharedCalendarScreen(calendarId: calendarId);
+            builder: (_, __) {
+              return PersonalCalendarScreen();
             },
           ),
 
