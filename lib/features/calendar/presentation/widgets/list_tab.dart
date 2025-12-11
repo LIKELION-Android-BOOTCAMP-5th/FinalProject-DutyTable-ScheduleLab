@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/custom_floatingactionbutton.dart';
-import '../viewmodels/schedule_view_model.dart';
+import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
 
 /// 리스트 탭(Provider 주입)
 class ListTab extends StatelessWidget {
-  const ListTab({super.key});
+  final int calendarId;
+
+  const ListTab({super.key, required this.calendarId});
 
   @override
   Widget build(BuildContext context) {
     // 스케쥴 뷰모델 주입
     return ChangeNotifierProvider(
-      create: (context) => ScheduleViewModel(),
+      create: (context) => ScheduleViewModel(calendarId),
       child: _ListTab(),
     );
   }

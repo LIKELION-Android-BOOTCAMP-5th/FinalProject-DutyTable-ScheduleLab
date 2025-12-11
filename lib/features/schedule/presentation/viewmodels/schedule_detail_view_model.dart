@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ScheduleDetailViewModeol extends ChangeNotifier {
+class ScheduleDetailViewModel extends ChangeNotifier {
   /// 일정 완료 상태
   bool _isDone = false;
 

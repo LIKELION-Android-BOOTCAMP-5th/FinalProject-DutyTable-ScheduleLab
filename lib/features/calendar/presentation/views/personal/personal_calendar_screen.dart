@@ -10,22 +10,26 @@ import '../../viewmodels/personal_calendar_view_model.dart';
 import '../../widgets/custom_calendar_tabview.dart';
 
 class PersonalCalendarScreen extends StatelessWidget {
+  final int calendarId;
+
   /// 개인 캘린더 화면(provider 주입)
-  const PersonalCalendarScreen({super.key});
+  const PersonalCalendarScreen({super.key, required this.calendarId});
 
   @override
   Widget build(BuildContext context) {
     // 개인 캘린더 뷰모델 주입
     return ChangeNotifierProvider(
       create: (context) => PersonalCalendarViewModel(),
-      child: _PersonalCalendarScreen(),
+      child: _PersonalCalendarScreen(calendarId: calendarId),
     );
   }
 }
 
 class _PersonalCalendarScreen extends StatelessWidget {
+  final int calendarId;
+
   /// 개인 캘린더 화면(private)
-  const _PersonalCalendarScreen({super.key});
+  const _PersonalCalendarScreen({super.key, required this.calendarId});
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +69,9 @@ class _PersonalCalendarScreen extends StatelessWidget {
               // 각 탭에 들어갈 위젯 리스트
               tabViewWidgetList: [
                 // 캘린더 탭
-                CalendarTab(),
+                CalendarTab(calendarId: calendarId),
                 // 리스트 탭
-                ListTab(),
+                ListTab(calendarId: calendarId),
                 // 채팅 탭
                 ChatTab(),
               ],
