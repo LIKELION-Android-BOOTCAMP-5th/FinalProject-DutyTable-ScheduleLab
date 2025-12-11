@@ -105,6 +105,7 @@ class ProfileViewmodel extends ChangeNotifier {
         .eq('id', user!.id)
         .maybeSingle();
     nickname = data!['nickname'];
+    nicknameController.text = nickname;
     email = data['email'];
     image = (data['profileurl'] ?? "");
     notifyListeners();
@@ -199,7 +200,8 @@ class ProfileViewmodel extends ChangeNotifier {
     final count = await supabase
         .from('users')
         .select()
-        .eq('nickname', nicknameController.text);
+        .eq('nickname', nicknameController.text)
+        .neq('id', user!.id);
     if (count.length > 0) {
       is_overlapping = true;
       Fluttertoast.showToast(msg: '중복된 닉네임입니다.');
