@@ -4,6 +4,7 @@ import 'package:dutytable/features/calendar/presentation/views/personal/personal
 import 'package:dutytable/features/calendar/presentation/views/shared/shared_calendar_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
+import 'package:dutytable/features/schedule/models/schedule_model.dart';
 import 'package:dutytable/features/schedule/presentation/views/schedule_add_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/schedule_detail_screen.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +68,14 @@ GoRouter createRouter(BuildContext context) {
       // 캘린더 - 일정 - 상세
       GoRoute(
         path: "/schedule/detail",
-        builder: (_, __) => const ScheduleDetailScreen(),
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+
+          return ScheduleDetailScreen(
+            scheduleDetail: data['schedule'],
+            isAdmin: data['isAdmin'],
+          );
+        },
       ),
 
       // 바텀 네비게이션

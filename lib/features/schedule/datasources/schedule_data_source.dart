@@ -18,10 +18,11 @@ class ScheduleDataSource {
     ),
   );
 
-  Future<List<ScheduleModel>> fetchSchedules(int scheduleId) async {
+  /// 스케줄 조회
+  Future<List<ScheduleModel>> fetchSchedules(int calendarId) async {
     final response = await _dio.get(
       '/rest/v1/schedules',
-      queryParameters: {'select': '*', 'calendar_id': 'eq.$scheduleId'},
+      queryParameters: {'select': '*', 'calendar_id': 'eq.$calendarId'},
     );
 
     if (response.statusCode == 200) {
@@ -29,6 +30,35 @@ class ScheduleDataSource {
       return jsonList.map((json) => ScheduleModel.fromJson(json)).toList();
     } else {
       throw Exception("Failed to load schedules");
+    }
+  }
+
+  /// 스케줄 삭제
+  Future<void> deleteSchedules(int scheduleId) async {
+    final response = await _dio.delete(
+      '/rest/v1/schedules',
+      queryParameters: {'id': 'eq.$scheduleId'},
+    );
+
+    if (response.statusCode == 204) {
+      return;
+    } else {
+      throw Exception("Failed to load schedules");
+    }
+  }
+
+  Future<void> deleteAllSchedules(Set<String> scheduleIds) async {
+    if (scheduleIds.isEmpty) return;
+
+    final ids = scheduleIds.join(',');
+
+    final response = await _dio.delete(
+      '/rest/v1/schedules',
+      queryParameters: {'id': 'in.($ids)'},
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete schedules');
     }
   }
 }

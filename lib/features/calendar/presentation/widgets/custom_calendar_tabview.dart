@@ -79,54 +79,54 @@ class _CustomCalendarTabViewState extends State<CustomCalendarTabView> {
 
   // 탭 버튼
   Widget _buildCustomTabBar() {
-    return Padding(
+    return Container(
+      margin: EdgeInsetsGeometry.only(bottom: 8.0),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Container(
-        padding: const EdgeInsets.all(4.0),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(10.0),
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        border: Border(
+          bottom: BorderSide(color: AppColors.commonGrey, width: 1),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(widget.tabLength, (index) {
-            final isSelected = _selectedIndex == index;
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(widget.tabLength, (index) {
+          final isSelected = _selectedIndex == index;
 
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: GestureDetector(
-                  onTap: () => _onTabSelected(index),
-                  child: Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8.0,
-                      horizontal: 12.0,
-                    ),
-                    decoration: BoxDecoration(
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: GestureDetector(
+                onTap: () => _onTabSelected(index),
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 12.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? _tabColors[index]
+                        // TODO: 민석님
+                        : AppColors.card(context),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Text(
+                    widget.tabNameList[index],
+                    style: TextStyle(
                       color: isSelected
-                          ? _tabColors[index]
-                          // TODO: 민석님
-                          : AppColors.card(context),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Text(
-                      widget.tabNameList[index],
-                      style: TextStyle(
-                        color: isSelected
-                            ? AppColors.commonWhite
-                            : AppColors.commonGrey,
-                        fontWeight: isSelected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
+                          ? AppColors.commonWhite
+                          : AppColors.commonGrey,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
               ),
-            );
-          }),
-        ),
+            ),
+          );
+        }),
       ),
     );
   }
