@@ -150,7 +150,6 @@ class CalendarDataSource {
               CalendarModel.fromJson(jsonItem as Map<String, dynamic>),
         )
         .toList();
-
     // 3단계: 각 캘린더의 멤버 목록을 비동기적으로 가져와 병합
     final List<Future<List<CalendarMemberModel>?>> memberFutures = calendars
         .map((calendar) => fetchCalendarMembers(calendar.id))

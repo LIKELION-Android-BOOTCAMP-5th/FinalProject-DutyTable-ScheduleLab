@@ -1,3 +1,5 @@
+import 'features/schedule/models/schedule_model.dart';
+
 extension NullableStringDateExtensions on String? {
   DateTime? toDateTimeOrNull() {
     if (this == null || this!.isEmpty) {
@@ -63,6 +65,62 @@ extension DateTimeTimeAgoExtension on DateTime {
 extension StringToDateTime on String {
   // "2022-10-23T00:00:00".toDateTime()
   DateTime toDateTime() {
-    return DateTime.parse(this);
+    return DateTime.parse(this).toLocal();
+  }
+}
+
+/// 캘린더 탭 - 캘린더 관련 extension
+bool sameDay(DateTime a, DateTime b) =>
+    a.year == b.year && a.month == b.month && a.day == b.day;
+
+DateTime onlyDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
+
+extension ScheduleRangeCheck on ScheduleModel {
+  bool containsDay(DateTime day) {
+    final d = onlyDate(day);
+    final start = onlyDate(startedAt!);
+    final end = onlyDate(endedAt!);
+
+    if (start.isAfter(end)) return false;
+
+    return sameDay(d, start) ||
+        sameDay(d, end) ||
+        (d.isAfter(start) && d.isBefore(end));
+  }
+}
+
+/// 일정 더보기 - 텍스트로 주말 표현
+extension WeekdayExtension on int {
+  String get koreanWeekday {
+    const weekdays = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+
+    if (this < 1 || this > 7) {
+      throw RangeError('weekday must be between 1 and 7');
+    }
+
+    return weekdays[this - 1];
+  }
+}
+
+/// 일정 상세 화면 - 시작일 ~ 종료일/n시작 시간 -> 종료 시간
+/// 날짜 포멧
+extension DateTimeKoreanDate on DateTime {
+  String get koreanShortDateWithWeekday {
+    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+
+    return '$month월 $day일 (${weekdays[weekday - 1]})';
+  }
+}
+
+/// 시간 포멧
+extension DateTimeKoreanAmPm on DateTime {
+  String get koreanAmPmTime {
+    final isAm = hour < 12;
+    final period = isAm ? '오전' : '오후';
+
+    final h = hour % 12 == 0 ? 12 : hour % 12;
+    final m = minute.toString().padLeft(2, '0');
+
+    return '$period $h:$m';
   }
 }

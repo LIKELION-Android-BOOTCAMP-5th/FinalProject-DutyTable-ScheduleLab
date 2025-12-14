@@ -1,165 +1,112 @@
-import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/extensions.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
+import '../../../../core/configs/app_colors.dart';
 import '../../../../core/widgets/custom_floatingactionbutton.dart';
+import '../../../schedule/models/schedule_model.dart';
 import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
 
 class CalendarTab extends StatelessWidget {
   final CalendarModel? calendar;
 
-  /// 캘린더 탭(provider 주입)
   const CalendarTab({super.key, required this.calendar});
 
   @override
   Widget build(BuildContext context) {
-    // 스케쥴 뷰모델 주입
     return ChangeNotifierProvider(
-      create: (context) => ScheduleViewModel(calendar: calendar),
-      child: _CalendarTab(),
+      create: (_) => ScheduleViewModel(calendar: calendar),
+      child: const _CalendarTab(),
     );
   }
 }
 
 class _CalendarTab extends StatelessWidget {
-  /// 캘린더 탭(private)
   const _CalendarTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 스케쥴 뷰모델 주입
     return Consumer<ScheduleViewModel>(
       builder: (context, viewModel, child) {
+        final appointments = viewModel.schedules.map((s) {
+          return Appointment(
+            startTime: s.startedAt,
+            endTime: s.endedAt,
+            subject: s.title,
+            color: Color(int.parse(s.colorValue)),
+            notes: s.emotionTag,
+          );
+        }).toList();
+
+        final dataSource = _ScheduleDataSource(appointments);
+
         return Scaffold(
-          // 테이블 캘린더 라이브러리 사용
-          body: TableCalendar(
-            shouldFillViewport: true,
-            firstDay: DateTime.utc(2000, 1, 1), // 달력 시작
-            lastDay: DateTime.utc(2100, 12, 31), // 달력 종료
-            focusedDay: viewModel.selectedDay, // 오늘
-            locale: 'ko_KR', // 국가
-            currentDay: viewModel.selectedDay,
-            onDaySelected: (selectedDay, focusedDay) {
-              viewModel.changeSelectedDay(selectedDay);
+          body: SfCalendar(
+            view: CalendarView.month,
+            dataSource: dataSource,
+            headerDateFormat: 'yyyy년 MM월',
+            headerStyle: CalendarHeaderStyle(
+              textAlign: TextAlign.center,
+              backgroundColor: AppColors.background(context),
+              textStyle: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: AppColors.text(context),
+              ),
+            ),
+            todayHighlightColor: AppColors.commonBlue,
+            // 날짜 클릭 이벤트
+            onTap: (details) {
+              if (details.date == null) return;
+
+              DateTime tappedDay = details.date!;
+
+              viewModel.changeSelectedDay(tappedDay);
+
+              // 일정이 있으면 다이얼로그 띄우기
+              final hasSchedule = viewModel.schedules.any(
+                (s) => s.containsDay(tappedDay),
+              );
+
+              if (hasSchedule) {
+                showDialog(
+                  context: context,
+                  builder: (dialogContext) {
+                    return ChangeNotifierProvider.value(
+                      value: context.read<ScheduleViewModel>(),
+                      child: Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 24,
+                        ),
+                        child: _ScheduleDialogContent(day: tappedDay),
+                      ),
+                    );
+                  },
+                );
+              }
             },
 
-            headerStyle: HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-              titleTextStyle: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-              leftChevronIcon: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Color(0xFFE5E5E5)),
-                  borderRadius: BorderRadiusGeometry.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Icon(Icons.chevron_left),
-                ),
-              ),
-              rightChevronIcon: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Color(0xFFE5E5E5)),
-                  borderRadius: BorderRadiusGeometry.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Icon(Icons.chevron_right),
-                ),
-              ),
-            ),
-
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, focusedDay) {
-                final viewModel = context.read<ScheduleViewModel>();
-
-                // 🔥 해당 날짜의 일정만 필터링
-                final daySchedules = viewModel.schedules.where((s) {
-                  return s.startedAt.toPureDate() == day.toPureDate();
-                }).toList();
-
-                // 🔥 표시할 일정 (첫 번째만)
-                final schedule = daySchedules.isNotEmpty
-                    ? daySchedules.first
-                    : null;
-
-                return Padding(
-                  padding: const EdgeInsets.all(1.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      alignment: Alignment.topCenter,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 6),
-
-                          // 날짜 숫자
-                          Text(
-                            '${day.day}',
-                            style: TextStyle(color: AppColors.text(context)),
-                          ),
-
-                          const SizedBox(height: 4),
-
-                          // 🔥 일정이 있으면 아래에 일정 표시
-                          if (schedule != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Color(int.parse(schedule.colorValue)),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                schedule.title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-              todayBuilder: (context, day, focusedDay) {
-                return Padding(
-                  padding: const EdgeInsets.all(1.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      alignment: Alignment.topCenter,
-                      child: Text(
-                        '${day.day}',
-                        style: TextStyle(
-                          color: AppColors.text(context),
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
+            monthViewSettings: const MonthViewSettings(
+              appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
             ),
           ),
-          floatingActionButton: CustomFloatingActionButton(),
+
+          floatingActionButton: const CustomFloatingActionButton(),
         );
       },
     );
+  }
+}
+
+/// Syncfusion Calendar DataSource
+class _ScheduleDataSource extends CalendarDataSource {
+  _ScheduleDataSource(List<Appointment> source) {
+    appointments = source;
   }
 }
 
@@ -170,131 +117,213 @@ class _ScheduleDialogContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> schedules = [
-      {
-        "emoji": "😐",
-        "title": "팀 회의",
-        "calendar": "공유 캘린더",
-        "color": 0xFFDDEAFF,
-      },
-      {"emoji": "😐", "title": "운동", "calendar": "내 캘린더", "color": 0xFFE1F7E6},
-    ];
+    return Consumer<ScheduleViewModel>(
+      builder: (context, viewModel, _) {
+        final items = viewModel.schedules
+            .where((s) => s.containsDay(day))
+            .toList();
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // 상단 날짜 영역
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.card(context),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  Text(
-                    "${day.day}",
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: AppColors.text(context),
-                      fontWeight: FontWeight.w800,
+              // 상단 날짜 영역
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          day.day.toString(),
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: AppColors.text(context),
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          day.weekday.koreanWeekday,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.text(context),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
 
-                  const SizedBox(width: 6),
-
-                  Text(
-                    _weekday(day.weekday),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.text(context),
-                      fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap:
+                          viewModel.calendar?.user_id == viewModel.currentUserId
+                          ? () async {
+                              if (viewModel.deleteMode) {
+                                await viewModel.deleteAllSchedules();
+                                await viewModel.fetchSchedules();
+                                context.pop();
+                              } else {
+                                viewModel.toggleDeleteMode();
+                              }
+                            }
+                          : null,
+                      child:
+                          viewModel.calendar?.user_id == viewModel.currentUserId
+                          ? Text(
+                              viewModel.deleteMode ? "삭제" : "선택삭제",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: viewModel.deleteMode
+                                    ? AppColors.commonRed
+                                    : AppColors.commonBlue,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            )
+                          : const SizedBox.shrink(),
                     ),
-                  ),
-                ],
-              ),
-
-              Text(
-                "선택삭제",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.commonBlue,
-                  fontWeight: FontWeight.w700,
+                  ],
                 ),
               ),
+
+              const Divider(height: 1),
+
+              const SizedBox(height: 10),
+
+              // 일정 리스트
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: items.length,
+                itemBuilder: (_, index) {
+                  final item = items[index];
+
+                  return GestureDetector(
+                    onTap: () {
+                      if (viewModel.deleteMode) {
+                        viewModel.toggleSelected(item.id.toString());
+                        return;
+                      }
+
+                      final isAdmin =
+                          viewModel.calendar?.user_id ==
+                          viewModel.currentUserId;
+
+                      context.pop();
+                      context.push(
+                        "/schedule/detail",
+                        extra: {"schedule": item, "isAdmin": isAdmin},
+                      );
+                    },
+                    child: _SchedulePreviewCard(
+                      item: item,
+                      viewModel: viewModel,
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SchedulePreviewCard extends StatelessWidget {
+  final ScheduleModel item;
+  final ScheduleViewModel viewModel;
+
+  const _SchedulePreviewCard({
+    super.key,
+    required this.item,
+    required this.viewModel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = viewModel.isSelected(item.id.toString());
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Color(int.parse(item.colorValue)).withOpacity(0.2),
+          borderRadius: BorderRadius.circular(16),
+          border: viewModel.deleteMode && isSelected
+              ? Border.all(color: AppColors.commonRed, width: 1)
+              : null,
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 이모지
+              Text(
+                item.emotionTag ?? "🙂",
+                style: const TextStyle(fontSize: 28),
+              ),
+
+              const SizedBox(width: 12),
+
+              // 세로 막대 (높이는 텍스트 높이에 자동 맞춤)
+              Container(width: 6, color: Color(int.parse(item.colorValue))),
+
+              const SizedBox(width: 12),
+
+              // 텍스트 묶음
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 일정 제목
+                    Text(
+                      item.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    // 캘린더 타입 표시
+                    Text(
+                      viewModel.calendar?.type == "group" ? "공유 캘린더" : "내 캘린더",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: Color(int.parse(item.colorValue)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              if (viewModel.deleteMode)
+                Checkbox(
+                  value: viewModel.isSelected(item.id.toString()),
+                  onChanged: (_) {
+                    viewModel.toggleSelected(item.id.toString());
+                  },
+                  activeColor: AppColors.commonRed,
+                ),
             ],
           ),
         ),
-
-        const Divider(color: AppColors.commonGrey, height: 1),
-
-        const SizedBox(height: 10),
-
-        // 일정 리스트
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: schedules.length,
-          itemBuilder: (_, index) {
-            final item = schedules[index];
-
-            return GestureDetector(
-              onTap: () {
-                // 다이얼로그 끄기
-                context.pop();
-                context.push("/schedule/detail");
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Color(item["color"]),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(item["emoji"], style: TextStyle(fontSize: 26)),
-
-                      const SizedBox(width: 12),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item["title"],
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item["calendar"],
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-
-        const SizedBox(height: 20),
-      ],
+      ),
     );
-  }
-
-  String _weekday(int w) {
-    return ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'][w - 1];
   }
 }

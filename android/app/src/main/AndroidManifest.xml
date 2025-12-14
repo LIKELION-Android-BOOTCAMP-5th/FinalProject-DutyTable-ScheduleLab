@@ -3,6 +3,12 @@
         android:label="dutytable"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+      <!-- ⭐️ 네이버 지도 CLIENT ID (필수) -->
+        <meta-data
+          android:name="com.naver.maps.map.CLIENT_ID"
+          android:value="e98nekb2dd" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

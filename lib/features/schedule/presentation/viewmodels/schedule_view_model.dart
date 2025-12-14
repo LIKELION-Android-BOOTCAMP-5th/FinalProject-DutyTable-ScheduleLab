@@ -132,7 +132,7 @@ class ScheduleViewModel extends ChangeNotifier {
   }
 
   /// 일정 목록 가져오기
-  void fetchSchedules() async {
+  Future<void> fetchSchedules() async {
     if (_calendar == null) {
       return;
     } else {
@@ -148,6 +148,16 @@ class ScheduleViewModel extends ChangeNotifier {
       } catch (e) {
         debugPrint("❌ fetchSchedules error: $e");
       }
+    }
+  }
+
+  /// 일정 선택 삭제(다수 선택)
+  Future<void> deleteAllSchedules() async {
+    try {
+      await ScheduleDataSource().deleteAllSchedules(selectedIds);
+      notifyListeners();
+    } catch (e) {
+      rethrow;
     }
   }
 }

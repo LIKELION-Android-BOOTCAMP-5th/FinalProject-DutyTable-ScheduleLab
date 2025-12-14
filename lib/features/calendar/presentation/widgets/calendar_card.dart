@@ -12,13 +12,13 @@ class CalendarCard extends StatelessWidget {
 
   const CalendarCard({
     super.key,
-    this.imageUrl,
     required this.title,
+    this.imageUrl,
     required this.deleteMode,
     required this.isAdmin,
     required this.isSelected,
-    required this.onChangeSelected,
     required this.members,
+    required this.onChangeSelected,
   });
 
   @override
