@@ -122,7 +122,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
   }
 
   /// 캘린더 목록 가져오기
-  void fetchCalendars() async {
+  Future<void> fetchCalendars() async {
     if (_isDisposed) return;
 
     _state = ViewState.loading;
@@ -146,6 +146,26 @@ class SharedCalendarViewModel extends ChangeNotifier {
       if (!_isDisposed) {
         notifyListeners();
       }
+    }
+  }
+
+  Future<void> deleteSelectedCalendars() async {
+    final ids = selectedIds.map(int.parse).toList();
+
+    if (ids.isEmpty) return;
+
+    _state = ViewState.loading;
+    notifyListeners();
+
+    try {
+      await CalendarDataSource.shared.deleteCalendars(ids);
+      await fetchCalendars();
+      cancelDeleteMode();
+    } catch (e) {
+      _state = ViewState.error;
+      _errorMessage = e.toString();
+    } finally {
+      notifyListeners();
     }
   }
 }

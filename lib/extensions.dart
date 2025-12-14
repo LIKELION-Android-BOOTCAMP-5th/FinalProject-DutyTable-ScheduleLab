@@ -124,3 +124,17 @@ extension DateTimeKoreanAmPm on DateTime {
     return '$period $h:$m';
   }
 }
+
+/// supabase storage path 헬퍼 함수
+String? extractStoragePath(String? imageUrl) {
+  if (imageUrl == null || imageUrl.isEmpty) return null;
+
+  final uri = Uri.parse(imageUrl);
+  final segments = uri.pathSegments;
+
+  // storage/v1/object/public/{bucket}/{path...}
+  final index = segments.indexOf('public');
+  if (index == -1 || index + 2 >= segments.length) return null;
+
+  return segments.sublist(index + 2).join('/');
+}
