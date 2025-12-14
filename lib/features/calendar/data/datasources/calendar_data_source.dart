@@ -2,13 +2,35 @@ import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
 import 'package:flutter/foundation.dart'; // debugPrint를 위해 추가
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../../../../extensions.dart';
 import '../../../../main.dart';
 import '../models/calendar_member_model.dart';
 import '../models/calendar_model.dart';
 
 class CalendarDataSource {
+  CalendarDataSource._internal() {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          final session = supabase.auth.currentSession;
+
+          if (session?.accessToken != null) {
+            options.headers['Authorization'] = 'Bearer ${session!.accessToken}';
+          }
+
+          handler.next(options);
+        },
+        onError: (e, handler) {
+          debugPrint('❌ Dio Error: ${e.response?.statusCode}');
+          debugPrint('❌ Dio Error Body: ${e.response?.data}');
+          handler.next(e);
+        },
+      ),
+    );
+  }
+
   /// 싱글턴
-  static final CalendarDataSource _shared = CalendarDataSource();
+  static final CalendarDataSource _shared = CalendarDataSource._internal();
   static CalendarDataSource get shared => _shared;
 
   static const String _baseUrl = 'https://eexkppotdipyrzzjakur.supabase.co';
@@ -22,6 +44,77 @@ class CalendarDataSource {
       headers: {'apikey': apiKey, 'Content-Type': 'application/json'},
     ),
   );
+
+  /// 캘린더 추가
+  Future<void> addSharedCalendar({
+    required String title,
+    String? imageURL,
+    String? description,
+    required List<String> invitedUserIds,
+  }) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) throw Exception('로그인 필요');
+
+    // 1️⃣ 캘린더 생성 (id 반환)
+    final response = await _dio.post(
+      '/rest/v1/calendars',
+      options: Options(headers: const {'Prefer': 'return=representation'}),
+      data: {
+        'type': 'group',
+        'user_id': user.id,
+        'title': title,
+        'imageURL': imageURL,
+        'description': description,
+      },
+    );
+
+    final calendarId = response.data[0]['id'];
+
+    // 2️⃣ 초대 멤버 추가 (생성자는 트리거가 처리)
+    if (invitedUserIds.isNotEmpty) {
+      final members = invitedUserIds
+          .map(
+            (uid) => {
+              'calendar_id': calendarId,
+              'user_id': uid,
+              'is_admin': false,
+            },
+          )
+          .toList();
+
+      await _dio.post('/rest/v1/calendar_members', data: members);
+    }
+  }
+
+  /// supabase storage 에 이미지 삭제
+  Future<void> deleteCalendarImage(String? imageUrl) async {
+    final path = extractStoragePath(imageUrl);
+    if (path == null) return;
+
+    await supabase.storage.from('calendar-images').remove([path]);
+  }
+
+  /// 캘린더 삭제 (방장만 가능)
+  Future<void> deleteCalendars(List<int> calendarIds) async {
+    final response = await _dio.get(
+      '/rest/v1/calendars',
+      queryParameters: {
+        'select': 'id,imageURL',
+        'id': 'in.(${calendarIds.join(",")})',
+      },
+    );
+
+    final List data = response.data as List;
+
+    for (final item in data) {
+      await deleteCalendarImage(item['imageURL'] as String?);
+    }
+
+    await _dio.delete(
+      '/rest/v1/calendars',
+      queryParameters: {'id': 'in.(${calendarIds.join(",")})'},
+    );
+  }
 
   /// 개인 캘린더 가져오기
   Future<CalendarModel> fetchPersonalCalendar() async {

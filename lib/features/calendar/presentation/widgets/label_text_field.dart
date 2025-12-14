@@ -25,6 +25,8 @@ class LabeledTextField extends StatelessWidget {
   /// 텍스트 필드 클릭 시 해당 콜백 함수
   final VoidCallback? onTap;
 
+  final ValueChanged<String>? onChanged;
+
   /// 라벨 + 텍스트 필드
   const LabeledTextField({
     super.key,
@@ -35,6 +37,7 @@ class LabeledTextField extends StatelessWidget {
     this.validator,
     this.readOnly = false,
     this.onTap,
+    this.onChanged,
   });
 
   @override
@@ -59,6 +62,7 @@ class LabeledTextField extends StatelessWidget {
           maxLines: maxLines,
           readOnly: readOnly,
           onTap: onTap,
+          onChanged: onChanged,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(

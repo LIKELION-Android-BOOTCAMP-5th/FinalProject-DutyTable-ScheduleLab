@@ -151,7 +151,12 @@ class _RightActions extends StatelessWidget {
                 child: const Text("취소"),
               ),
               const SizedBox(width: 16),
-              const Text("삭제"),
+              GestureDetector(
+                onTap: () async {
+                  await viewModel.deleteSelectedCalendars();
+                },
+                child: const Text("삭제"),
+              ),
             ],
           )
         : Row(
@@ -165,7 +170,13 @@ class _RightActions extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: GestureDetector(
-                  onTap: () => context.push("/calendar/add"),
+                  onTap: () async {
+                    final result = await context.push<bool>("/calendar/add");
+
+                    if (result == true) {
+                      context.read<SharedCalendarViewModel>().fetchCalendars();
+                    }
+                  },
                   child: Icon(Icons.add, color: AppColors.commonWhite),
                 ),
               ),
