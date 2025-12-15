@@ -9,10 +9,18 @@ interface invite_notifications {
   message: string
 }
 
+interface reminder_notifications {
+  id: string
+  user_id: string
+  calendar_id : string
+  schedule_id : string
+  first_message: string
+}
+
 interface WebhookPayload {
   type: 'INSERT'
-  table: string
-  record: invite_notifications
+  table: 'invite_notifications' | 'reminder_notifications'
+  record: invite_notifications | reminder_notifications
   schema: 'public'
 }
 
@@ -24,13 +32,81 @@ const supabase = createClient(
 Deno.serve(async (req) => {
   const payload: WebhookPayload = await req.json()
 
-  const { data } = await supabase
-    .from('users')
-    .select('fcm_token')
-    .eq('id', payload.record.user_id)
+  let targetUserId: string;
+  let notificationTitle: string;
+  let notificationBody: string = '새로운 알림이 도착했습니다.';
+
+  // 캘린더 이름 조회
+  const { data: calendarData, error: calendarError } = await supabase
+    .from('calendars')
+    .select('title')
+    .eq('id', payload.record.calendar_id)
     .single()
 
-  const fcmToken = data!.fcm_token as string
+  // 캘린더 이름 없을 경우 예외 처리
+  if (calendarError || !calendarData) {
+    console.error('Failed to fetch calendar title:', calendarError)
+    notificationTitle = '새로운 알림';
+  } else {
+    notificationTitle = calendarData.title;
+  }
+
+  // 초대 알림
+  if (payload.table === 'invite_notifications') {
+    const record = payload.record as invite_notifications;
+
+    targetUserId = record.user_id;
+    notificationBody = record.message;
+
+  }
+  // 일정 알림
+  else if (payload.table === 'reminder_notifications') {
+  const record = payload.record as reminder_notifications;
+
+  // 일정 제목 조회
+  const { data: scheduleData, error: scheduleError } = await supabase
+    .from('schedules')
+    .select('title')
+    .eq('id', record.schedule_id)
+    .single()
+
+  // 받는 사람
+  targetUserId = record.user_id;
+
+  // 기본값
+  let scheduleTitle = '일정';
+
+  if (scheduleError || !scheduleData) {
+          console.error('Failed to fetch schedule title:', scheduleError);
+      } else {
+          scheduleTitle = scheduleData.title;
+      }
+
+  notificationBody = `${record.first_message}${scheduleTitle}`;
+
+
+  } else {
+    return new Response(JSON.stringify({ error: `Unsupported table: ${payload.table}` }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('fcm_token')
+      .eq('id', targetUserId)
+      .single()
+
+  if (userError || !userData || !userData.fcm_token) {
+    console.error('Failed to fetch user or FCM token:', userError)
+    return new Response(JSON.stringify({ message: 'User or FCM token not found. Notification skipped.' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  const fcmToken = userData.fcm_token as string
 
   const accessToken = await getAccessToken({
     clientEmail: serviceAccount.client_email,
@@ -49,10 +125,16 @@ Deno.serve(async (req) => {
         message: {
           token: fcmToken,
           notification: {
-            title: payload.calendar_id,
-            body: payload.record.message,
+            title: notificationTitle,
+            body: notificationBody,
           },
         },
+      android: {
+        priority: 'HIGH',
+        notification: {
+          channel_id: 'fcm_head_up_channel_id'
+        }
+      }
       }),
     }
   )
