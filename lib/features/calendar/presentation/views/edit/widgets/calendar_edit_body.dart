@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CalendarEditBody extends StatelessWidget {
-  const CalendarEditBody({super.key});
+  final CalendarEditViewModel viewModel;
+  const CalendarEditBody({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class CalendarEditBody extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,12 +33,12 @@ class CalendarEditBody extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              /// 캘린더 멤버 목록
-              _CalendarMemberList(),
+              /// 멤버 섹션
+              const _CalendarMemberSection(),
 
               const SizedBox(height: 40),
 
-              /// 캘린더 설명 - 커스텀 캘린더 수정 텍스트 필드 사용
+              /// 캘린더 설명
               CustomCalendarEditTextField(
                 title: const Text(
                   "캘린더 설명",
@@ -53,6 +54,22 @@ class CalendarEditBody extends StatelessWidget {
   }
 }
 
+class _CalendarMemberSection extends StatelessWidget {
+  const _CalendarMemberSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Text("캘린더 멤버", style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        _CalendarMemberList(),
+      ],
+    );
+  }
+}
+
 class _CalendarMemberList extends StatelessWidget {
   const _CalendarMemberList();
 
@@ -62,43 +79,35 @@ class _CalendarMemberList extends StatelessWidget {
       builder: (_, viewModel, __) {
         final members = viewModel.calendar.calendarMemberModel;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("캘린더 멤버", style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+        final isPersonal = members == null || members.isEmpty;
 
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: (members == null || members.isEmpty)
-                  ? 1
-                  : members.length,
-              itemBuilder: (_, index) {
-                if (members == null || members.isEmpty) {
-                  return _PersonalMemberTile(
-                    ownerNickname: viewModel.calendar.ownerNickname,
-                  );
-                }
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: isPersonal ? 1 : members.length,
+          itemBuilder: (_, index) {
+            if (isPersonal) {
+              return _PersonalOwnerTile(
+                nickname: viewModel.calendar.ownerNickname,
+              );
+            }
 
-                return _SharedMemberTile(
-                  member: members[index],
-                  isPersonal: viewModel.calendar.type == "personal",
-                );
-              },
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
-            ),
-          ],
+            return _SharedMemberTile(
+              member: members[index],
+              isPersonalCalendar: viewModel.calendar.type == "personal",
+            );
+          },
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
         );
       },
     );
   }
 }
 
-class _PersonalMemberTile extends StatelessWidget {
-  final String ownerNickname;
+class _PersonalOwnerTile extends StatelessWidget {
+  final String nickname;
 
-  const _PersonalMemberTile({required this.ownerNickname});
+  const _PersonalOwnerTile({required this.nickname});
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +117,7 @@ class _PersonalMemberTile extends StatelessWidget {
         children: [
           const CustomChatProfileImageBox(width: 24, height: 24),
           const SizedBox(width: 4),
-          Text(ownerNickname),
+          Text(nickname),
           const Text(" 👑"),
         ],
       ),
@@ -118,9 +127,12 @@ class _PersonalMemberTile extends StatelessWidget {
 
 class _SharedMemberTile extends StatelessWidget {
   final dynamic member;
-  final bool isPersonal;
+  final bool isPersonalCalendar;
 
-  const _SharedMemberTile({required this.member, required this.isPersonal});
+  const _SharedMemberTile({
+    required this.member,
+    required this.isPersonalCalendar,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -136,19 +148,19 @@ class _SharedMemberTile extends StatelessWidget {
               Text(member.nickname),
             ],
           ),
-          isPersonal
+          isPersonalCalendar
               ? const SizedBox.shrink()
               : member.is_admin
               ? const Text("👑")
-              : const _RoleActionButton(),
+              : const _RoleButton(),
         ],
       ),
     );
   }
 }
 
-class _RoleActionButton extends StatelessWidget {
-  const _RoleActionButton();
+class _RoleButton extends StatelessWidget {
+  const _RoleButton();
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +170,9 @@ class _RoleActionButton extends StatelessWidget {
         CustomConfirmationDialog(
           content: "방장 권한을 넘기시겠습니까?",
           confirmColor: AppColors.commonBlue,
-          onConfirm: () {},
+          onConfirm: () {
+            // TODO: 방장 권한 위임 로직
+          },
         );
       },
       child: Container(
