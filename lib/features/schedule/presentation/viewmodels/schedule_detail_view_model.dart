@@ -1,5 +1,5 @@
-import 'package:dutytable/features/schedule/datasources/schedule_data_source.dart';
-import 'package:dutytable/features/schedule/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
+import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../main.dart';

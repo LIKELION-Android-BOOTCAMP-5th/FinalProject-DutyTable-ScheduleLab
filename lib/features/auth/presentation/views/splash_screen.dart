@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (isLoggedIn) {
         // 로그인 상태인 경우, 데이터 로드를 시도
-        sharedCalendars = await CalendarDataSource.shared
+        sharedCalendars = await CalendarDataSource.instance
             .fetchCalendarFinalList("group");
       } else {
         // 로그인 상태가 아닌 경우, 로그인 화면으로 이동 플래그 설정

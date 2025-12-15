@@ -112,7 +112,6 @@ class CalendarAddViewModel extends ChangeNotifier {
       return;
     }
 
-    // ✅ 성공
     _invitedUsers[userId] = userNickname;
     _setInviteError(null); // 에러 제거
   }
@@ -128,7 +127,7 @@ class CalendarAddViewModel extends ChangeNotifier {
     try {
       final imageUrl = await _uploadCalendarImage();
 
-      await CalendarDataSource.shared.addSharedCalendar(
+      await CalendarDataSource.instance.addSharedCalendar(
         title: _title,
         imageURL: imageUrl,
         description: _description,

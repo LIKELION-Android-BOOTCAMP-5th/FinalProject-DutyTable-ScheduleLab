@@ -1,3 +1,4 @@
+import 'package:dutytable/features/auth/presentation/viewmodels/login_viewmodel.dart';
 import 'package:dutytable/features/onboarding/presentation/views/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../../core/configs/app_colors.dart';
-import '../viewmodels/login_viewmodel.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

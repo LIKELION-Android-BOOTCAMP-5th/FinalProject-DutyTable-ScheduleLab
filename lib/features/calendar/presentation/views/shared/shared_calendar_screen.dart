@@ -2,7 +2,7 @@ import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
-import 'package:dutytable/features/calendar/presentation/widgets/calendar_tab.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/calendar_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/custom_calendar_tabview.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
@@ -50,7 +50,7 @@ class _SharedCalendarScreen extends StatelessWidget {
                     onTap: () => context.push(
                       "/calendar/setting",
                       // 캘린더 데이터 함께 보냄
-                      extra: viewModel.calendarList,
+                      extra: viewModel.calendar,
                     ),
                   ),
                 ],

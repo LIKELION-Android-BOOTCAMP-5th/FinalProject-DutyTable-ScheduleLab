@@ -1,8 +1,8 @@
+import 'package:dutytable/features/schedule/data/models/address_search_result_model.dart';
+import 'package:dutytable/features/schedule/presentation/viewmodels/address_search_view_model.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/address_search_result_model.dart';
-import '../viewmodels/address_search_view_model.dart';
 
 Future<AddressSearchResult?> showAddressSearchSheet(BuildContext context) {
   return showModalBottomSheet<AddressSearchResult>(
