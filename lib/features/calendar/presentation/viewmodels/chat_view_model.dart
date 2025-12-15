@@ -49,8 +49,8 @@ class ChatViewModel extends ChangeNotifier {
   List<String> time = [];
 
   Future<void> timeFetch() async {
-    final data2 = await supabase.from('chat_messages').select('created_at');
-    time = data2.map((row) => row['created_at'] as String).toList();
+    final data = await supabase.from('chat_messages').select('created_at');
+    time = data.map((row) => row['created_at'] as String).toList();
     notifyListeners();
   }
 
@@ -58,8 +58,8 @@ class ChatViewModel extends ChangeNotifier {
   List<bool> isMe = [];
 
   Future<void> isMeFetch() async {
-    final data3 = await supabase.from('chat_messages').select('user_id');
-    isMe = data3.map((row) {
+    final data = await supabase.from('chat_messages').select('user_id');
+    isMe = data.map((row) {
       return row['user_id'] == user!.id;
     }).toList();
   }

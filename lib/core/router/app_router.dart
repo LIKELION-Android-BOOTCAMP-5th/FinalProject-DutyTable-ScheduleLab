@@ -4,7 +4,6 @@ import 'package:dutytable/features/calendar/presentation/views/personal/personal
 import 'package:dutytable/features/calendar/presentation/views/shared/shared_calendar_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
-import 'package:dutytable/features/schedule/models/schedule_model.dart';
 import 'package:dutytable/features/schedule/presentation/views/schedule_add_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/schedule_detail_screen.dart';
 import 'package:flutter/material.dart';
@@ -95,7 +94,7 @@ GoRouter createRouter(BuildContext context) {
             },
             routes: [
               GoRoute(
-                path: "/schedule",
+                path: "schedule",
                 builder: (context, state) {
                   // 2단계 : 데이터랑 같이 라우팅
                   final CalendarModel calendar = state.extra as CalendarModel;
