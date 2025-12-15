@@ -2,6 +2,7 @@ import 'package:dutytable/features/onboarding/presentation/views/onboarding_scre
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../../core/configs/app_colors.dart';
 import '../viewmodels/login_viewmodel.dart';
@@ -123,29 +124,44 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                   // 버튼 섹션
                   Consumer<LoginViewModel>(
                     builder: (context, viewmodel, child) {
-                      return SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: GestureDetector(
-                          onTap: () => viewmodel.googleSignIn(
-                            context,
-                            isAutoLogin: _isAutoLogin,
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.actionPositive(context),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            alignment: Alignment.center,
-                            child: const Text(
-                              '구글로 계속하기',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
+                      return Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: GestureDetector(
+                              onTap: () => viewmodel.googleSignIn(
+                                context,
+                                isAutoLogin: _isAutoLogin,
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.actionPositive(context),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                alignment: Alignment.center,
+                                child: const Text(
+                                  '구글로 계속하기',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: SignInWithAppleButton(
+                              onPressed: () => viewmodel.signInWithApple(
+                                context,
+                                isAutoLogin: _isAutoLogin,
+                              ),
+                            ),
+                          ),
+                        ],
                       );
                     },
                   ),

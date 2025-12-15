@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/widgets/loading_dialog.dart';
@@ -90,7 +93,6 @@ class LoginViewModel extends ChangeNotifier {
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('auto_login', isAutoLogin);
-
       // 로그인 후 프로필 확인 및 화면 이동 로직 처리
       await _handlePostSignIn(context);
     } catch (e) {
@@ -111,6 +113,80 @@ class LoginViewModel extends ChangeNotifier {
         // Pop하기 전에 context가 여전히 화면에 마운트되어 있는지 다시 확인
         if (ModalRoute.of(context)?.isCurrent == true) {
           GoRouter.of(context).pop();
+        }
+      }
+    }
+  }
+
+  Future<void> signInWithApple(
+    BuildContext context, {
+    required bool isAutoLogin,
+  }) async {
+    // 전체 화면 로딩 인디케이터 표시
+    showFullScreenLoading(context);
+    try {
+      final rawNonce = supabase.auth.generateRawNonce();
+      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: hashedNonce,
+      );
+      final idToken = credential.identityToken;
+      if (idToken == null) {
+        throw const AuthException(
+          'Could not find ID Token from generated credential.',
+        );
+      }
+      final response = await supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        nonce: rawNonce,
+      );
+      print("response.user ${response.user}");
+      print("response.session ${response.session}");
+      if (credential.givenName != null || credential.familyName != null) {
+        final nameParts = <String>[];
+        if (credential.givenName != null) nameParts.add(credential.givenName!);
+        if (credential.familyName != null)
+          nameParts.add(credential.familyName!);
+        final fullName = nameParts.join(' ');
+        await supabase.auth.updateUser(
+          UserAttributes(
+            data: {
+              'full_name': fullName,
+              'given_name': credential.givenName,
+              'family_name': credential.familyName,
+            },
+          ),
+        );
+      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('auto_login', isAutoLogin);
+      // 로그인 후 프로필 확인 및 화면 이동 로직 처리
+      print("response.user ${response.user}");
+      print("response.session ${response.session}");
+      await _handlePostSignIn(context);
+    } catch (e) {
+      // TODO: 나중에 스낵바 제거
+      // 오류 발생 시 스낵바로 오류 메시지 표시
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('로그인 처리 중 오류 발생: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        // GoRouter.of(context).pop();
+      }
+    } finally {
+      // 로딩 인디케이터 닫기
+      if (context.mounted) {
+        // Pop하기 전에 context가 여전히 화면에 마운트되어 있는지 다시 확인
+        if (ModalRoute.of(context)?.isCurrent == true) {
+          // GoRouter.of(context).pop();
         }
       }
     }
