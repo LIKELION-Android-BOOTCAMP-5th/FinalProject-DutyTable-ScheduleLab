@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
 import 'package:flutter/foundation.dart'; // debugPrint를 위해 추가
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../extensions.dart';
@@ -41,7 +42,11 @@ class CalendarDataSource {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: _baseUrl,
-      headers: {'apikey': apiKey, 'Content-Type': 'application/json'},
+      headers: {
+        'apikey': apiKey,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+      },
     ),
   );
 
@@ -169,6 +174,33 @@ class CalendarDataSource {
       throw Exception(
         'Failed to load calendar Member: Status ${response.statusCode}',
       );
+    }
+  }
+
+  /// 캘린더 수정
+  Future<bool> updateCalendarInfo(
+    String title,
+    String description,
+    int calendarId,
+  ) async {
+    try {
+      final Map<String, dynamic> data = {
+        'title': title,
+        'description': description,
+      };
+
+      final response = await _dio.patch(
+        '/rest/v1/calendars?id=eq.$calendarId',
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      return false;
     }
   }
 
