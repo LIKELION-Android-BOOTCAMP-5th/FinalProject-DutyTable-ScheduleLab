@@ -62,5 +62,6 @@ class ChatViewModel extends ChangeNotifier {
     isMe = data.map((row) {
       return row['user_id'] == user!.id;
     }).toList();
+    notifyListeners();
   }
 }
