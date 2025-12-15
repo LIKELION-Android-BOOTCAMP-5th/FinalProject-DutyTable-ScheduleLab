@@ -72,7 +72,7 @@ class _SharedCalendarScreen extends StatelessWidget {
                 // 리스트 탭
                 ListTab(calendar: viewModel.calendar), // 6단계 : 데이터 전달
                 // 채팅 탭
-                ChatTab(),
+                ChatTab(calendar: viewModel.calendar),
               ],
             ),
           ),

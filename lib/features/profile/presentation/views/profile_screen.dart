@@ -156,16 +156,11 @@ class _ProfileScreen extends StatelessWidget {
                                 )
                               : Spacer(),
                           GestureDetector(
-                            onTap: () async {
-                              if (viewModel.is_edit == false) {
-                                viewModel.setProfileEdit(); //수정으로 들어가기
-                              } else {
-                                viewModel
-                                    .nicknameCheck(); // 닉네임 중복, 글자수 체크 후 저장
-                              }
+                            onTap: () {
+                              viewModel.nicknameButtonFunc();
                             },
                             child: Text(
-                              (viewModel.is_edit) ? "  저장  " : "수정  ",
+                              viewModel.nicknameButtonText(),
                               style: TextStyle(
                                 color: Color(0xFF3C82F6),
                                 fontWeight: FontWeight.bold,
