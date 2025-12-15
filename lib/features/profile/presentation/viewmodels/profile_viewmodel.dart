@@ -49,6 +49,7 @@ class ProfileViewmodel extends ChangeNotifier {
   void _init() {
     fetchUser();
     loadTheme(); // 로컬저장한 테마 불러오기
+    nicknameCancel();
   }
 
   //프로필 수정
@@ -185,12 +186,13 @@ class ProfileViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //  닉네임 조건 체크
+  //   닉네임 조건 체크
   void nicknameCheck() {
     if (nicknameController.text.length > 1 &&
         nicknameController.text.length < 11 &&
         is_overlapping == false) {
       setProfileEdit();
+    } else if (is_overlapping == true) {
     } else {}
     notifyListeners();
   }
@@ -204,17 +206,13 @@ class ProfileViewmodel extends ChangeNotifier {
         .neq('id', user!.id);
     if (count.length > 0) {
       is_overlapping = true;
-      Fluttertoast.showToast(msg: '중복된 닉네임입니다.');
     } else if (nicknameController.text.length < 2 ||
         nicknameController.text.length > 10) {
       Fluttertoast.showToast(msg: "닉네임은 2~10글자로 입력해야 합니다.");
     } else {
       is_overlapping = false;
       Fluttertoast.showToast(msg: "사용가능한 닉네임입니다.");
-      updateNickname(user!.id);
-      editNickname();
     }
-    notifyListeners();
   }
 
   //로그아웃 하기
@@ -234,11 +232,54 @@ class ProfileViewmodel extends ChangeNotifier {
   //테마 로컬 가져오기
   Future<void> loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    selectedOption = prefs.getString(user!.id)!;
+    selectedOption = prefs.getString(user!.id) ?? "라이트모드";
   }
 
   // 회원탈퇴
   Future<void> deleteUser() async {
     await supabase.from('users').delete().eq('id', user!.id);
+  }
+
+  // 버튼 텍스트
+  String nicknameButtonText() {
+    final result;
+    (is_edit == false)
+        ? result = "수정"
+        : (nickname == nicknameController.text)
+        ? result = "  취소  "
+        : result = "  저장  ";
+    return result;
+  }
+
+  //버튼 기능
+  void nicknameButtonFunc() {
+    if (is_edit == false) {
+      // 수정
+      setProfileEdit();
+    } else if (is_edit == true && nickname == nicknameController.text) {
+      // 취소
+      nicknameController.text = nickname;
+      is_edit = false;
+    } else {
+      if (nicknameController.text.length > 1 &&
+          nicknameController.text.length < 11 &&
+          is_overlapping == false) {
+        // 저장
+        updateNickname(user!.id);
+        editNickname();
+        setProfileEdit();
+      } else if (is_overlapping == true) {
+        //중복체크 안했을때
+        Fluttertoast.showToast(msg: "중복체크를 해주세요.");
+      } else {}
+    }
+    notifyListeners();
+  }
+
+  // 닉네임 변경되면 저장, 변경안되면 취소버튼
+  void nicknameCancel() {
+    nicknameController.addListener(() {
+      notifyListeners();
+    });
   }
 }

@@ -95,7 +95,7 @@ GoRouter createRouter(BuildContext context) {
             },
             routes: [
               GoRoute(
-                path: "schedule",
+                path: "/schedule",
                 builder: (context, state) {
                   // 2단계 : 데이터랑 같이 라우팅
                   final CalendarModel calendar = state.extra as CalendarModel;

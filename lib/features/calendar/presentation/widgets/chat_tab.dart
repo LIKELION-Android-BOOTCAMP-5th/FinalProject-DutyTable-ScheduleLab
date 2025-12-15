@@ -2,15 +2,19 @@ import 'package:dutytable/features/calendar/presentation/viewmodels/chat_view_mo
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../data/models/calendar_model.dart';
+
 class ChatTab extends StatelessWidget {
+  final CalendarModel? calendar;
+
   /// 채팅 탭(provider 주입)
-  const ChatTab({super.key});
+  const ChatTab({super.key, this.calendar});
 
   @override
   Widget build(BuildContext context) {
     // 챗 뷰모델주입
     return ChangeNotifierProvider(
-      create: (context) => ChatViewModel(),
+      create: (context) => ChatViewModel(calendar?.id ?? 0),
       child: _ChatTab(),
     );
   }
@@ -21,45 +25,15 @@ class _ChatTab extends StatelessWidget {
   const _ChatTab({super.key});
   @override
   Widget build(BuildContext context) {
-    // 더미 데이터
-    List<bool> isMe = [
-      true,
-      true,
-      true,
-      false,
-      false,
-      true,
-      false,
-      false,
-      false,
-      true,
-    ];
-    // 더미 데이터
-    List<String> time = [
-      "오전 09:10",
-      "오전 09:12",
-      "오전 10:42",
-      "오전 11:33",
-      "오후 12:03",
-      "오후 12:12",
-      "오후 13:50",
-      "오후 15:30",
-      "오후 17:52",
-      "오후 18:02",
-    ];
-    // 더미 데이터
-    List<String> chat = [
-      "안녕하세요",
-      "다들 잘 지내시죠?",
-      "다음엔 언제 볼까요?",
-      "안녕하세요",
-      "내일 어떄요?",
-      "시간은요?",
-      "18시요",
-      "장소는",
-      "광화문역 3번출구 어떄요?",
-      "좋아요",
-    ];
+    final viewModel = context.watch<ChatViewModel>();
+
+    // 내가 보낸 채팅/ 상대방이 보낸 채팅
+    final isMe = viewModel.isMe;
+    //채팅 보낸 시간
+    final time = viewModel.time;
+    // 채팅 메시지
+    final chat = viewModel.messages;
+
     return SafeArea(
       child: Column(
         children: [
@@ -67,7 +41,7 @@ class _ChatTab extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView.separated(
-                itemCount: 10,
+                itemCount: viewModel.messages.length,
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
@@ -105,6 +79,8 @@ class CustomInputChatMessageBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<ChatViewModel>();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: Row(
@@ -112,6 +88,7 @@ class CustomInputChatMessageBox extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
+              controller: viewModel.chatController,
               decoration: InputDecoration(
                 hintText: '메시지를 입력하세요...',
                 border: OutlineInputBorder(
@@ -129,6 +106,7 @@ class CustomInputChatMessageBox extends StatelessWidget {
           GestureDetector(
             onTap: () {
               print("전송 눌림");
+              viewModel.chatInsert();
             },
             // 버튼 크기
             child: Container(
@@ -183,13 +161,13 @@ class CustomNextDayLine extends StatelessWidget {
 
 class CustomChatCard extends StatelessWidget {
   /// 내가 보낸 채팅인가
-  final bool isMyChat;
+  final isMyChat;
 
   /// 채팅 보낸 시간
-  final String chatTime;
+  final chatTime;
 
   /// 채팅 메세지
-  final String message;
+  final message;
 
   /// 커스텀 채팅 소유자에 따른 UI 변경 카드
   const CustomChatCard({
