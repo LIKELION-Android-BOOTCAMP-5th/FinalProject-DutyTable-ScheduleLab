@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -194,6 +195,19 @@ class LoginViewModel extends ChangeNotifier {
 
   // 로그인 성공 후 공통 로직을 처리하는 함수
   Future<void> _handlePostSignIn(BuildContext context) async {
+    await FirebaseMessaging.instance.requestPermission();
+
+    await FirebaseMessaging.instance.getAPNSToken();
+
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    final userId = supabase.auth.currentUser!.id;
+    if (fcmToken != null) {
+      await supabase
+          .from('users')
+          .update({'fcm_token': fcmToken})
+          .eq('id', userId);
+    }
+
     // 현재 Supabase에 로그인된 사용자 정보 가져오기
     final currentUser = supabase.auth.currentUser;
     if (currentUser == null) {

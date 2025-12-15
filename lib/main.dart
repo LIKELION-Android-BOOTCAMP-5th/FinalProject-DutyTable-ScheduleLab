@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -9,14 +10,15 @@ import 'package:timezone/data/latest_all.dart' as timezone;
 
 import 'core/configs/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Supabase.initialize(
-    url: 'https://eexkppotdipyrzzjakur.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVleGtwcG90ZGlweXJ6empha3VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODcwNzksImV4cCI6MjA3NDk2MzA3OX0.HFGirj_JSIZB5bkgwm8CnQAqE9kBoRMOlcG8dl6-vyw',
+    url: dotenv.get("SUPABASE_URL"),
+    anonKey: dotenv.get("SUPABASE_ANON_KEY"),
   );
 
   await FlutterNaverMap().init(
