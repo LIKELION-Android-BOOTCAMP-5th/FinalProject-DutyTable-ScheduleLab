@@ -1,3 +1,4 @@
+import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/widgets.dart';
 
@@ -29,6 +30,15 @@ class CalendarEditViewModel extends ChangeNotifier {
     if (initialCalendarData != null) {
       _calendar = initialCalendarData;
     }
+  }
+
+  Future<bool> updateCalendarInfo() async {
+    final bool result = await CalendarDataSource.shared.updateCalendarInfo(
+      _titleController.text,
+      _descController.text,
+      _calendar.id,
+    );
+    return result;
   }
 
   /// 컨트롤러 dispose
