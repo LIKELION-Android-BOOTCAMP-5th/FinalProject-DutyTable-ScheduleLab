@@ -23,7 +23,7 @@ class CalendarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final applyBlur = deleteMode && !isAdmin;
+    final applyBlur = deleteMode && isAdmin;
     print(applyBlur);
     print(deleteMode);
     print(isAdmin);
@@ -174,8 +174,8 @@ class CalendarCard extends StatelessWidget {
     }
 
     /// deleteMode === true
-    if (!isAdmin) {
-      ///  관리자가 아님 → 삭제 불가
+    if (isAdmin) {
+      ///  관리자 → 삭제 불가
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
