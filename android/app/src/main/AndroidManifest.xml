@@ -4,6 +4,10 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
+      <meta-data
+        android:name="com.google.firebase.messaging.default_notification_channel_id"
+        android:value="fcm_head_up_channel_id" />
+
       <!-- ⭐️ 네이버 지도 CLIENT ID (필수) -->
         <meta-data
           android:name="com.naver.maps.map.CLIENT_ID"

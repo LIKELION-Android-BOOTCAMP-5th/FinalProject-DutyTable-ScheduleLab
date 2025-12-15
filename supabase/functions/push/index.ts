@@ -129,6 +129,12 @@ Deno.serve(async (req) => {
             body: notificationBody,
           },
         },
+      android: {
+        priority: 'HIGH',
+        notification: {
+          channel_id: 'fcm_head_up_channel_id'
+        }
+      }
       }),
     }
   )
