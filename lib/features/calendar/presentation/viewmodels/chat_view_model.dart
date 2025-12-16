@@ -1,12 +1,17 @@
+import 'package:dutytable/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../main.dart';
+import '../../../../supabase_manager.dart';
+
+enum ViewState { loading, success, error }
 
 /// 챗 뷰모델
 class ChatViewModel extends ChangeNotifier {
-  ChatViewModel(this.calendarId) {
-    _init();
-  }
+  ViewState _state = ViewState.loading;
+
+  ViewState get state => _state;
 
   /// 채팅 입력
   final chatController = TextEditingController();
@@ -17,13 +22,63 @@ class ChatViewModel extends ChangeNotifier {
   /// 현재 로그인 유저
   final user = supabase.auth.currentUser;
 
-  void _init() {
-    messageFetch();
-    timeFetch();
-    isMeFetch();
+  ///리얼타임 채널
+  RealtimeChannel? channel;
+
+  ///채팅 메시지
+  List<String> messages = [];
+
+  ///채팅 시간
+  List<String> time = [];
+
+  late int hour;
+
+  ///내 채팅인지 아닌지
+  List<bool> isMe = [];
+
+  final ScrollController scrollController = ScrollController();
+
+  // 리얼타임 구독하기
+  RealtimeChannel _subcribeMessageEvent() {
+    return SupabaseManager.shared.supabase
+        .channel('chatting')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'chat_messages',
+          callback: (payload) {
+            final newMessage = payload.newRecord;
+
+            final newChatMessage = newMessage['message'];
+            final createdAtString = newMessage['created_at'] as String;
+            final createdAt = DateTime.parse(createdAtString);
+            final newChatUserid = newMessage['user_id'];
+
+            messages.add(newChatMessage);
+            time.add('${createdAt.hour}시 ${createdAt.minute}분');
+            isMe.add(newChatUserid == user!.id);
+            print("Change received: ${payload.toString()}");
+            notifyListeners();
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (scrollController.hasClients) {
+                scrollController.animateTo(
+                  scrollController.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.fastEaseInToSlowEaseOut,
+                );
+              }
+            });
+          },
+        )
+        .subscribe();
   }
 
-  /// 채팅을 수파베이스에 저장
+  ChatViewModel(this.calendarId) {
+    fetchChatMessages();
+  }
+
+  // 채팅을 수파베이스에 저장
   Future<void> chatInsert() async {
     await supabase.from('chat_messages').insert({
       'user_id': user!.id,
@@ -34,34 +89,50 @@ class ChatViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 수파베이스 채팅 메시지 리스트로 불러오기
-  List<String> messages = [];
-
+  // 수파베이스 채팅 메시지 리스트로 불러오기
   Future<void> messageFetch() async {
     final data = await supabase.from('chat_messages').select('message');
-
     messages = data.map((row) => row['message'] as String).toList();
-
     notifyListeners();
   }
 
-  /// 수파베이스 채팅 시간 리스트로 불러오기
-  List<String> time = [];
-
+  // 수파베이스 채팅 시간 리스트로 불러오기
   Future<void> timeFetch() async {
     final data = await supabase.from('chat_messages').select('created_at');
-    time = data.map((row) => row['created_at'] as String).toList();
+    time = data.map((row) {
+      return (row['created_at'] as String).toChatTime();
+    }).toList();
     notifyListeners();
   }
 
-  /// 내가 보낸 채팅인지 아닌지 리스트로 불러오기
-  List<bool> isMe = [];
-
+  // 내가 보낸 채팅인지 아닌지 리스트로 불러오기
   Future<void> isMeFetch() async {
     final data = await supabase.from('chat_messages').select('user_id');
     isMe = data.map((row) {
       return row['user_id'] == user!.id;
     }).toList();
     notifyListeners();
+  }
+
+  // 채팅방데이터 불러오기
+  Future<void> fetchChatMessages() async {
+    _state = ViewState.loading;
+    try {
+      await messageFetch();
+      await timeFetch();
+      await isMeFetch();
+      channel = _subcribeMessageEvent();
+      _state = ViewState.success;
+    } catch (e) {
+      _state = ViewState.success;
+    }
+  }
+
+  @override
+  void dispose() {
+    channel?.unsubscribe();
+    chatController.dispose();
+    scrollController.dispose();
+    super.dispose();
   }
 }

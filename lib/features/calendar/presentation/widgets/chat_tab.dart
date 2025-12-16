@@ -41,6 +41,7 @@ class _ChatTab extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView.separated(
+                controller: viewModel.scrollController,
                 itemCount: viewModel.messages.length,
                 itemBuilder: (context, index) {
                   return Column(
@@ -107,6 +108,7 @@ class CustomInputChatMessageBox extends StatelessWidget {
             onTap: () {
               print("전송 눌림");
               viewModel.chatInsert();
+              viewModel.chatController.clear();
             },
             // 버튼 크기
             child: Container(
