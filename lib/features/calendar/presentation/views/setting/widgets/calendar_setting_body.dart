@@ -1,8 +1,8 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/widgets/custom_calendar_setting_content_box.dart';
 import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
-import 'package:dutytable/core/widgets/custom_calendar_setting_content_box.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -154,7 +154,8 @@ class _KickButton extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        CustomConfirmationDialog(
+        CustomConfirmationDialog.show(
+          context,
           content: "추방하시겠습니까?",
           confirmColor: AppColors.commonRed,
           onConfirm: () {},

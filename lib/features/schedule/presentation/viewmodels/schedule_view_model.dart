@@ -16,7 +16,7 @@ class ScheduleViewModel extends ChangeNotifier {
       SupabaseManager.shared.supabase.auth.currentUser?.id ?? "";
   String get currentUserId => _currentUserId;
 
-  /// 불러온 일정 리스트(private)
+  /// 불러온 일정 리스트(private) - 전체 목록
   List<ScheduleModel> _schedules = [];
 
   /// 불러온 일정 리스트(public)
@@ -60,6 +60,10 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 선택된 필터 드롭다운 컬러
   String selectedFilterColor = "전체";
+
+  // 화면에 표시될 필터링된 일정 리스트
+  List<ScheduleModel> _selectedFilteringList = [];
+  List<ScheduleModel> get selectedFilteringList => _selectedFilteringList;
 
   /// 캘린더 선택된 날짜
   DateTime selectedDay = DateTime.now();
@@ -113,7 +117,16 @@ class ScheduleViewModel extends ChangeNotifier {
 
     _filterMonths = [for (int month = 1; month <= 12; month++) month];
 
-    _filterColors = ['전체', 'Red', 'Blue', 'Green', 'Yellow', 'Purple'];
+    _filterColors = [
+      '전체',
+      '0xFFFF3B30',
+      '0xFFFF9500',
+      '0xFFFFCC00',
+      '0xFF34C759',
+      '0xFF32ADE6',
+      '0xFF007AFF',
+      '0xFFAF52DE',
+    ];
 
     selectedFilterYears = DateTime.now().year;
     selectedFilterMonth = DateTime.now().month;
@@ -126,12 +139,25 @@ class ScheduleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 필터 연도 선택
   void selectedYear(int value) {
     selectedFilterYears = value;
-    notifyListeners();
+    applyFilter();
   }
 
-  /// 일정 목록 가져오기
+  /// 필터 월 선택
+  void selectedMonth(int value) {
+    selectedFilterMonth = value;
+    applyFilter();
+  }
+
+  /// 필터 컬러 선택
+  void selectedColor(String value) {
+    selectedFilterColor = value;
+    applyFilter();
+  }
+
+  /// 일정 목록 가져오기 (서버 호출: 초기 로드 및 갱신 시 사용)
   Future<void> fetchSchedules() async {
     if (_calendar == null) {
       return;
@@ -144,18 +170,44 @@ class ScheduleViewModel extends ChangeNotifier {
         _scheduleDate = _schedules
             .map((e) => e.startedAt.toPureDate())
             .toList();
-        notifyListeners();
+
+        applyFilter();
       } catch (e) {
         debugPrint("❌ fetchSchedules error: $e");
       }
     }
   }
 
+  /// 클라이언트 메모리상의 데이터를 필터링하여 리스트 갱신 (서버 호출 없음)
+  void applyFilter() {
+    _selectedFilteringList = _schedules.where((schedule) {
+      final startedAt = schedule.startedAt;
+
+      // 년도 필터링
+      final isYearMatch =
+          selectedFilterYears == null || startedAt.year == selectedFilterYears;
+
+      // 월 필터링
+      final isMonthMatch =
+          selectedFilterMonth == null || startedAt.month == selectedFilterMonth;
+
+      // 컬러 필터링
+      final isColorMatch =
+          selectedFilterColor == "전체" ||
+          schedule.colorValue == selectedFilterColor;
+
+      return isYearMatch && isMonthMatch && isColorMatch;
+    }).toList();
+
+    notifyListeners();
+  }
+
   /// 일정 선택 삭제(다수 선택)
   Future<void> deleteAllSchedules() async {
     try {
       await ScheduleDataSource().deleteAllSchedules(selectedIds);
-      notifyListeners();
+      fetchSchedules();
+      // 삭제 후 fetchSchedules를 호출하여 서버에서 최신 리스트를 다시 가져와야 함 (이것은 View에서 처리됩니다.)
     } catch (e) {
       rethrow;
     }
