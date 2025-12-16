@@ -142,7 +142,19 @@ String? extractStoragePath(String? imageUrl) {
 /// 채팅 시간 함수
 extension ChattingDateTime on String {
   String toChatTime() {
-    final createdAt = DateTime.parse(this);
-    return '${createdAt.hour}시 ${createdAt.minute}분';
+    // 1. UTC 문자열을 파싱한 후, 시스템 로컬 시간대(KST)로 변환합니다.
+    final createdAtLocal = DateTime.parse(this).toLocal();
+
+    // 2. 오전/오후 구분
+    String amPm = createdAtLocal.hour < 12 ? '오전' : '오후';
+
+    // 3. 12시간제 시간 계산 (0시와 12시를 12로 표시)
+    int hour12 = createdAtLocal.hour % 12;
+    if (hour12 == 0) hour12 = 12;
+
+    // 4. 분(minute)은 padLeft를 사용하여 항상 두 자릿수로 표시
+    String minute = createdAtLocal.minute.toString().padLeft(2, '0');
+
+    return '$amPm $hour12시 $minute분';
   }
 }

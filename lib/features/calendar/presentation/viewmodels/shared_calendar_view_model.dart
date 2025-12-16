@@ -13,7 +13,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
   ViewState get state => _state;
 
   /// 개인 캘린더 탭 이름 리스트(private)
-  final List<String> _tabNames = ["캘린더", "리스트", "나와의 채팅"];
+  final List<String> _tabNames = ["캘린더", "리스트", "채팅"];
 
   /// 개인 캘린더 탭 이름 리스트(public)
   List<String> get tabNames => _tabNames;
