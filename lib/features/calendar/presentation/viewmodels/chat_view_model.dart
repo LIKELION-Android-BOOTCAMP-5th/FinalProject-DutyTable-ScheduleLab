@@ -114,12 +114,29 @@ class ChatViewModel extends ChangeNotifier {
         .subscribe();
   }
 
+  //새로운 캘린더인지 구분하기
+  Future<bool> isNew(calendarId) async {
+    final result = await supabase
+        .from('chat_messages')
+        .select()
+        .eq('calendar_id', calendarId);
+    if (result.isEmpty) {
+      return true; // 새 캘린더이다
+    } else {
+      return false;
+    }
+  }
+
   Future<void> fetchChatMessages() async {
-    await messageFetch();
-    await timeFetch();
-    await isMeFetch();
-    channel = _subcribeMessageEvent();
-    _state = ViewState.success;
-    notifyListeners();
+    if (await isNew(calendarId) == true) {
+      _state = ViewState.success;
+    } else {
+      await messageFetch();
+      await timeFetch();
+      await isMeFetch();
+      channel = _subcribeMessageEvent();
+      _state = ViewState.success;
+      notifyListeners();
+    }
   }
 }
