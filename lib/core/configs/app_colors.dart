@@ -5,6 +5,7 @@ class AppColors {
   static const Color commonWhite = Color(0xFFFFFFFF);
   static const Color commonRed = Color(0xFFEE4444);
   static const Color commonGrey = Color(0xFF9E9E9E);
+  static const Color commonLightGrey = Color(0xFFEEEEEE);
   static const Color commonBlack54 = Colors.black54;
   static const Color commonGreyShade400 = Color(0xffBDBDBD);
 

@@ -11,11 +11,15 @@ class CustomConfirmationDialog extends StatelessWidget {
   /// 확인 버튼 클릭 시 실행
   final VoidCallback onConfirm;
 
+  /// 취소 버튼 클릭 시 실행
+  final VoidCallback? onCancel;
+
   const CustomConfirmationDialog({
     super.key,
     required this.content,
     required this.confirmColor,
     required this.onConfirm,
+    this.onCancel,
   });
 
   @override
@@ -104,6 +108,26 @@ class CustomConfirmationDialog extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  static Future<void> show(
+    BuildContext context, {
+    required String content,
+    required Color confirmColor,
+    required VoidCallback onConfirm,
+    VoidCallback? onCancel,
+    bool barrierDismissible = false,
+  }) {
+    return showDialog(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (_) => CustomConfirmationDialog(
+        content: content,
+        confirmColor: confirmColor,
+        onConfirm: onConfirm,
+        onCancel: onCancel,
       ),
     );
   }

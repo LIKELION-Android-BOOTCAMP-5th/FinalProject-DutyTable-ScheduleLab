@@ -64,7 +64,6 @@ class _ListTab extends StatelessWidget {
                           // 아이템 눌렀을 떄 실행 할 함수
                           onChanged: (dynamic newValue) {
                             viewModel.selectedYear(newValue ?? 0);
-                            print('선택된 연도: $newValue');
                           },
                         ),
                         // 커스텀 드롭다운 버튼 사용
@@ -82,8 +81,7 @@ class _ListTab extends StatelessWidget {
                               .toList(),
                           // 아이템 눌렀을 떄 실행 할 함수
                           onChanged: (dynamic newValue) {
-                            viewModel.selectedYear(newValue ?? 0);
-                            print('선택된 월: $newValue');
+                            viewModel.selectedMonth(newValue ?? 0);
                           },
                         ),
                         // 커스텀 드롭다운 버튼 사용
@@ -95,14 +93,22 @@ class _ListTab extends StatelessWidget {
                               .map<DropdownMenuItem<String>>((String color) {
                                 return DropdownMenuItem<String>(
                                   value: color,
-                                  child: Text("${color.toString()}"),
+                                  child: color == '전체'
+                                      ? Text(color)
+                                      : Container(
+                                          width: 28,
+                                          height: 28,
+                                          decoration: BoxDecoration(
+                                            color: Color(int.parse(color)),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
                                 );
                               })
                               .toList(),
                           // 아이템 눌렀을 떄 실행 할 함수
                           onChanged: (dynamic newValue) {
-                            viewModel.selectedYear(newValue ?? 0);
-                            print('선택된 연도: $newValue');
+                            viewModel.selectedColor(newValue ?? "");
                           },
                         ),
                       ],
@@ -127,13 +133,18 @@ class _ListTab extends StatelessWidget {
                                     GestureDetector(
                                       onTap: () {
                                         if (viewModel.selectedIds.isNotEmpty) {
-                                          CustomConfirmationDialog(
+                                          CustomConfirmationDialog.show(
+                                            context,
                                             content: '정말 삭제 하시겠습니까?',
                                             confirmColor: AppColors.commonRed,
-                                            onConfirm: () {
-                                              //TODO: 일정 삭제 구현
+                                            onConfirm: () async {
+                                              await viewModel
+                                                  .deleteAllSchedules();
+                                              viewModel.cancelDeleteMode();
                                             },
                                           );
+                                        } else {
+                                          null;
                                         }
                                       },
                                       child: Text(
@@ -168,21 +179,26 @@ class _ListTab extends StatelessWidget {
                     vertical: 8.0,
                   ),
                   child: ListView.separated(
-                    itemCount: viewModel.schedules.length,
+                    itemCount: viewModel.selectedFilteringList.length,
                     itemBuilder: (context, index) {
                       return CustomScheduleCard(
-                        emoji: viewModel.schedules[index].emotionTag ?? "",
-                        title: viewModel.schedules[index].title,
-                        color: viewModel.schedules[index].colorValue,
-                        startedAt: viewModel.schedules[index].startedAt,
-                        endedAt: viewModel.schedules[index].endedAt,
+                        emoji:
+                            viewModel.selectedFilteringList[index].emotionTag ??
+                            "",
+                        title: viewModel.selectedFilteringList[index].title,
+                        color:
+                            viewModel.selectedFilteringList[index].colorValue,
+                        startedAt:
+                            viewModel.selectedFilteringList[index].startedAt,
+                        endedAt: viewModel.selectedFilteringList[index].endedAt,
                         isDeleteMode: viewModel.deleteMode,
                         isSelected: viewModel.isSelected(
-                          viewModel.schedules[index].id.toString(),
+                          viewModel.selectedFilteringList[index].id.toString(),
                         ),
                         onChangeSelected: () {
                           viewModel.toggleSelected(
-                            viewModel.schedules[index].id.toString(),
+                            viewModel.selectedFilteringList[index].id
+                                .toString(),
                           );
                         },
                       );
@@ -224,7 +240,7 @@ class CustomDropdownButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey,
+        color: AppColors.commonLightGrey,
         borderRadius: BorderRadius.circular(10),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
