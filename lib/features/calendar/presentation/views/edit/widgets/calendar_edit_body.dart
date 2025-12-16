@@ -167,7 +167,8 @@ class _RoleButton extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        CustomConfirmationDialog(
+        CustomConfirmationDialog.show(
+          context,
           content: "방장 권한을 넘기시겠습니까?",
           confirmColor: AppColors.commonBlue,
           onConfirm: () {

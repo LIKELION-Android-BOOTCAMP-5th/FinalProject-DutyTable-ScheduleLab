@@ -1,3 +1,4 @@
+import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 
 class ScheduleAddViewModel extends ChangeNotifier {
@@ -45,6 +46,8 @@ class ScheduleAddViewModel extends ChangeNotifier {
 
   /// 주소
   String? _address;
+  String? _longitude;
+  String? _latitude;
 
   /// 메모
   String _memo = "";
@@ -63,6 +66,8 @@ class ScheduleAddViewModel extends ChangeNotifier {
   DateTime get startDate => _startDate;
   DateTime get endDate => _endDate;
   String? get address => _address;
+  String? get longitude => _longitude;
+  String? get latitude => _latitude;
   String get memo => _memo;
 
   /// setter
@@ -126,8 +131,19 @@ class ScheduleAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  set address(String? value) {
-    _address = value;
+  void setLocation({
+    required String address,
+    required String latitude,
+    required String longitude,
+  }) {
+    _address = address;
+    _latitude = latitude;
+    _longitude = longitude;
+    notifyListeners();
+  }
+
+  void clearAddress() {
+    _address = null;
     notifyListeners();
   }
 
@@ -138,8 +154,17 @@ class ScheduleAddViewModel extends ChangeNotifier {
     }
   }
 
-  void clearAddress() {
-    _address = null;
-    notifyListeners();
+  Future<Map<String, double>?> geocodeAddress(String address) async {
+    final response = await supabase.functions.invoke(
+      'hyper-endpoint',
+      body: {'type': 'geocode', 'address': address},
+    );
+
+    if (response.data == null) return null;
+
+    return {
+      'latitude': (response.data['latitude'] as num).toDouble(),
+      'longitude': (response.data['longitude'] as num).toDouble(),
+    };
   }
 }

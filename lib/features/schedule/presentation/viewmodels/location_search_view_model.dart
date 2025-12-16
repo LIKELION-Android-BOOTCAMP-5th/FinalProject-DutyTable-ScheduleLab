@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'package:dutytable/features/schedule/data/models/address_search_result_model.dart';
+import 'package:dutytable/features/schedule/data/models/location_search_result_model.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class AddressSearchViewModel extends ChangeNotifier {
+class LocationSearchViewModel extends ChangeNotifier {
   final SupabaseClient supabase;
 
-  AddressSearchViewModel(this.supabase);
+  LocationSearchViewModel(this.supabase);
 
   Timer? _debounce;
   bool isLoading = false;
-  List<AddressSearchResult> results = [];
+  List<LocationSearchResultModel> results = [];
 
   void onKeywordChanged(String keyword) {
     _debounce?.cancel();
@@ -31,7 +31,7 @@ class AddressSearchViewModel extends ChangeNotifier {
       );
 
       results = (res.data as List)
-          .map((e) => AddressSearchResult.fromJson(e))
+          .map((e) => LocationSearchResultModel.fromJson(e))
           .toList();
 
       isLoading = false;

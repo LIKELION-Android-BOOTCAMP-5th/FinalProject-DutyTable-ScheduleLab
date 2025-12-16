@@ -83,11 +83,11 @@ class ScheduleDialogHeader extends StatelessWidget {
                         content: const Text("선택한 일정을 삭제하시겠습니까?"),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context, false),
+                            onPressed: () => context.pop(),
                             child: const Text("취소"),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.pop(context, true),
+                            onPressed: () => context.pop(),
                             child: const Text(
                               "삭제",
                               style: TextStyle(color: Colors.red),
