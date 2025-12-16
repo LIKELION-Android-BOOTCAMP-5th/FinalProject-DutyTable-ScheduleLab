@@ -64,7 +64,6 @@ class _ListTab extends StatelessWidget {
                           // 아이템 눌렀을 떄 실행 할 함수
                           onChanged: (dynamic newValue) {
                             viewModel.selectedYear(newValue ?? 0);
-                            print('선택된 연도: $newValue');
                           },
                         ),
                         // 커스텀 드롭다운 버튼 사용
@@ -83,7 +82,6 @@ class _ListTab extends StatelessWidget {
                           // 아이템 눌렀을 떄 실행 할 함수
                           onChanged: (dynamic newValue) {
                             viewModel.selectedMonth(newValue ?? 0);
-                            print('선택된 월: $newValue');
                           },
                         ),
                         // 커스텀 드롭다운 버튼 사용
@@ -111,7 +109,6 @@ class _ListTab extends StatelessWidget {
                           // 아이템 눌렀을 떄 실행 할 함수
                           onChanged: (dynamic newValue) {
                             viewModel.selectedColor(newValue ?? "");
-                            print('선택된 컬러: $newValue');
                           },
                         ),
                       ],
