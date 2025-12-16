@@ -79,7 +79,6 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 앱 실행될 때
   /// 초기화 함수 실행
   ScheduleViewModel({CalendarModel? calendar}) : _calendar = calendar {
-    // 매개변수 이름을 받은 후 _calendar에 할당
     _init();
   }
 
@@ -157,7 +156,7 @@ class ScheduleViewModel extends ChangeNotifier {
     applyFilter();
   }
 
-  /// 일정 목록 가져오기 (서버 호출: 초기 로드 및 갱신 시 사용)
+  /// 일정 목록 가져오기
   Future<void> fetchSchedules() async {
     if (_calendar == null) {
       return;
@@ -178,7 +177,7 @@ class ScheduleViewModel extends ChangeNotifier {
     }
   }
 
-  /// 클라이언트 메모리상의 데이터를 필터링하여 리스트 갱신 (서버 호출 없음)
+  /// 일정 목록 필터링
   void applyFilter() {
     _selectedFilteringList = _schedules.where((schedule) {
       final startedAt = schedule.startedAt;
@@ -207,7 +206,6 @@ class ScheduleViewModel extends ChangeNotifier {
     try {
       await ScheduleDataSource().deleteAllSchedules(selectedIds);
       fetchSchedules();
-      // 삭제 후 fetchSchedules를 호출하여 서버에서 최신 리스트를 다시 가져와야 함 (이것은 View에서 처리됩니다.)
     } catch (e) {
       rethrow;
     }
