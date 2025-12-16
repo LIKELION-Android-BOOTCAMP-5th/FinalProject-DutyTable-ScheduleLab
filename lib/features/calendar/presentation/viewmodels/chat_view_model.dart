@@ -75,14 +75,7 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   ChatViewModel(this.calendarId) {
-    if (messages.isNotEmpty) {
-      // 메시지가 있으면 성공
-      _state = ViewState.success;
-    } else {
-      // 없으면 fetchChatMessages()
-      _state = ViewState.loading;
-      fetchChatMessages();
-    }
+    fetchChatMessages();
   }
 
   // 채팅을 수파베이스에 저장
@@ -100,6 +93,7 @@ class ChatViewModel extends ChangeNotifier {
   Future<void> messageFetch() async {
     final data = await supabase.from('chat_messages').select('message');
     messages = data.map((row) => row['message'] as String).toList();
+    notifyListeners();
   }
 
   // 수파베이스 채팅 시간 리스트로 불러오기
@@ -108,6 +102,7 @@ class ChatViewModel extends ChangeNotifier {
     time = data.map((row) {
       return (row['created_at'] as String).toChatTime();
     }).toList();
+    notifyListeners();
   }
 
   // 내가 보낸 채팅인지 아닌지 리스트로 불러오기
@@ -119,30 +114,25 @@ class ChatViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //새로운 캘린더인지 구분하기
-  Future<bool> isNew(calendarId) async {
-    final result = await supabase
-        .from('chat_messages')
-        .select()
-        .eq('calendar_id', calendarId);
-    if (result.isEmpty) {
-      return true; // 새 캘린더이다
-    } else {
-      return false;
-    }
-  }
-
   // 채팅방데이터 불러오기
   Future<void> fetchChatMessages() async {
-    if (await isNew(calendarId) == true) {
-      _state = ViewState.success;
-    } else {
+    _state = ViewState.loading;
+    try {
       await messageFetch();
       await timeFetch();
       await isMeFetch();
       channel = _subcribeMessageEvent();
       _state = ViewState.success;
-      notifyListeners();
+    } catch (e) {
+      _state = ViewState.success;
     }
+  }
+
+  @override
+  void dispose() {
+    channel?.unsubscribe();
+    chatController.dispose();
+    scrollController.dispose();
+    super.dispose();
   }
 }
