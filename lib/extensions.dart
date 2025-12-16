@@ -138,3 +138,11 @@ String? extractStoragePath(String? imageUrl) {
 
   return segments.sublist(index + 2).join('/');
 }
+
+/// 채팅 시간 함수
+extension ChattingDateTime on String {
+  String toChatTime() {
+    final createdAt = DateTime.parse(this);
+    return '${createdAt.hour}시 ${createdAt.minute}분';
+  }
+}
