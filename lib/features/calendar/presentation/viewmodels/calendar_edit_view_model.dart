@@ -33,7 +33,7 @@ class CalendarEditViewModel extends ChangeNotifier {
   }
 
   Future<bool> updateCalendarInfo() async {
-    final bool result = await CalendarDataSource.shared.updateCalendarInfo(
+    final bool result = await CalendarDataSource.instance.updateCalendarInfo(
       _titleController.text,
       _descController.text,
       _calendar.id,

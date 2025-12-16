@@ -1,0 +1,91 @@
+import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/widgets/custom_floatingactionbutton.dart';
+import 'package:dutytable/extensions.dart';
+import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
+
+import 'schedule_dialog/schedule_dialog.dart';
+
+class CalendarTabBody extends StatelessWidget {
+  /// 캘린더 탭 - 바디(캘린더 모양)
+  const CalendarTabBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ScheduleViewModel>(
+      builder: (context, viewModel, _) {
+        final dataSource = ScheduleDataSource.fromSchedules(
+          viewModel.schedules,
+        );
+
+        return Scaffold(
+          body: SfCalendar(
+            view: CalendarView.month,
+            dataSource: dataSource,
+            headerDateFormat: 'yyyy년 MM월',
+            headerStyle: CalendarHeaderStyle(
+              textAlign: TextAlign.center,
+              backgroundColor: AppColors.background(context),
+              textStyle: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: AppColors.text(context),
+              ),
+            ),
+            todayHighlightColor: AppColors.commonBlue,
+            onTap: (details) {
+              final date = details.date;
+              if (date == null) return;
+
+              viewModel.changeSelectedDay(date);
+
+              final hasSchedule = viewModel.schedules.any(
+                (s) => s.containsDay(date),
+              );
+
+              if (!hasSchedule) return;
+
+              showDialog(
+                context: context,
+                builder: (_) => ChangeNotifierProvider.value(
+                  value: viewModel,
+                  child: ScheduleDialog(day: date),
+                ),
+              );
+            },
+            monthViewSettings: const MonthViewSettings(
+              appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
+            ),
+          ),
+          floatingActionButton: const CustomFloatingActionButton(),
+        );
+      },
+    );
+  }
+}
+
+/// 일정 - 데이터 소스
+class ScheduleDataSource extends CalendarDataSource {
+  ScheduleDataSource(List<Appointment> source) {
+    appointments = source;
+  }
+
+  factory ScheduleDataSource.fromSchedules(List<ScheduleModel> schedules) {
+    return ScheduleDataSource(
+      schedules
+          .map(
+            (s) => Appointment(
+              startTime: s.startedAt,
+              endTime: s.endedAt,
+              subject: s.title,
+              color: Color(int.parse(s.colorValue)),
+              notes: s.emotionTag,
+            ),
+          )
+          .toList(),
+    );
+  }
+}

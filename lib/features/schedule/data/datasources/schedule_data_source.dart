@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:dutytable/features/schedule/models/schedule_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import '../models/schedule_model.dart';
 
 class ScheduleDataSource {
   static final ScheduleDataSource _shared = ScheduleDataSource();

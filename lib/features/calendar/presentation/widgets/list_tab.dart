@@ -127,10 +127,9 @@ class _ListTab extends StatelessWidget {
                                     GestureDetector(
                                       onTap: () {
                                         if (viewModel.selectedIds.isNotEmpty) {
-                                          showCustomConfirmationDialog(
-                                            context,
+                                          CustomConfirmationDialog(
                                             content: '정말 삭제 하시겠습니까?',
-                                            color: AppColors.commonRed,
+                                            confirmColor: AppColors.commonRed,
                                             onConfirm: () {
                                               //TODO: 일정 삭제 구현
                                             },

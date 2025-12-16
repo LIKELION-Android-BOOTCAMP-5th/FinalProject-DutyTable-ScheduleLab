@@ -1,4 +1,4 @@
-import 'package:dutytable/features/calendar/presentation/widgets/calendar_tab.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/calendar_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
 import 'package:flutter/material.dart';

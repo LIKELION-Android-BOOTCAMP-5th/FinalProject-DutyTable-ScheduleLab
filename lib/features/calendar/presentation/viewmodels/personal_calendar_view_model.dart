@@ -47,7 +47,7 @@ class PersonalCalendarViewModel extends ChangeNotifier {
     _state = ViewState.loading;
     notifyListeners();
     try {
-      _calendar = await CalendarDataSource.shared.fetchPersonalCalendar();
+      _calendar = await CalendarDataSource.instance.fetchPersonalCalendar();
       _state = ViewState.success;
     } catch (e) {
       _state = ViewState.error;

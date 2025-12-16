@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'package:dutytable/features/schedule/data/models/address_search_result_model.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../models/address_search_result_model.dart';
 
 class AddressSearchViewModel extends ChangeNotifier {
   final SupabaseClient supabase;

@@ -1,4 +1,4 @@
-import 'features/schedule/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 
 extension NullableStringDateExtensions on String? {
   DateTime? toDateTimeOrNull() {
@@ -78,8 +78,8 @@ DateTime onlyDate(DateTime dt) => DateTime(dt.year, dt.month, dt.day);
 extension ScheduleRangeCheck on ScheduleModel {
   bool containsDay(DateTime day) {
     final d = onlyDate(day);
-    final start = onlyDate(startedAt!);
-    final end = onlyDate(endedAt!);
+    final start = onlyDate(startedAt);
+    final end = onlyDate(endedAt);
 
     if (start.isAfter(end)) return false;
 

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
+import 'package:dutytable/core/network/dio_client.dart';
 import 'package:flutter/foundation.dart'; // debugPrint를 위해 추가
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../extensions.dart';
@@ -9,47 +9,12 @@ import '../models/calendar_member_model.dart';
 import '../models/calendar_model.dart';
 
 class CalendarDataSource {
-  CalendarDataSource._internal() {
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          final session = supabase.auth.currentSession;
+  CalendarDataSource._();
+  static final CalendarDataSource instance = CalendarDataSource._();
 
-          if (session?.accessToken != null) {
-            options.headers['Authorization'] = 'Bearer ${session!.accessToken}';
-          }
+  final Dio _dio = DioClient.shared.dio;
 
-          handler.next(options);
-        },
-        onError: (e, handler) {
-          debugPrint('❌ Dio Error: ${e.response?.statusCode}');
-          debugPrint('❌ Dio Error Body: ${e.response?.data}');
-          handler.next(e);
-        },
-      ),
-    );
-  }
-
-  /// 싱글턴
-  static final CalendarDataSource _shared = CalendarDataSource._internal();
-  static CalendarDataSource get shared => _shared;
-
-  static const String _baseUrl = 'https://eexkppotdipyrzzjakur.supabase.co';
-
-  static final String apiKey = dotenv.env['SUPABASE_ANON_KEY']!;
-
-  // 인스턴스 초기화
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: _baseUrl,
-      headers: {
-        'apikey': apiKey,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
-      },
-    ),
-  );
-
+  /// CREATE
   /// 캘린더 추가
   Future<void> addSharedCalendar({
     required String title,
@@ -60,7 +25,7 @@ class CalendarDataSource {
     final user = supabase.auth.currentUser;
     if (user == null) throw Exception('로그인 필요');
 
-    // 1️⃣ 캘린더 생성 (id 반환)
+    // 캘린더 생성 (id 반환)
     final response = await _dio.post(
       '/rest/v1/calendars',
       options: Options(headers: const {'Prefer': 'return=representation'}),
@@ -75,7 +40,7 @@ class CalendarDataSource {
 
     final calendarId = response.data[0]['id'];
 
-    // 2️⃣ 초대 멤버 추가 (생성자는 트리거가 처리)
+    // 초대 멤버 추가 (생성자는 트리거가 처리)
     if (invitedUserIds.isNotEmpty) {
       final members = invitedUserIds
           .map(
@@ -91,36 +56,36 @@ class CalendarDataSource {
     }
   }
 
-  /// supabase storage 에 이미지 삭제
-  Future<void> deleteCalendarImage(String? imageUrl) async {
-    final path = extractStoragePath(imageUrl);
-    if (path == null) return;
+  /// UPDATE
+  /// 캘린더 수정
+  /// 캘린더 수정
+  Future<bool> updateCalendarInfo(
+    String title,
+    String description,
+    int calendarId,
+  ) async {
+    try {
+      final Map<String, dynamic> data = {
+        'title': title,
+        'description': description,
+      };
 
-    await supabase.storage.from('calendar-images').remove([path]);
-  }
+      final response = await _dio.patch(
+        '/rest/v1/calendars?id=eq.$calendarId',
+        data: data,
+      );
 
-  /// 캘린더 삭제 (방장만 가능)
-  Future<void> deleteCalendars(List<int> calendarIds) async {
-    final response = await _dio.get(
-      '/rest/v1/calendars',
-      queryParameters: {
-        'select': 'id,imageURL',
-        'id': 'in.(${calendarIds.join(",")})',
-      },
-    );
-
-    final List data = response.data as List;
-
-    for (final item in data) {
-      await deleteCalendarImage(item['imageURL'] as String?);
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } on DioException catch (e) {
+      return false;
     }
-
-    await _dio.delete(
-      '/rest/v1/calendars',
-      queryParameters: {'id': 'in.(${calendarIds.join(",")})'},
-    );
   }
 
+  /// READ
   /// 개인 캘린더 가져오기
   Future<CalendarModel> fetchPersonalCalendar() async {
     final userId = supabase.auth.currentUser?.id ?? "";
@@ -160,48 +125,30 @@ class CalendarDataSource {
       },
     );
 
-    if (response.statusCode == 200 && response.data is List) {
-      final List<dynamic> jsonData = response.data;
-
-      if (jsonData.isNotEmpty) {
-        return jsonData.map((jsonItem) {
-          return CalendarMemberModel.fromJson(jsonItem as Map<String, dynamic>);
-        }).toList();
-      } else {
-        return [];
-      }
-    } else {
+    if (response.statusCode != 200 || response.data is! List) {
       throw Exception(
         'Failed to load calendar Member: Status ${response.statusCode}',
       );
     }
-  }
 
-  /// 캘린더 수정
-  Future<bool> updateCalendarInfo(
-    String title,
-    String description,
-    int calendarId,
-  ) async {
-    try {
-      final Map<String, dynamic> data = {
-        'title': title,
-        'description': description,
-      };
+    final List<dynamic> jsonData = response.data;
 
-      final response = await _dio.patch(
-        '/rest/v1/calendars?id=eq.$calendarId',
-        data: data,
-      );
+    if (jsonData.isEmpty) return [];
 
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
-    } on DioException catch (e) {
-      return false;
-    }
+    final members = jsonData
+        .map(
+          (jsonItem) =>
+              CalendarMemberModel.fromJson(jsonItem as Map<String, dynamic>),
+        )
+        .toList();
+
+    // 방장을 제일 위로 정렬
+    members.sort((a, b) {
+      if (a.is_admin == b.is_admin) return 0;
+      return a.is_admin ? -1 : 1;
+    });
+
+    return members;
   }
 
   /// 공유 캘린더 목록 가져오기
@@ -290,5 +237,36 @@ class CalendarDataSource {
     }
 
     return calendars;
+  }
+
+  /// DELETE
+  /// supabase storage 에 이미지 삭제
+  Future<void> deleteCalendarImage(String? imageUrl) async {
+    final path = extractStoragePath(imageUrl);
+    if (path == null) return;
+
+    await supabase.storage.from('calendar-images').remove([path]);
+  }
+
+  /// 캘린더 삭제 (방장만 가능)
+  Future<void> deleteCalendars(List<int> calendarIds) async {
+    final response = await _dio.get(
+      '/rest/v1/calendars',
+      queryParameters: {
+        'select': 'id,imageURL',
+        'id': 'in.(${calendarIds.join(",")})',
+      },
+    );
+
+    final List data = response.data as List;
+
+    for (final item in data) {
+      await deleteCalendarImage(item['imageURL'] as String?);
+    }
+
+    await _dio.delete(
+      '/rest/v1/calendars',
+      queryParameters: {'id': 'in.(${calendarIds.join(",")})'},
+    );
   }
 }

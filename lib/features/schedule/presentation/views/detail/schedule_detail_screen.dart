@@ -1,20 +1,16 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/extensions.dart';
-import 'package:dutytable/features/schedule/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import 'address_search_bottom_sheet.dart';
+import '../address_search_bottom_sheet.dart';
 
-/// TODO
-/// 일정 상세 UI 추가
-/// 지도 API 연동하여 주소가 있을 시 지도와 마커 추가
 class ScheduleDetailScreen extends StatelessWidget {
   final ScheduleModel scheduleDetail;
   final bool isAdmin;
@@ -57,298 +53,259 @@ class _ScheduleDetailScreen extends StatelessWidget {
                   /// 일정 상세 - 감정 및 색
                   _EmotionColorSection(),
 
-                  const SizedBox(height: 12),
-
-                  const Divider(),
-
-                  const SizedBox(height: 12),
+                  _DividerGap(),
 
                   /// 일정 상세 - 일정 날짜 및 시간
                   _ScheduleDateTime(),
 
-                  const SizedBox(height: 12),
-
-                  const Divider(),
-
-                  const SizedBox(height: 10),
+                  _DividerGap(),
 
                   /// 일정 상세 - 완료 여부
                   _SuccessStatusSection(),
 
-                  const SizedBox(height: 10),
-
-                  const Divider(),
-
-                  const SizedBox(height: 8),
+                  _DividerGap(),
 
                   /// 일정 상세 - 지도(위치 및 마커)
                   _MapSection(),
 
-                  const SizedBox(height: 8),
-
-                  const Divider(),
-
-                  const SizedBox(height: 10),
+                  _DividerGap(),
 
                   /// 일정 상세 - 반복
                   _RepeatSection(),
 
-                  const SizedBox(height: 10),
-
-                  const Divider(),
-
-                  const SizedBox(height: 10),
+                  _DividerGap(),
 
                   /// 일정 상세 - 메모
                   _MemoSection(),
-
-                  const SizedBox(height: 10),
-
-                  const Divider(),
-
-                  const SizedBox(height: 10),
-
-                  /// 일정 상세 바텀 버튼 - 편집, 공유, 삭제
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        /// 편집 버튼
-                        if (viewModel.isAdmin)
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                print("편집");
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: AppColors.background(context),
-                                  border: Border.all(
-                                    color: AppColors.commonGrey,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.edit_note),
-
-                                    const SizedBox(width: 6),
-
-                                    Text(
-                                      "편집",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-
-                        const SizedBox(width: 10),
-
-                        /// 공유 버튼
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              print("공유");
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: AppColors.background(context),
-                                border: Border.all(
-                                  color: AppColors.commonBlue,
-                                  width: 2,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.share,
-                                    color: AppColors.commonBlue,
-                                  ),
-
-                                  const SizedBox(width: 6),
-
-                                  Text(
-                                    "공유",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.commonBlue,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        /// 삭제 버튼
-                        if (viewModel.isAdmin)
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => Dialog(
-                                    backgroundColor: AppColors.background(
-                                      context,
-                                    ),
-                                    insetPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 24,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            "일정을 삭제하시겠습니까?",
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ),
-
-                                          const SizedBox(height: 14),
-
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: GestureDetector(
-                                                  onTap: () => context.pop(),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      color: Color(0xfff3f4f6),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            10,
-                                                          ),
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                          vertical: 10,
-                                                        ),
-                                                    child: const Text(
-                                                      "취소",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-
-                                              const SizedBox(width: 10),
-
-                                              Expanded(
-                                                child: GestureDetector(
-                                                  onTap: () async {
-                                                    await viewModel
-                                                        .deleteSchedules(
-                                                          viewModel.scheduleId,
-                                                        );
-                                                    context.pop();
-                                                    context.pop(true);
-                                                  },
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      color: Color(0xffef4444),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            10,
-                                                          ),
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                          vertical: 10,
-                                                        ),
-                                                    child: const Text(
-                                                      "확인",
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: AppColors.background(context),
-                                  border: Border.all(
-                                    color: AppColors.commonRed,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.delete,
-                                      color: AppColors.commonRed,
-                                    ),
-
-                                    const SizedBox(width: 6),
-
-                                    Text(
-                                      "삭제",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColors.commonRed,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
                 ],
               );
             },
           ),
         ),
       ),
+      bottomNavigationBar: SafeArea(
+        /// 일정 상세 바텀 버튼 - 편집, 공유, 삭제
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0, right: 8.0, left: 8.0),
+          child: Row(
+            children: [
+              /// 편집 버튼
+              if (viewModel.isAdmin)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      print("편집");
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.background(context),
+                        border: Border.all(
+                          color: AppColors.commonGrey,
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.edit_note),
+
+                          const SizedBox(width: 6),
+
+                          Text(
+                            "편집",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+              const SizedBox(width: 10),
+
+              /// 공유 버튼
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    print("공유");
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.background(context),
+                      border: Border.all(color: AppColors.commonBlue, width: 2),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.share, color: AppColors.commonBlue),
+
+                        const SizedBox(width: 6),
+
+                        Text(
+                          "공유",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.commonBlue,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              /// 삭제 버튼
+              if (viewModel.isAdmin)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => Dialog(
+                          backgroundColor: AppColors.background(context),
+                          insetPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 24,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "일정을 삭제하시겠습니까?",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 14),
+
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => context.pop(),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Color(0xfff3f4f6),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          child: const Text(
+                                            "취소",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(width: 10),
+
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          await viewModel.deleteSchedules(
+                                            viewModel.scheduleId,
+                                          );
+                                          context.pop();
+                                          context.pop(true);
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Color(0xffef4444),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          child: const Text(
+                                            "확인",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.background(context),
+                        border: Border.all(
+                          color: AppColors.commonRed,
+                          width: 2,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.delete, color: AppColors.commonRed),
+
+                          const SizedBox(width: 6),
+
+                          Text(
+                            "삭제",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.commonRed,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DividerGap extends StatelessWidget {
+  const _DividerGap();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Divider(),
     );
   }
 }

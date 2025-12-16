@@ -1,10 +1,10 @@
+import 'package:dutytable/features/auth/presentation/viewmodels/signup_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/configs/app_colors.dart';
-import '../viewmodels/signup_viewmodel.dart';
 
 // 회원가입 화면의 엔트리 포인트 위젯
 // ChangeNotifierProvider를 사용하여 SignupViewModel을 하위 위젯에 제공

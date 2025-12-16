@@ -129,7 +129,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _calendarList = await CalendarDataSource.shared.fetchCalendarFinalList(
+      _calendarList = await CalendarDataSource.instance.fetchCalendarFinalList(
         "group",
       );
 
@@ -158,7 +158,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await CalendarDataSource.shared.deleteCalendars(ids);
+      await CalendarDataSource.instance.deleteCalendars(ids);
       await fetchCalendars();
       cancelDeleteMode();
     } catch (e) {
