@@ -14,10 +14,14 @@ class SharedCalendarListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SharedCalendarViewModel(calendarList: initialCalendars),
-      child: const _SharedCalendarListScreen(),
-    );
+    final viewModel = context.read<SharedCalendarViewModel>();
+
+    // build 중에 직접 실행하면 에러가 날 수 있으므로 setInitialData 내부에 microtask 처리를
+    if (initialCalendars != null) {
+      viewModel.setInitialData(initialCalendars);
+    }
+
+    return const _SharedCalendarListScreen();
   }
 }
 

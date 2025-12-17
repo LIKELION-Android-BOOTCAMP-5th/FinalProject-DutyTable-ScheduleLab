@@ -113,10 +113,42 @@ class CalendarDataSource {
     }
   }
 
+  /// 단일 캘린더 조회
+  Future<CalendarModel> fetchSharedCalendarFromId(int calendarId) async {
+    final response = await _dio.get(
+      '/rest/v1/calendars',
+      queryParameters: {
+        'select': '*,calendars_user_id_fkey(nickname)',
+        'id': 'eq.$calendarId',
+      },
+    );
+    CalendarModel calendar;
+    if (response.statusCode == 200 && response.data is List) {
+      final List<dynamic> jsonData = response.data;
+
+      if (jsonData.isNotEmpty) {
+        calendar = CalendarModel.fromJson(
+          jsonData.first as Map<String, dynamic>,
+        );
+      } else {
+        throw Exception('Calendar not found.');
+      }
+    } else {
+      throw Exception('Failed to load calendar: Status ${response.statusCode}');
+    }
+
+    // 3단계: 각 캘린더의 멤버 목록을 비동기적으로 가져와 병합
+    final List<CalendarMemberModel> memberList = await fetchCalendarMembers(
+      calendar.id,
+    );
+
+    calendar.calendarMemberModel = memberList;
+
+    return calendar;
+  }
+
   /// 멤버 목록 가져오기
-  Future<List<CalendarMemberModel>?> fetchCalendarMembers(
-    int calendarId,
-  ) async {
+  Future<List<CalendarMemberModel>> fetchCalendarMembers(int calendarId) async {
     final response = await _dio.get(
       '/rest/v1/calendar_members',
       queryParameters: {

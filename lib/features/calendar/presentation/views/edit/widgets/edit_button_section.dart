@@ -30,6 +30,8 @@ class EditButtonSection extends StatelessWidget {
                   confirmColor: AppColors.commonBlue,
                   onConfirm: () async {
                     final bool result = await viewModel.updateCalendarInfo();
+
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
