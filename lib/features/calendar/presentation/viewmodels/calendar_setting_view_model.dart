@@ -1,3 +1,4 @@
+import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/widgets.dart';
 
@@ -13,5 +14,16 @@ class CalendarSettingViewModel extends ChangeNotifier {
     if (calendar != null) {
       _calendar = calendar;
     }
+  }
+
+  Future<void> fetchCalendar() async {
+    if (_calendar.type == 'personal') {
+      _calendar = await CalendarDataSource.instance.fetchPersonalCalendar();
+    } else {
+      _calendar = await CalendarDataSource.instance.fetchCalendarFromId(
+        _calendar.id,
+      );
+    }
+    notifyListeners();
   }
 }

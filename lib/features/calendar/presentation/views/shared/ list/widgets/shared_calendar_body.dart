@@ -60,7 +60,10 @@ class _CalendarListItem extends StatelessWidget {
     final isSelected = viewModel.isSelected(calendar.id.toString());
 
     return GestureDetector(
-      onTap: () => context.push("/shared/schedule", extra: calendar),
+      onTap: () async {
+        await context.push("/shared/schedule", extra: calendar);
+        viewModel.fetchCalendars();
+      },
       child: CalendarCard(
         imageUrl: calendar.imageURL,
         title: calendar.title,
