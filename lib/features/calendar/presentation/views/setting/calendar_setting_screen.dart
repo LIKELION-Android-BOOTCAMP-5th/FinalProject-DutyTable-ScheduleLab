@@ -34,7 +34,9 @@ class _CalendarSettingScreen extends StatelessWidget {
           "캘린더 설정",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
         ),
-        actions: const [_EditButton()],
+        actions: viewModel.calendar.user_id == viewModel.currentUser!.id
+            ? [_EditButton()]
+            : null,
       ),
       body: const CalendarSettingBody(),
       bottomNavigationBar: viewModel.calendar.type == "personal"

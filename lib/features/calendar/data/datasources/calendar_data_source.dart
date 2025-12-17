@@ -348,4 +348,15 @@ class CalendarDataSource {
     // 이미지 삭제
     await deleteCalendarImage(imageURL);
   }
+
+  /// 멤버 추방
+  Future<void> exileMember(int calendarId, String userId) async {
+    await _dio.delete(
+      '/rest/v1/calendar_members',
+      queryParameters: {
+        'calendar_id': 'eq.$calendarId',
+        'user_id': 'eq.$userId',
+      },
+    );
+  }
 }

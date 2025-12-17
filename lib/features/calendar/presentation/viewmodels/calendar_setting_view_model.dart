@@ -31,6 +31,11 @@ class CalendarSettingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 멤버 추방
+  Future<void> exileMember(String userId) async {
+    CalendarDataSource.instance.exileMember(_calendar.id, userId);
+  }
+
   /// 캘린더 나가기(멤버만)
   Future<void> outCalendar() async {
     CalendarDataSource.instance.outCalendar(_calendar.id);

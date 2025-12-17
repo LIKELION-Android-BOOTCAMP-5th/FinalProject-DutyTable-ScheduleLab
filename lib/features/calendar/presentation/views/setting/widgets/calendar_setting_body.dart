@@ -1,8 +1,10 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/custom_calendar_setting_content_box.dart';
 import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
+import 'package:dutytable/features/calendar/data/models/calendar_member_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
+import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -119,7 +121,7 @@ class _OwnerMemberTile extends StatelessWidget {
 }
 
 class _SharedMemberTile extends StatelessWidget {
-  final dynamic member;
+  final CalendarMemberModel member;
   final String calendarType;
 
   /// 캘린더 설정 - 바디 : 캘린더 멤버(멤버)
@@ -127,6 +129,8 @@ class _SharedMemberTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = supabase.auth.currentUser;
+    final calendar = context.read<CalendarSettingViewModel>().calendar;
     return CustomCalendarSettingContentBox(
       title: null,
       child: Row(
@@ -143,7 +147,9 @@ class _SharedMemberTile extends StatelessWidget {
               ? const SizedBox.shrink()
               : member.is_admin
               ? const Text("👑", style: TextStyle(fontSize: 24))
-              : const _KickButton(),
+              : calendar.user_id == currentUser!.id
+              ? _KickButton(member.user_id)
+              : SizedBox.shrink(),
         ],
       ),
     );
@@ -151,11 +157,14 @@ class _SharedMemberTile extends StatelessWidget {
 }
 
 class _KickButton extends StatelessWidget {
+  final String userId;
+
   /// 추방 버튼
-  const _KickButton();
+  const _KickButton(this.userId);
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.read<CalendarSettingViewModel>();
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -163,7 +172,10 @@ class _KickButton extends StatelessWidget {
           context,
           content: "추방하시겠습니까?",
           confirmColor: AppColors.commonRed,
-          onConfirm: () {},
+          onConfirm: () async {
+            await viewModel.exileMember(userId);
+            viewModel.fetchCalendar();
+          },
         );
       },
       child: Container(
