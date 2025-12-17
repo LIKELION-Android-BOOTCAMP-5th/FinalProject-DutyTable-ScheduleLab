@@ -8,12 +8,15 @@ import 'package:dutytable/features/schedule/presentation/views/add/schedule_add_
 import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 // UI
 import '../../features/auth/presentation/views/login_screen.dart';
 import '../../features/auth/presentation/views/signup_screen.dart';
 import '../../features/auth/presentation/views/splash_screen.dart';
 import '../../features/calendar/data/models/calendar_model.dart';
+import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
+import '../../features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import '../../features/calendar/presentation/views/setting/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/ list/shared_calendar_list_screen.dart';
 import 'app_shell.dart';
@@ -81,7 +84,21 @@ GoRouter createRouter(BuildContext context) {
 
       // 바텀 네비게이션
       ShellRoute(
-        builder: (_, _, child) => AppShell(child: child),
+        builder: (context, state, child) {
+          return MultiProvider(
+            providers: [
+              // 공유 캘린더 리스트 새로고침용 뷰모델
+              ChangeNotifierProvider(
+                create: (context) => SharedCalendarViewModel(),
+              ),
+              // 개인 캘린더 새로고침용 뷰모델
+              ChangeNotifierProvider(
+                create: (context) => PersonalCalendarViewModel(),
+              ),
+            ],
+            child: AppShell(child: child),
+          );
+        },
         routes: [
           GoRoute(
             path: '/shared',

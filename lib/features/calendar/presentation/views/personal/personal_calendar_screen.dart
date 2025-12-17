@@ -10,16 +10,11 @@ import '../../viewmodels/personal_calendar_view_model.dart';
 import '../../widgets/custom_calendar_tabview.dart';
 
 class PersonalCalendarScreen extends StatelessWidget {
-  /// 개인 캘린더 화면(provider 주입)
   const PersonalCalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 개인 캘린더 뷰모델 주입
-    return ChangeNotifierProvider(
-      create: (context) => PersonalCalendarViewModel(),
-      child: _PersonalCalendarScreen(),
-    );
+    return const _PersonalCalendarScreen();
   }
 }
 
@@ -81,11 +76,14 @@ class _PersonalCalendarScreen extends StatelessWidget {
             // 커스텀 캘린더 앱바 아이콘 사용
             CustomAppBarIcon(
               icon: Icons.menu,
-              onTap: () => context.push(
-                "/calendar/setting",
-                // 캘린더 데이터 함께 보냄
-                extra: viewModel.calendar,
-              ),
+              onTap: () async {
+                await context.push(
+                  "/calendar/setting",
+                  // 캘린더 데이터 함께 보냄
+                  extra: viewModel.calendar,
+                );
+                viewModel.fetchCalendar();
+              },
             ),
           ],
         ),

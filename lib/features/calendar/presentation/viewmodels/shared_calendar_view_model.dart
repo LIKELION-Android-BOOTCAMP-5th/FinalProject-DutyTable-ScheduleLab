@@ -75,6 +75,15 @@ class SharedCalendarViewModel extends ChangeNotifier {
     }
   }
 
+  void setInitialData(List<CalendarModel>? initialData) {
+    if (initialData != null && _calendarList == null) {
+      _calendarList = initialData;
+      _state = ViewState.success;
+      // build 단계에서 호출될 수 있으므로 마이크로태스크나 다음 프레임에 알림
+      Future.microtask(() => notifyListeners());
+    }
+  }
+
   @override
   void dispose() {
     _isDisposed = true;
@@ -146,6 +155,24 @@ class SharedCalendarViewModel extends ChangeNotifier {
       if (!_isDisposed) {
         notifyListeners();
       }
+    }
+  }
+
+  /// 공유 캘린더 정보 가져오기
+  Future<void> fetchCalendar() async {
+    _state = ViewState.loading;
+    notifyListeners();
+    try {
+      _calendar = await CalendarDataSource.instance.fetchCalendarFromId(
+        _calendar!.id,
+      );
+      _state = ViewState.success;
+    } catch (e) {
+      _state = ViewState.error;
+      _errorMessage = e.toString();
+      debugPrint("Error loading calendars: $e");
+    } finally {
+      notifyListeners();
     }
   }
 

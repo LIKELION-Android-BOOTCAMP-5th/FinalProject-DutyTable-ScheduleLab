@@ -1,6 +1,9 @@
+import 'package:dutytable/features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import '../configs/app_colors.dart';
 
 class AppShell extends StatelessWidget {
@@ -11,6 +14,7 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentIndex = _calculateIndex(context);
+    final location = GoRouterState.of(context).uri.toString(); // 현재 위치 가져오기
 
     return Theme(
       // 리플 효과 삭제
@@ -31,9 +35,18 @@ class AppShell extends StatelessWidget {
             onTap: (index) {
               switch (index) {
                 case 0:
+                  // 이미 공유 캘린더 탭이거나, 공유 캘린더의 상세 페이지에 있는 경우
+                  if (location.startsWith('/shared')) {
+                    // 리스트 화면 새로고침
+                    context.read<SharedCalendarViewModel>().fetchCalendars();
+                  }
                   context.go('/shared');
                   break;
                 case 1:
+                  if (location.startsWith('/personal')) {
+                    // 개인 캘린더 화면 새로고침
+                    context.read<PersonalCalendarViewModel>().fetchCalendar();
+                  }
                   context.go('/personal');
                   break;
                 case 2:
