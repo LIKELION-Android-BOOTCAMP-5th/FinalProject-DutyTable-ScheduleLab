@@ -114,11 +114,16 @@ class _PersonalOwnerTile extends StatelessWidget {
     return CustomCalendarSettingContentBox(
       title: null,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const CustomChatProfileImageBox(width: 24, height: 24),
-          const SizedBox(width: 4),
-          Text(nickname),
-          const Text(" 👑"),
+          Row(
+            children: [
+              const CustomChatProfileImageBox(width: 24, height: 24),
+              const SizedBox(width: 4),
+              Text(nickname),
+            ],
+          ),
+          const Text("👑", style: TextStyle(fontSize: 24)),
         ],
       ),
     );
@@ -151,7 +156,7 @@ class _SharedMemberTile extends StatelessWidget {
           isPersonalCalendar
               ? const SizedBox.shrink()
               : member.is_admin
-              ? const Text("👑")
+              ? const Text("👑", style: TextStyle(fontSize: 24))
               : const _RoleButton(),
         ],
       ),
