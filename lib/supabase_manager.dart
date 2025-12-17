@@ -1,7 +1,8 @@
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
-import 'package:dutytable/task_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'features/calendar/data/models/calendar_model.dart';
+import 'task_model.dart';
 
 class SupabaseManager {
   static final SupabaseManager _shared = SupabaseManager();
@@ -28,8 +29,8 @@ class SupabaseManager {
     final response = await supabase
         .from('calendars')
         .select(
-          '*, calendars_user_id_fkey:users(*), calendar_members(*, users(*))',
-        );
+      '*, calendars_user_id_fkey:users(*), calendar_members(*, users(*))',
+    );
     final calendars = (response as List)
         .map((json) => CalendarModel.fromJson(json))
         .toList();
