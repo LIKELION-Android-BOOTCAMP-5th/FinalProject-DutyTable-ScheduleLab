@@ -86,9 +86,10 @@ class CalendarDataSource {
   }
 
   /// READ
-  /// 개인 캘린더 가져오기
+  /// 개인 캘린더 가져오기 (없으면 생성)
   Future<CalendarModel> fetchPersonalCalendar() async {
     final userId = supabase.auth.currentUser?.id ?? "";
+    if (userId.isEmpty) throw Exception('로그인 필요');
 
     final response = await _dio.get(
       '/rest/v1/calendars',
@@ -104,13 +105,45 @@ class CalendarDataSource {
       final List<dynamic> jsonData = response.data;
 
       if (jsonData.isNotEmpty) {
+        // 캘린더가 존재하면 바로 반환
         return CalendarModel.fromJson(jsonData.first as Map<String, dynamic>);
       } else {
-        throw Exception('Calendar not found for user.');
+        // 캘린더가 없으면 생성 후 반환
+        return await _createAndFetchPersonalCalendar(userId);
       }
     } else {
       throw Exception('Failed to load calendar: Status ${response.statusCode}');
     }
+  }
+
+  /// 개인 캘린더를 생성하고, 생성자를 멤버로 추가한 뒤, 생성된 캘린더 정보를 반환
+  Future<CalendarModel> _createAndFetchPersonalCalendar(String userId) async {
+    // '내 캘린더'라는 이름으로 개인 캘린더 생성
+    final calendarResponse = await _dio.post(
+      '/rest/v1/calendars',
+      options: Options(headers: const {'Prefer': 'return=representation'}),
+      data: {
+        'type': 'personal',
+        'user_id': userId,
+        'title': '내 캘린더', // 기본 제목
+      },
+    );
+
+    final newCalendarData = calendarResponse.data[0];
+    final calendarId = newCalendarData['id'];
+
+    // 생성자를 멤버 테이블에 추가
+    await _dio.post(
+      '/rest/v1/calendar_members',
+      data: {
+        'calendar_id': calendarId,
+        'user_id': userId,
+        'is_admin': true, // 생성자
+      },
+    );
+
+    // 생성된 캘린더 정보를 모델로 변환하여 반환
+    return CalendarModel.fromJson(newCalendarData as Map<String, dynamic>);
   }
 
   /// 단일 캘린더 조회
