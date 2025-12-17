@@ -1,7 +1,7 @@
 class InviteNotificationModel {
   final int id;
   final String userId;
-  final String calendarId;
+  final int calendarId;
   final String message;
   final bool isRead;
   final DateTime createdAt;
@@ -19,7 +19,7 @@ class InviteNotificationModel {
     return InviteNotificationModel(
       id: json['id'] as int,
       userId: json['user_id'] as String,
-      calendarId: json['calendar_id'].toString(),
+      calendarId: int.parse(json['calendar_id'].toString()),
       message: json['message'] as String,
       isRead: json['is_read'] as bool,
       createdAt: DateTime.parse(json['created_at'] as String),

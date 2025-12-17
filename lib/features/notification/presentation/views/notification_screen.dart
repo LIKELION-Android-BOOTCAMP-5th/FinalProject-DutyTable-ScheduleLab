@@ -4,6 +4,7 @@ import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/supabase_manager.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/datasources/notification_data_source.dart';
 import '../../data/models/invite_notification_model.dart';
 import '../../data/models/reminder_notification_model.dart';
 import '../widgets/all_delete_dialog.dart';
@@ -22,10 +23,13 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   // 데이터 로딩 중인지 여부를 나타내는 플래그
   bool _isLoading = true;
+
   // 현재 표시될 알림 목록 (초대 알림과 리마인더 알림을 모두 포함)
   List<dynamic> _notifications = [];
+
   // 초대 알림 스트림 구독을 관리하는 객체
   StreamSubscription? _inviteSubscription;
+
   // 리마인더 알림 스트림 구독을 관리하는 객체
   StreamSubscription? _reminderSubscription;
 
@@ -51,8 +55,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// 초대 알림과 리마인더 알림을 모두 가져와 합친 후, 최신순으로 정렬
   Future<void> _loadInitialNotifications() async {
     try {
-      final inviteFuture = SupabaseManager.shared.getInviteNotifications();
-      final reminderFuture = SupabaseManager.shared.getReminderNotifications();
+      final inviteFuture = NotificationDataSource.shared
+          .getInviteNotifications();
+      final reminderFuture = NotificationDataSource.shared
+          .getReminderNotifications();
 
       final results = await Future.wait([inviteFuture, reminderFuture]);
 
@@ -88,19 +94,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// 새로운 알림이 수신되면 목록의 가장 위에 추가하고 UI를 업데이트
   void _setupRealtimeListeners() {
     // 초대 알림 스트림을 구독
-    _inviteSubscription = SupabaseManager.shared.newInviteNotifications.listen((
-        notification,
-        ) {
-      // 위젯이 마운트된 상태일 때만 UI를 업데이트
-      if (mounted) {
-        setState(() {
-          _notifications.insert(0, notification); // 새로운 알림을 목록의 맨 앞에 추가
+    _inviteSubscription =
+        NotificationDataSource.shared.newInviteNotifications.listen((
+            notification,) {
+          // 위젯이 마운트된 상태일 때만 UI를 업데이트
+          if (mounted) {
+            setState(() {
+              _notifications.insert(0, notification); // 새로운 알림을 목록의 맨 앞에 추가
+            });
+          }
         });
-      }
-    });
 
     // 리마인더 알림 스트림을 구독
-    SupabaseManager.shared.newReminderNotifications.listen((notification) {
+    NotificationDataSource.shared.newReminderNotifications.listen((
+        notification) {
       // 위젯이 마운트된 상태일 때만 UI를 업데이트
       if (mounted) {
         setState(() {
@@ -121,7 +128,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       // 사용자가 '확인'을 눌렀을 경우
       if (confirmed == true) {
         try {
-          await SupabaseManager.shared
+          await NotificationDataSource.shared
               .deleteAllNotifications(); // Supabase에서 모든 알림 삭제
           if (mounted) {
             setState(() {
@@ -169,21 +176,32 @@ class _NotificationScreenState extends State<NotificationScreen> {
       body: SafeArea(
         child: Container(
           color: const Color(0xfff9fafb), // 배경색 설정
-          child: _buildBody(), // 실제 내용(로딩, 빈 상태, 목록)을 빌드
+          child: NotificationBody(
+            isLoading: _isLoading,
+            notifications: _notifications,
+          ),
         ),
       ),
     );
   }
+}
 
-  /// 현재 상태에 따라 바디 위젯을 빌드
-  /// 로딩 중이면 로딩 인디케이터, 알림이 없으면 메시지, 그 외에는 알림 목록을 표시
-  Widget _buildBody() {
+class NotificationBody extends StatelessWidget {
+  final bool isLoading;
+  final List<dynamic> notifications;
+
+  const NotificationBody(
+      {super.key, required this.isLoading, required this.notifications});
+
+  @override
+  Widget build(BuildContext context) {
+
     // 로딩 중일 때
-    if (_isLoading) {
+    if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
     // 알림 목록이 비어 있을 때
-    if (_notifications.isEmpty) {
+    if (notifications.isEmpty) {
       return const Center(
         child: Text('새로운 알림이 없습니다.', style: TextStyle(color: Colors.grey)),
       );
@@ -191,11 +209,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
     // 알림 목록이 있을 때
     return ListView.separated(
       padding: const EdgeInsets.all(16.0), // 패딩 설정
-      itemCount: _notifications.length, // 알림 개수
+      itemCount: notifications.length, // 알림 개수
       separatorBuilder: (context, index) =>
       const SizedBox(height: 10), // 각 알림 카드 사이의 간격
       itemBuilder: (context, index) {
-        final notification = _notifications[index]; // 현재 인덱스의 알림 객체
+        final notification = notifications[index]; // 현재 인덱스의 알림 객체
 
         // 알림 타입에 따라 다른 NotificationCard 위젯 반환
         if (notification is InviteNotificationModel) {

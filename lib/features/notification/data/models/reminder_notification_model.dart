@@ -1,6 +1,6 @@
 class ReminderNotificationModel {
   final int id;
-  final String calendarId;
+  final int calendarId;
   final int scheduleId;
   final String userId;
   final String firstMessage;
@@ -22,7 +22,7 @@ class ReminderNotificationModel {
   factory ReminderNotificationModel.fromJson(Map<String, dynamic> json) {
     return ReminderNotificationModel(
       id: json['id'] as int,
-      calendarId: json['calendar_id'].toString(),
+      calendarId: int.parse(json['calendar_id'].toString()),
       scheduleId: json['schedule_id'] as int,
       userId: json['user_id'] as String,
       firstMessage: json['first_message'] as String,
