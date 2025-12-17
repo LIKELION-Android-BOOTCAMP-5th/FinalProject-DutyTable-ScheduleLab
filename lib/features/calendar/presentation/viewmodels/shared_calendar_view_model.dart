@@ -176,7 +176,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteSelectedCalendars() async {
+  Future<void> outSelectedCalendars() async {
     final ids = selectedIds.map(int.parse).toList();
 
     if (ids.isEmpty) return;
@@ -185,7 +185,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await CalendarDataSource.instance.deleteCalendars(ids);
+      await CalendarDataSource.instance.outCalendars(ids);
       await fetchCalendars();
       cancelDeleteMode();
     } catch (e) {

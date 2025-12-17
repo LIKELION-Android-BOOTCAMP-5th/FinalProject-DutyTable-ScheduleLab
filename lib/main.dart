@@ -6,11 +6,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as timezone;
 
 import 'core/configs/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'firebase_options.dart';
 
 // 전역에서 사용할 채널 ID 정의
@@ -88,20 +90,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      locale: const Locale("ko", "KR"),
-      supportedLocales: const [Locale("ko", "KR")],
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      routerConfig: createRouter(context),
-      title: "DutyTable",
+    // 공유 캘린더 리스트 새로고침용 뷰모델
+    return ChangeNotifierProvider(
+      create: (context) => SharedCalendarViewModel(),
+      child: MaterialApp.router(
+        locale: const Locale("ko", "KR"),
+        supportedLocales: const [Locale("ko", "KR")],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
+        routerConfig: createRouter(context),
+        title: "DutyTable",
+      ),
     );
   }
 }

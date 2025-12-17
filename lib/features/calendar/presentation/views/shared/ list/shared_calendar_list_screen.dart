@@ -99,7 +99,7 @@ class _DeleteModeActions extends StatelessWidget {
         ),
         const SizedBox(width: 16),
         GestureDetector(
-          onTap: viewModel.deleteSelectedCalendars,
+          onTap: viewModel.outSelectedCalendars,
           child: const Text("삭제"),
         ),
       ],
