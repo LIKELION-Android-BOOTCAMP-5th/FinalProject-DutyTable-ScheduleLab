@@ -92,6 +92,8 @@ class CalendarAddViewModel extends ChangeNotifier {
   Future<void> addInvitedUserByNickname(String nickname) async {
     final value = nickname.trim();
 
+    final currentUser = supabase.auth.currentUser;
+
     if (value.isEmpty) {
       _setInviteError('닉네임을 입력해주세요');
       return;
@@ -100,7 +102,7 @@ class CalendarAddViewModel extends ChangeNotifier {
     final user = await UserDataSource.shared.findUserByNickname(value);
 
     if (user == null) {
-      _setInviteError('존재하지 않는 사용자입니다');
+      _setInviteError('존재하지 않는 사용자입니다.');
       return;
     }
 
@@ -108,7 +110,12 @@ class CalendarAddViewModel extends ChangeNotifier {
     final userNickname = user['nickname']!;
 
     if (_invitedUsers.containsKey(userId)) {
-      _setInviteError('이미 추가된 사용자입니다');
+      _setInviteError('이미 추가된 사용자입니다.');
+      return;
+    }
+
+    if (userId == currentUser!.id) {
+      _setInviteError('자신은 추가 할 수 없습니다.');
       return;
     }
 

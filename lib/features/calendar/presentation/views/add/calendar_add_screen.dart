@@ -25,21 +25,28 @@ class _CalendarAddScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: BackActionsAppBar(
-        title: Text(
-          "새 캘린더",
-          style: TextStyle(
-            color: AppColors.text(context),
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: BackActionsAppBar(
+          title: Text(
+            "새 캘린더",
+            style: TextStyle(
+              color: AppColors.text(context),
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
+
+        body: CalendarAddBody(formKey: _formKey),
+
+        bottomNavigationBar: SafeArea(
+          child: SaveButtonSection(formKey: _formKey),
+        ),
       ),
-
-      body: CalendarAddBody(formKey: _formKey),
-
-      bottomNavigationBar: SaveButtonSection(formKey: _formKey),
     );
   }
 }
