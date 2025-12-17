@@ -20,7 +20,7 @@ class CalendarSettingViewModel extends ChangeNotifier {
     if (_calendar.type == 'personal') {
       _calendar = await CalendarDataSource.instance.fetchPersonalCalendar();
     } else {
-      _calendar = await CalendarDataSource.instance.fetchCalendarFromId(
+      _calendar = await CalendarDataSource.instance.fetchSharedCalendarFromId(
         _calendar.id,
       );
     }

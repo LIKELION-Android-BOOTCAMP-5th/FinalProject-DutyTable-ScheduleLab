@@ -163,7 +163,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     _state = ViewState.loading;
     notifyListeners();
     try {
-      _calendar = await CalendarDataSource.instance.fetchCalendarFromId(
+      _calendar = await CalendarDataSource.instance.fetchSharedCalendarFromId(
         _calendar!.id,
       );
       _state = ViewState.success;

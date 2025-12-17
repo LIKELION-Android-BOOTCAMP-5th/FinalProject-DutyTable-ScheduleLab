@@ -114,7 +114,7 @@ class CalendarDataSource {
   }
 
   /// 단일 캘린더 조회
-  Future<CalendarModel> fetchCalendarFromId(int calendarId) async {
+  Future<CalendarModel> fetchSharedCalendarFromId(int calendarId) async {
     final response = await _dio.get(
       '/rest/v1/calendars',
       queryParameters: {
