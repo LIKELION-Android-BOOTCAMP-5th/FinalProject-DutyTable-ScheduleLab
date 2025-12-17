@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../viewmodels/calendar_setting_view_model.dart';
-import '../../../viewmodels/shared_calendar_view_model.dart';
 
 class DeleteButtonSection extends StatelessWidget {
   const DeleteButtonSection({super.key});
@@ -32,15 +31,14 @@ class DeleteButtonSection extends StatelessWidget {
                         confirmColor: AppColors.commonRed,
                         onConfirm: () async {
                           await viewModel.deleteCalendar();
-
-                          if (context.mounted) {
-                            // ShellRoute에서 관리 중인 SharedCalendarViewModel을 찾아 새로고침 실행
-                            context
-                                .read<SharedCalendarViewModel>()
-                                .fetchCalendars();
-
-                            context.go('/shared');
-                          }
+                          context.go(
+                            '/shared',
+                            extra: {
+                              'refresh': true,
+                              'signalId': DateTime.now().millisecondsSinceEpoch
+                                  .toString(),
+                            },
+                          );
                         },
                       );
                     },
@@ -51,15 +49,14 @@ class DeleteButtonSection extends StatelessWidget {
                     confirmColor: AppColors.commonRed,
                     onConfirm: () async {
                       await viewModel.outCalendar();
-
-                      if (context.mounted) {
-                        // ShellRoute에서 관리 중인 SharedCalendarViewModel을 찾아 새로고침 실행
-                        context
-                            .read<SharedCalendarViewModel>()
-                            .fetchCalendars();
-
-                        context.go('/shared');
-                      }
+                      context.go(
+                        '/shared',
+                        extra: {
+                          'refresh': true,
+                          'signalId': DateTime.now().millisecondsSinceEpoch
+                              .toString(),
+                        },
+                      );
                     },
                   );
           },

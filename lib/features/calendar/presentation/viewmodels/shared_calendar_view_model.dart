@@ -55,6 +55,27 @@ class SharedCalendarViewModel extends ChangeNotifier {
 
   bool _isDisposed = false;
 
+  /// 마지막으로 처리한 새로고침 신호
+  String? _lastProcessedSignalId;
+
+  Future<void> fetchCalendarsWithSignal(Map<String, dynamic>? extra) async {
+    if (extra == null || extra['refresh'] != true) return;
+
+    // 신호에 포함된 고유 ID를 확인
+    final String? signalId = extra['signalId'];
+
+    // 이미 처리한 ID라면 다시 실행하지 않음
+    if (signalId != null && _lastProcessedSignalId == signalId) {
+      return;
+    }
+
+    // 처리 시작
+    _lastProcessedSignalId = signalId;
+
+    // 실제 서버 데이터 로드 로직
+    await fetchCalendars();
+  }
+
   /// 공유 캘린더 목록 뷰모델
   SharedCalendarViewModel({
     List<CalendarModel>? calendarList,

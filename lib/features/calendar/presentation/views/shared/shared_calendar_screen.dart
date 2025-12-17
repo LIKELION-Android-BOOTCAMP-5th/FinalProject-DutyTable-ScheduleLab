@@ -48,11 +48,14 @@ class _SharedCalendarScreen extends StatelessWidget {
                   CustomAppBarIcon(
                     icon: Icons.menu,
                     onTap: () async {
-                      await context.push(
+                      final result = await context.push(
                         "/calendar/setting",
-                        // 캘린더 데이터 함께 보냄
                         extra: viewModel.calendar,
                       );
+
+                      if (result == true && context.mounted) {
+                        context.pop(true);
+                      }
                       viewModel.fetchCalendar();
                     },
                   ),
