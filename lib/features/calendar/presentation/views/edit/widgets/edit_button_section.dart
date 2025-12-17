@@ -24,7 +24,8 @@ class EditButtonSection extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             onTap: () {
               if (isContentChange) {
-                CustomConfirmationDialog(
+                CustomConfirmationDialog.show(
+                  context,
                   content: "수정 완료하시겠습니까?",
                   confirmColor: AppColors.commonBlue,
                   onConfirm: () async {

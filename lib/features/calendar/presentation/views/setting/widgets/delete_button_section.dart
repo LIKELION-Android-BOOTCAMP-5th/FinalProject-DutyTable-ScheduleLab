@@ -12,7 +12,8 @@ class DeleteButtonSection extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         child: GestureDetector(
           onTap: () {
-            CustomConfirmationDialog(
+            CustomConfirmationDialog.show(
+              context,
               content: "캘린더를 삭제하시겠습니까?",
               confirmColor: AppColors.commonRed,
               onConfirm: () {},
