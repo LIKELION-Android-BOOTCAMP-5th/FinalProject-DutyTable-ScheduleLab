@@ -70,7 +70,8 @@ class CalendarDataSource {
       };
 
       final response = await _dio.patch(
-        '/rest/v1/calendars?id=eq.$calendarId',
+        '/rest/v1/calendars',
+        queryParameters: {'id': 'eq.$calendarId'},
         options: Options(headers: const {'Prefer': 'return=representation'}),
         data: data,
       );
@@ -83,6 +84,21 @@ class CalendarDataSource {
     } on DioException catch (e) {
       return false;
     }
+  }
+
+  /// 방장 이전
+  Future<void> transferAdminRole(int calendarId, String newAdminId) async {
+    final currentUserId = supabase.auth.currentUser!.id;
+
+    // supabase function
+    await supabase.rpc(
+      'transfer_admin_role',
+      params: {
+        'p_calendar_id': calendarId,
+        'p_new_admin_id': newAdminId,
+        'p_old_admin_id': currentUserId,
+      },
+    );
   }
 
   /// READ
