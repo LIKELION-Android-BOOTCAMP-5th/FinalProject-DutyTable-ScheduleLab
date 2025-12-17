@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
-import 'package:dutytable/supabase_manager.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/datasources/notification_data_source.dart';
@@ -224,8 +223,7 @@ class NotificationBody extends StatelessWidget {
           );
         } else if (notification is ReminderNotificationModel) {
           return NotificationCard(
-            title:
-            '${notification.firstMessage} ${notification.secondMessage}', // 리마인더 알림 메시지
+            title: notification.firstMessage, // 리마인더 알림 메시지
             createdAt: notification.createdAt, // 생성 일자
             type: "reminder", // 알림 타입 (리마인더)
           );

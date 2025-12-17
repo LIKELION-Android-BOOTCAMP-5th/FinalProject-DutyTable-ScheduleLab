@@ -4,7 +4,6 @@ class ReminderNotificationModel {
   final int scheduleId;
   final String userId;
   final String firstMessage;
-  final String secondMessage;
   final bool isRead;
   final DateTime createdAt;
 
@@ -14,7 +13,6 @@ class ReminderNotificationModel {
     required this.scheduleId,
     required this.userId,
     required this.firstMessage,
-    required this.secondMessage,
     required this.isRead,
     required this.createdAt,
   });
@@ -26,7 +24,6 @@ class ReminderNotificationModel {
       scheduleId: json['schedule_id'] as int,
       userId: json['user_id'] as String,
       firstMessage: json['first_message'] as String,
-      secondMessage: json['second_message'] as String,
       isRead: json['is_read'] as bool,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
@@ -39,7 +36,6 @@ class ReminderNotificationModel {
       'schedule_id': scheduleId,
       'user_id': userId,
       'first_message': firstMessage,
-      'second_message': secondMessage,
       'is_read': isRead,
       'created_at': createdAt.toIso8601String(),
     };
@@ -47,6 +43,6 @@ class ReminderNotificationModel {
 
   @override
   String toString() {
-    return 'ReminderNotificationModel(id: $id, calendarId: $calendarId, scheduleId: $scheduleId, userId: $userId, firstMessage: $firstMessage, secondMessage: $secondMessage, isRead: $isRead, createdAt: $createdAt)';
+    return 'ReminderNotificationModel(id: $id, calendarId: $calendarId, scheduleId: $scheduleId, userId: $userId, firstMessage: $firstMessage, isRead: $isRead, createdAt: $createdAt)';
   }
 }

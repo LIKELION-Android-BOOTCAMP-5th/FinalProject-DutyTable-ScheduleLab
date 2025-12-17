@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
-import 'package:dutytable/task_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -126,7 +124,7 @@ class NotificationDataSource {
         final notification = ReminderNotificationModel.fromJson(newRecord);
         _reminderNotificationController.sink.add(notification);
         debugPrint(
-          '새로운 리마인더 알림: ${notification.firstMessage} ${notification.secondMessage}',
+          '새로운 리마인더 알림: ${notification.firstMessage}',
         );
       },
     )
