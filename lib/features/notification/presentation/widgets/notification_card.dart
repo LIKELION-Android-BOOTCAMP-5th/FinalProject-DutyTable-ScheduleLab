@@ -11,12 +11,16 @@ class NotificationCard extends StatelessWidget {
   /// 알림 생성일
   final DateTime createdAt;
 
+  /// 알림 읽음 여부
+  final bool isRead;
+
   /// 알림 카드
   const NotificationCard({
     super.key,
     required this.title,
     required this.type,
     required this.createdAt,
+    required this.isRead,
   });
 
   @override
@@ -27,7 +31,9 @@ class NotificationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        boxShadow: isRead
+            ? []
+            : [
           BoxShadow(
             color: Colors.black.withOpacity(0.15),
             offset: const Offset(1.95, 1.95),
@@ -39,7 +45,9 @@ class NotificationCard extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: type == "invite" ? Color(0xff3c82f6) : Color(0xffa855f7),
+              color: type == "invite"
+                  ? const Color(0xff3c82f6)
+                  : const Color(0xffa855f7),
               borderRadius: BorderRadius.circular(12),
             ),
             width: deviceWidth,
@@ -51,17 +59,23 @@ class NotificationCard extends StatelessWidget {
               width: deviceWidth * 0.91,
               height: 80,
               decoration: BoxDecoration(
-                color: type == "invite" ? Color(0xffd7e6f8) : Color(0xfffaf5ff),
+                color: isRead
+                    ? Colors.white
+                    : (type == "invite"
+                    ? const Color(0xffd7e6f8)
+                    : const Color(0xfffaf5ff)),
                 borderRadius: BorderRadius.circular(14),
               ),
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     title,
                     textAlign: TextAlign.start,
-                    style: TextStyle(fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                        fontWeight:
+                        isRead ? FontWeight.normal : FontWeight.w800),
                   ),
                   Text(
                     createdAt.timeAgo(),

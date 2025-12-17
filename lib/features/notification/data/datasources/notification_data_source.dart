@@ -76,6 +76,15 @@ class NotificationDataSource {
     ]);
   }
 
+  /// 특정 알림을 읽음으로 표시
+  Future<void> markAsRead(int notificationId, String type) async {
+    final tableName =
+    type == 'invite' ? 'invite_notifications' : 'reminder_notifications';
+    await supabase
+        .from(tableName)
+        .update({'is_read': true}).eq('id', notificationId);
+  }
+
   /// Realtime 알림 리스너 시작
   void startRealtimeListeners() {
     final userId = supabase.auth.currentUser?.id;
