@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:flutter/foundation.dart'; // debugPrint를 위해 추가
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../extensions.dart';
 import '../../../../main.dart';
@@ -72,6 +71,7 @@ class CalendarDataSource {
 
       final response = await _dio.patch(
         '/rest/v1/calendars?id=eq.$calendarId',
+        options: Options(headers: const {'Prefer': 'return=representation'}),
         data: data,
       );
 

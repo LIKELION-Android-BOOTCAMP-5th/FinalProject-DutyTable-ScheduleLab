@@ -23,52 +23,79 @@ class ChatTab extends StatelessWidget {
 class _ChatTab extends StatelessWidget {
   /// 채팅 탭(private)
   const _ChatTab({super.key});
+
+  // 날짜가 같은지 확인하는 헬퍼 함수
+  bool _isSameDay(DateTime d1, DateTime d2) {
+    return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
+  }
+
+  // 날짜 표시 포맷
+  String _formatDate(DateTime date) {
+    return '${date.year}년 ${date.month.toString().padLeft(2, '0')}월 ${date.day.toString().padLeft(2, '0')}일';
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ChatViewModel>();
+    final chatMessages = viewModel.chatMessages;
 
-    // 내가 보낸 채팅/ 상대방이 보낸 채팅
-    final isMe = viewModel.isMe;
-    //채팅 보낸 시간
-    final time = viewModel.time;
-    // 채팅 메시지
-    final chat = viewModel.messages;
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.separated(
+                  controller: viewModel.scrollController,
+                  itemCount: chatMessages.length,
+                  itemBuilder: (context, index) {
+                    final currentMessage = chatMessages[index];
 
-    return SafeArea(
-      child: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView.separated(
-                controller: viewModel.scrollController,
-                itemCount: viewModel.messages.length,
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      // 커스텀 날짜 구분선 사용
-                      CustomNextDayLine(),
-                      // 커스텀 채팅 소유자에 따른 UI 변경 카드 사용
-                      CustomChatCard(
-                        // 내가 보낸 채팅인가
-                        isMyChat: isMe[index],
-                        // 채팅 보낸 시간
-                        chatTime: time[index],
-                        // 채팅 메세지
-                        message: chat[index],
-                      ),
-                    ],
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const SizedBox(height: 20.0);
-                },
+                    // 이전 메시지가 있는지 확인
+                    final isFirstMessage = index == 0;
+                    final previousMessage = isFirstMessage
+                        ? null
+                        : chatMessages[index - 1];
+
+                    // 날짜가 변경되었는지 확인 (첫 메시지이거나 이전 메시지와 날짜가 다를 경우)
+                    final bool showDateDivider =
+                        isFirstMessage ||
+                        !_isSameDay(
+                          currentMessage.createdAt,
+                          previousMessage!.createdAt,
+                        );
+
+                    return Column(
+                      children: [
+                        // 날짜가 변경되었을 때만 날짜 구분선 표시
+                        if (showDateDivider)
+                          CustomNextDayLine(
+                            date: _formatDate(currentMessage.createdAt),
+                          ),
+
+                        // 커스텀 채팅 소유자에 따른 UI 변경 카드 사용
+                        CustomChatCard(
+                          isMyChat: currentMessage.isMe,
+                          chatTime: currentMessage.time,
+                          message: currentMessage.message,
+                        ),
+                      ],
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return const SizedBox(height: 12.0);
+                  },
+                ),
               ),
             ),
-          ),
-          // 커스텀 채팅 입력창 사용
-          CustomInputChatMessageBox(),
-        ],
+            // 커스텀 채팅 입력창 사용
+            CustomInputChatMessageBox(),
+          ],
+        ),
       ),
     );
   }
@@ -133,8 +160,10 @@ class CustomInputChatMessageBox extends StatelessWidget {
 }
 
 class CustomNextDayLine extends StatelessWidget {
+  final String date;
+
   /// 커스텀 날짜 구분선
-  const CustomNextDayLine({super.key});
+  const CustomNextDayLine({super.key, required this.date});
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +177,7 @@ class CustomNextDayLine extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            "0000년 00월 00일",
+            date,
             style: const TextStyle(
               color: Colors.black,
               fontSize: 12,
