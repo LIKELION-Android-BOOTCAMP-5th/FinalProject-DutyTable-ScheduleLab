@@ -15,10 +15,12 @@ class SharedCalendarListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.read<SharedCalendarViewModel>();
+    final state = GoRouterState.of(context);
+    final extra = state.extra as Map<String, dynamic>?;
 
-    // build 중에 직접 실행하면 에러가 날 수 있으므로 setInitialData 내부에 microtask 처리를
-    if (initialCalendars != null) {
-      viewModel.setInitialData(initialCalendars);
+    // build가 여러 번 호출되어도 viewModel 내부에서 중복 실행을 막아줌
+    if (extra != null) {
+      Future.microtask(() => viewModel.fetchCalendarsWithSignal(extra));
     }
 
     return const _SharedCalendarListScreen();
@@ -99,7 +101,7 @@ class _DeleteModeActions extends StatelessWidget {
         ),
         const SizedBox(width: 16),
         GestureDetector(
-          onTap: viewModel.deleteSelectedCalendars,
+          onTap: viewModel.outSelectedCalendars,
           child: const Text("삭제"),
         ),
       ],

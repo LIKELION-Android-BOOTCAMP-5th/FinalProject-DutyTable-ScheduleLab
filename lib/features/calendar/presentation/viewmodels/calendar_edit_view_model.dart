@@ -32,6 +32,15 @@ class CalendarEditViewModel extends ChangeNotifier {
     }
   }
 
+  /// 방장 권한 넘김
+  Future<void> transferAdminRole(String newAdminId) async {
+    await CalendarDataSource.instance.transferAdminRole(
+      _calendar.id,
+      newAdminId,
+    );
+  }
+
+  /// 캘린더 정보 업데이트
   Future<bool> updateCalendarInfo() async {
     final bool result = await CalendarDataSource.instance.updateCalendarInfo(
       _titleController.text,

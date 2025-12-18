@@ -70,7 +70,8 @@ class CalendarDataSource {
       };
 
       final response = await _dio.patch(
-        '/rest/v1/calendars?id=eq.$calendarId',
+        '/rest/v1/calendars',
+        queryParameters: {'id': 'eq.$calendarId'},
         options: Options(headers: const {'Prefer': 'return=representation'}),
         data: data,
       );
@@ -83,6 +84,21 @@ class CalendarDataSource {
     } on DioException catch (e) {
       return false;
     }
+  }
+
+  /// 방장 이전
+  Future<void> transferAdminRole(int calendarId, String newAdminId) async {
+    final currentUserId = supabase.auth.currentUser!.id;
+
+    // supabase function
+    await supabase.rpc(
+      'transfer_admin_role',
+      params: {
+        'p_calendar_id': calendarId,
+        'p_new_admin_id': newAdminId,
+        'p_old_admin_id': currentUserId,
+      },
+    );
   }
 
   /// READ
@@ -303,25 +319,60 @@ class CalendarDataSource {
     await supabase.storage.from('calendar-images').remove([path]);
   }
 
-  /// 캘린더 삭제 (방장만 가능)
-  Future<void> deleteCalendars(List<int> calendarIds) async {
+  /// 다수의 캘린더 선택하여 나가기(삭제)(내가 방장이 아닌 캘린더들만)
+  Future<void> outCalendars(List<int> calendarIds) async {
+    final currentUser = supabase.auth.currentUser;
+    await _dio.delete(
+      '/rest/v1/calendar_members',
+      queryParameters: {
+        'calendar_id': 'in.(${calendarIds.join(",")})',
+        'is_admin': 'eq.false',
+        'user_id': 'eq.${currentUser!.id}',
+      },
+    );
+  }
+
+  /// 단일 캘린더 나가기(내가 방장이 아닌 캘린더만)
+  Future<void> outCalendar(int calendarId) async {
+    final currentUser = supabase.auth.currentUser;
+    await _dio.delete(
+      '/rest/v1/calendar_members',
+      queryParameters: {
+        'calendar_id': 'eq.$calendarId',
+        'is_admin': 'eq.false',
+        'user_id': 'eq.${currentUser!.id}',
+      },
+    );
+  }
+
+  /// 단일 캘린더 삭제 (방장만 가능)
+  Future<void> deleteCalendar(int calendarId) async {
     final response = await _dio.get(
       '/rest/v1/calendars',
-      queryParameters: {
-        'select': 'id,imageURL',
-        'id': 'in.(${calendarIds.join(",")})',
-      },
+      queryParameters: {'select': 'id,imageURL', 'id': 'eq.$calendarId'},
     );
 
     final List data = response.data as List;
+    final String? imageURL = data.first['imageURL'] as String?;
 
-    for (final item in data) {
-      await deleteCalendarImage(item['imageURL'] as String?);
-    }
-
+    // 캘린더 삭제(멤버는 디비에서 cascade로 삭제 처리)
     await _dio.delete(
       '/rest/v1/calendars',
-      queryParameters: {'id': 'in.(${calendarIds.join(",")})'},
+      queryParameters: {'id': 'eq.$calendarId'},
+    );
+
+    // 이미지 삭제
+    await deleteCalendarImage(imageURL);
+  }
+
+  /// 멤버 추방
+  Future<void> exileMember(int calendarId, String userId) async {
+    await _dio.delete(
+      '/rest/v1/calendar_members',
+      queryParameters: {
+        'calendar_id': 'eq.$calendarId',
+        'user_id': 'eq.$userId',
+      },
     );
   }
 }

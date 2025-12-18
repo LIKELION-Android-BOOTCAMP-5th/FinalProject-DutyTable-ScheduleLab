@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../configs/app_colors.dart';
+
 class CustomConfirmationDialog extends StatelessWidget {
   /// 내용
   final String content;
+
+  final Color contentColor;
 
   /// 확인 버튼 색상
   final Color confirmColor;
@@ -17,6 +21,7 @@ class CustomConfirmationDialog extends StatelessWidget {
   const CustomConfirmationDialog({
     super.key,
     required this.content,
+    required this.contentColor,
     required this.confirmColor,
     required this.onConfirm,
     this.onCancel,
@@ -40,7 +45,8 @@ class CustomConfirmationDialog extends StatelessWidget {
               Text(
                 content,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
+                  color: contentColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
@@ -115,6 +121,7 @@ class CustomConfirmationDialog extends StatelessWidget {
   static Future<void> show(
     BuildContext context, {
     required String content,
+    Color contentColor = AppColors.commonBlack54,
     required Color confirmColor,
     required VoidCallback onConfirm,
     VoidCallback? onCancel,
@@ -125,6 +132,7 @@ class CustomConfirmationDialog extends StatelessWidget {
       barrierDismissible: barrierDismissible,
       builder: (_) => CustomConfirmationDialog(
         content: content,
+        contentColor: contentColor,
         confirmColor: confirmColor,
         onConfirm: onConfirm,
         onCancel: onCancel,

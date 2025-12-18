@@ -50,7 +50,6 @@ class _SharedCalendarScreen extends StatelessWidget {
                     onTap: () async {
                       await context.push(
                         "/calendar/setting",
-                        // 캘린더 데이터 함께 보냄
                         extra: viewModel.calendar,
                       );
                       viewModel.fetchCalendar();

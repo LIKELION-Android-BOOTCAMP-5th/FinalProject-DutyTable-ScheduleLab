@@ -1,10 +1,12 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/custom_calendar_setting_content_box.dart';
 import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
+import 'package:dutytable/features/calendar/data/models/calendar_member_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_edit_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/edit/widgets/custom_calendar_edit_text_field.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class CalendarEditBody extends StatelessWidget {
@@ -131,7 +133,7 @@ class _PersonalOwnerTile extends StatelessWidget {
 }
 
 class _SharedMemberTile extends StatelessWidget {
-  final dynamic member;
+  final CalendarMemberModel member;
   final bool isPersonalCalendar;
 
   const _SharedMemberTile({
@@ -157,7 +159,7 @@ class _SharedMemberTile extends StatelessWidget {
               ? const SizedBox.shrink()
               : member.is_admin
               ? const Text("👑", style: TextStyle(fontSize: 24))
-              : const _RoleButton(),
+              : _RoleButton(member.user_id),
         ],
       ),
     );
@@ -165,10 +167,12 @@ class _SharedMemberTile extends StatelessWidget {
 }
 
 class _RoleButton extends StatelessWidget {
-  const _RoleButton();
+  final String newAdminId;
+  const _RoleButton(this.newAdminId);
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.read<CalendarEditViewModel>();
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -176,8 +180,12 @@ class _RoleButton extends StatelessWidget {
           context,
           content: "방장 권한을 넘기시겠습니까?",
           confirmColor: AppColors.commonBlue,
-          onConfirm: () {
-            // TODO: 방장 권한 위임 로직
+          onConfirm: () async {
+            await viewModel.transferAdminRole(newAdminId);
+
+            if (!context.mounted) return;
+
+            context.pop();
           },
         );
       },
