@@ -24,9 +24,6 @@ class CalendarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final applyBlur = deleteMode && isAdmin;
-    print(applyBlur);
-    print(deleteMode);
-    print(isAdmin);
 
     return Stack(
       children: [

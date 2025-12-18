@@ -54,25 +54,32 @@ class _CalendarListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<SharedCalendarViewModel>();
-
-    final isAdmin = calendar.user_id == viewModel.currentUserId;
-    final isSelected = viewModel.isSelected(calendar.id.toString());
+    // 필요한 값만 선택적으로 구독 (성능 최적화)
+    final isAdmin = context.select<SharedCalendarViewModel, bool>(
+      (vm) => calendar.user_id == vm.currentUserId,
+    );
+    final isSelected = context.select<SharedCalendarViewModel, bool>(
+      (vm) => vm.isSelected(calendar.id.toString()),
+    );
+    final deleteMode = context.select<SharedCalendarViewModel, bool>(
+      (vm) => vm.deleteMode,
+    );
 
     return GestureDetector(
       onTap: () async {
         await context.push("/shared/schedule", extra: calendar);
-        viewModel.fetchCalendars();
+        context.read<SharedCalendarViewModel>().fetchCalendars();
       },
       child: CalendarCard(
         imageUrl: calendar.imageURL,
         title: calendar.title,
-        deleteMode: viewModel.deleteMode,
+        deleteMode: deleteMode,
         isAdmin: isAdmin,
         members: calendar.calendarMemberModel?.length ?? 0,
         isSelected: isSelected,
-        onChangeSelected: () =>
-            viewModel.toggleSelected(calendar.id.toString()),
+        onChangeSelected: () => context
+            .read<SharedCalendarViewModel>()
+            .toggleSelected(calendar.id.toString()),
       ),
     );
   }

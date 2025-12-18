@@ -89,11 +89,11 @@ GoRouter createRouter(BuildContext context) {
             providers: [
               // 공유 캘린더 리스트 새로고침용 뷰모델
               ChangeNotifierProvider(
-                create: (context) => PersonalCalendarViewModel(),
+                create: (context) => SharedCalendarViewModel(),
               ),
               // 개인 캘린더 새로고침용 뷰모델
               ChangeNotifierProvider(
-                create: (context) => SharedCalendarViewModel(),
+                create: (context) => PersonalCalendarViewModel(),
               ),
             ],
             child: AppShell(child: child),
