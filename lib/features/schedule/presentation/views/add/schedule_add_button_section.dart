@@ -70,7 +70,7 @@ class ScheduleAddButtonSection extends StatelessWidget {
                   ),
                   child: viewModel.state == ViewState.loading
                       ? const SizedBox(
-                          width: 24, // ⭐ 여유 있게
+                          width: 24,
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
