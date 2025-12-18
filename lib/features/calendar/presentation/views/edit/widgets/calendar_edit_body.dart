@@ -91,6 +91,7 @@ class _CalendarMemberList extends StatelessWidget {
             if (isPersonal) {
               return _PersonalOwnerTile(
                 nickname: viewModel.calendar.ownerNickname,
+                profileUrl: viewModel.calendar.ownerProfileUrl,
               );
             }
 
@@ -108,8 +109,9 @@ class _CalendarMemberList extends StatelessWidget {
 
 class _PersonalOwnerTile extends StatelessWidget {
   final String nickname;
+  final String? profileUrl;
 
-  const _PersonalOwnerTile({required this.nickname});
+  const _PersonalOwnerTile({required this.nickname, this.profileUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +122,11 @@ class _PersonalOwnerTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              const CustomChatProfileImageBox(width: 24, height: 24),
+              CustomChatProfileImageBox(
+                width: 24,
+                height: 24,
+                imageUrl: profileUrl,
+              ),
               const SizedBox(width: 4),
               Text(nickname),
             ],
@@ -150,7 +156,11 @@ class _SharedMemberTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              const CustomChatProfileImageBox(width: 24, height: 24),
+              CustomChatProfileImageBox(
+                width: 24,
+                height: 24,
+                imageUrl: member.profileUrl,
+              ),
               const SizedBox(width: 4),
               Text(member.nickname),
             ],

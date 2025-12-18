@@ -5,6 +5,7 @@ class CalendarModel {
   final String type;
   final String user_id;
   final String ownerNickname;
+  final String? ownerProfileUrl;
   final String title;
   final String? description;
   final String? imageURL;
@@ -19,14 +20,24 @@ class CalendarModel {
     this.description,
     this.imageURL,
     this.calendarMemberModel,
+    required this.ownerProfileUrl,
   });
 
   factory CalendarModel.fromJson(Map<String, dynamic> json) {
+    // 방장 데이터
     final ownerJson = json['calendars_user_id_fkey'] as Map<String, dynamic>?;
+
+    // 방장 닉네임
     final String ownerNickname =
         ownerJson?['nickname'] as String? ?? 'Unknown Owner';
 
+    // 방장 프사
+    final String? ownerProfileUrl = ownerJson?['profileurl'] as String?;
+
+    // 멤버 데이터
     final List<dynamic> membersJson = json['calendar_members'] ?? [];
+
+    // 멤버 데이터 파싱
     final List<CalendarMemberModel> members = membersJson
         .map((m) => CalendarMemberModel.fromJson(m as Map<String, dynamic>))
         .toList();
@@ -40,6 +51,7 @@ class CalendarModel {
       description: json["description"] as String?,
       imageURL: json["imageURL"] as String?,
       calendarMemberModel: members.isNotEmpty ? members : null,
+      ownerProfileUrl: ownerProfileUrl,
     );
   }
 }
