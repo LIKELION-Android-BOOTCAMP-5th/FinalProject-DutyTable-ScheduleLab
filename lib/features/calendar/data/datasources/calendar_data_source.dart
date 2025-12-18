@@ -132,16 +132,6 @@ class CalendarDataSource {
     final newCalendarData = calendarResponse.data[0];
     final calendarId = newCalendarData['id'];
 
-    // 생성자를 멤버 테이블에 추가
-    await _dio.post(
-      '/rest/v1/calendar_members',
-      data: {
-        'calendar_id': calendarId,
-        'user_id': userId,
-        'is_admin': true, // 생성자
-      },
-    );
-
     // 생성된 캘린더 정보를 모델로 변환하여 반환
     return CalendarModel.fromJson(newCalendarData as Map<String, dynamic>);
   }
