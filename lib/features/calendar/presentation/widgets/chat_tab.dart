@@ -308,20 +308,37 @@ class CustomOtherChatCard extends StatelessWidget {
 class CustomChatProfileImageBox extends StatelessWidget {
   final double width;
   final double height;
+  final String? imageUrl;
+  final String? nickname;
 
   /// 커스텀 프로필 이미지 박스
   const CustomChatProfileImageBox({
     super.key,
     required this.width,
     required this.height,
+    this.imageUrl,
+    this.nickname,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+    return Column(
+      children: [
+        Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+          // child: Image.network("${imageUrl}"),
+          child: (imageUrl == null)
+              ? ClipOval(child: Icon(Icons.account_circle))
+              : ClipOval(child: Image.network(imageUrl!)),
+        ),
+        Container(
+          width: width,
+          height: height,
+          child: Text("${nickname}", style: TextStyle(fontSize: 8)),
+        ),
+      ],
     );
   }
 }
