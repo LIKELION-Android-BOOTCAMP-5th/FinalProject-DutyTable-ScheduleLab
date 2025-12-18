@@ -2,169 +2,75 @@ import 'package:dutytable/features/schedule/data/datasources/schedule_data_sourc
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../main.dart';
+enum DetailViewState { idle, loading, success, error }
 
 class ScheduleDetailViewModel extends ChangeNotifier {
-  final bool _isAdmin;
-  bool get isAdmin => _isAdmin;
+  DetailViewState _state = DetailViewState.loading;
 
   final int _scheduleId;
+  final bool _isAdmin;
 
-  /// 일정 상세 - 제목
-  final String _title;
+  ScheduleModel? _schedule;
 
-  /// 일정 상세 - 감정 및 색
-  final String? _emotionTag;
-  final String _colorValue;
+  ScheduleDetailViewModel({required int scheduleId, required bool isAdmin})
+    : _scheduleId = scheduleId,
+      _isAdmin = isAdmin {
+    fetchUpdatedSchedule();
+  }
 
-  /// 일정 상세 - 시작일(시작시간) / 종료일(종료시간)
-  final DateTime _startedAt;
-  final DateTime _endedAt;
+  /// ===== Getter =====
+  DetailViewState get state => _state;
 
-  /// 일정 상세 - 완료
-  bool _isDone = false;
-
-  /// 일정 상세 - 지도
-  String? _address;
-  String? _longitude;
-  String? _latitude;
-
-  /// 일정 상세 - 반복
-  bool _isRepeat = false;
-  final int? _repeatNum;
-  String _repeatOption = "day"; // day, week, month, year
-  int _repeatCount = 1;
-  bool _weekendException = false;
-  bool _holidayException = false;
-
-  /// 일정 상세 - 메모
-  String _memo = "";
-
-  ///  Getter
+  bool get isAdmin => _isAdmin;
   int get scheduleId => _scheduleId;
 
-  String get title => _title;
+  ScheduleModel? get schedule => _schedule;
 
-  String? get emotionTag => _emotionTag;
+  bool get hasData => _schedule != null;
 
-  String get colorValue => _colorValue;
+  String get title => _schedule?.title ?? '';
+  String? get emotionTag => _schedule?.emotionTag;
+  String get colorValue => _schedule?.colorValue ?? '';
 
-  DateTime get startedAt => _startedAt;
+  DateTime? get startedAt => _schedule?.startedAt;
+  DateTime? get endedAt => _schedule?.endedAt;
 
-  DateTime get endedAt => _endedAt;
+  bool get isDone => _schedule?.isDone ?? false;
 
-  bool get isDone => _isDone;
+  bool get isRepeat => _schedule?.isRepeat ?? false;
+  String get repeatOption => _schedule?.repeatOption ?? 'daily';
+  int get repeatNum => _schedule?.repeatNum ?? 1;
+  bool get weekendException => _schedule?.weekendException ?? false;
+  bool get holidayException => _schedule?.holidayException ?? false;
 
-  String? get address => _address;
+  String? get address => _schedule?.address;
+  String? get latitude => _schedule?.latitude;
+  String? get longitude => _schedule?.longitude;
 
-  String? get longitude => _longitude;
+  String get memo => _schedule?.memo ?? '';
 
-  String? get latitude => _latitude;
-
-  bool get isRepeat => _isRepeat;
-
-  int? get repeatNum => _repeatNum;
-
-  String get repeatOption => _repeatOption;
-
-  int get repeatCount => _repeatCount;
-
-  bool get weekendException => _weekendException;
-
-  bool get holidayException => _holidayException;
-
-  String get memo => _memo;
-
-  /// Setter
-  set isDone(bool value) {
-    _isDone = value;
+  /// ===== Fetch 최신 데이터 =====
+  Future<void> fetchUpdatedSchedule() async {
+    _state = DetailViewState.loading;
     notifyListeners();
-  }
 
-  set isRepeat(bool value) {
-    _isRepeat = value;
-    notifyListeners();
-  }
-
-  set repeatOption(String value) {
-    _repeatOption = value;
-    notifyListeners();
-  }
-
-  set repeatCount(int value) {
-    _repeatCount = value;
-    notifyListeners();
-  }
-
-  set weekendException(bool value) {
-    _weekendException = value;
-    notifyListeners();
-  }
-
-  set holidayException(bool value) {
-    _holidayException = value;
-    notifyListeners();
-  }
-
-  set memo(String value) {
-    if (_memo == value) return;
-    _memo = value;
-    notifyListeners();
-  }
-
-  ScheduleDetailViewModel({
-    required ScheduleModel scheduleDetail,
-    required bool isAdmin,
-  }) : _isAdmin = isAdmin,
-       _scheduleId = scheduleDetail.id,
-       _title = scheduleDetail.title,
-       _emotionTag = scheduleDetail.emotionTag,
-       _colorValue = scheduleDetail.colorValue,
-       _startedAt = scheduleDetail.startedAt,
-       _endedAt = scheduleDetail.endedAt,
-       _isDone = scheduleDetail.isDone,
-       _address = scheduleDetail.address,
-       _longitude = scheduleDetail.longitude,
-       _latitude = scheduleDetail.latitude,
-       _isRepeat = scheduleDetail.isRepeat,
-       _repeatNum = scheduleDetail.repeatNum,
-       _repeatOption = scheduleDetail.repeatOption ?? 'day',
-       _repeatCount = scheduleDetail.repeatCount ?? 1,
-       _weekendException = scheduleDetail.weekendException ?? false,
-       _holidayException = scheduleDetail.holidayException ?? false,
-       _memo = scheduleDetail.memo ?? "";
-
-  void setAddress({
-    required String address,
-    required String latitude,
-    required String longitude,
-  }) {
-    _address = address;
-    _latitude = latitude;
-    _longitude = longitude;
-    notifyListeners();
-  }
-
-  Future<void> deleteSchedules(int scheduleId) async {
     try {
-      await ScheduleDataSource().deleteSchedules(scheduleId);
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      _schedule = await ScheduleDataSource.instance.fetchScheduleById(
+        _scheduleId,
+      );
+
+      _state = DetailViewState.success;
       notifyListeners();
     } catch (e) {
-      rethrow;
+      _state = DetailViewState.error;
+      debugPrint('❌ fetchUpdatedSchedule error: $e');
     }
   }
 
-  Future<Map<String, double>?> geocodeAddress(String address) async {
-    final response = await supabase.functions.invoke(
-      'hyper-endpoint',
-      body: {'type': 'geocode', 'address': address},
-    );
-
-    if (response.data == null) return null;
-
-    return {
-      'latitude': (response.data['latitude'] as num).toDouble(),
-      'longitude': (response.data['longitude'] as num).toDouble(),
-    };
+  /// ===== Delete =====
+  Future<void> deleteSchedule() async {
+    await ScheduleDataSource.instance.deleteSchedules(_scheduleId);
   }
 }

@@ -1,16 +1,32 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_add_view_model.dart';
+import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_edit_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ColorSection extends StatelessWidget {
+  /// 색 리스트
+  static const List<String> colorList = [
+    "0xFFFF3B30",
+    "0xFFFF9500",
+    "0xFFFFCC00",
+    "0xFF34C759",
+    "0xFF32ADE6",
+    "0xFF007AFF",
+    "0xFFAF52DE",
+  ];
+
+  final String selectColor;
+  final ValueChanged<String> onColorSelected;
+
   /// 일정 추가 - 컬러 세션
-  const ColorSection({super.key});
+  const ColorSection({
+    super.key,
+    required this.selectColor,
+    required this.onColorSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<ScheduleAddViewModel>();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -23,11 +39,11 @@ class ColorSection extends StatelessWidget {
 
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: ScheduleAddViewModel.colorList.map((color) {
-            final isSelected = color == viewModel.selectedColor;
+          children: colorList.map((color) {
+            final isSelected = color == selectColor;
 
             return GestureDetector(
-              onTap: () => viewModel.selectedColor = color,
+              onTap: () => onColorSelected(color),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: AnimatedScale(
@@ -37,7 +53,7 @@ class ColorSection extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: Color(color),
+                      color: Color(int.parse(color)),
                       shape: BoxShape.circle,
                       border: isSelected
                           ? Border.all(color: AppColors.commonGrey, width: 2)

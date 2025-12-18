@@ -6,6 +6,7 @@ import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/ca
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/custom_calendar_tabview.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
+import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -19,9 +20,8 @@ class SharedCalendarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) =>
-          SharedCalendarViewModel(calendar: calendar), // 4단계 : 뷰모델로 전달
-      child: _SharedCalendarScreen(),
+      create: (_) => SharedCalendarViewModel(calendar: calendar),
+      child: const _SharedCalendarScreen(),
     );
   }
 }

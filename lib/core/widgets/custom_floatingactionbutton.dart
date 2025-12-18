@@ -1,15 +1,26 @@
+import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
+  final int calendarId;
+
   /// 커스텀 플로팅 액션 버튼(제스처 디텍터 사용)
-  const CustomFloatingActionButton({super.key});
+  const CustomFloatingActionButton({super.key, required this.calendarId});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        context.push("/schedule/add");
+      onTap: () async {
+        final result = await context.push(
+          "/schedule/add",
+          extra: {"calendarId": calendarId},
+        );
+
+        if (result == true && context.mounted) {
+          context.read<ScheduleViewModel>().fetchSchedules();
+        }
       },
       child: Container(
         width: 56.0,

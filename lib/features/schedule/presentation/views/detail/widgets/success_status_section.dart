@@ -13,22 +13,22 @@ class SuccessStatusSection extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "완료",
-            style: TextStyle(
-              color: AppColors.text(context),
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
+      child: IgnorePointer(
+        ignoring: true,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "완료",
+              style: TextStyle(
+                color: AppColors.text(context),
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-          Switch(
-            value: viewModel.isDone,
-            onChanged: (value) => viewModel.isDone = value,
-          ),
-        ],
+            Switch(value: viewModel.isDone, onChanged: (_) => viewModel.isDone),
+          ],
+        ),
       ),
     );
   }

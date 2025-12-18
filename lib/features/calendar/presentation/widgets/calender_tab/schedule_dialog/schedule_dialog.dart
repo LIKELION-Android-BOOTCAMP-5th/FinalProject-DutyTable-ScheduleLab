@@ -48,7 +48,7 @@ class ScheduleDialog extends StatelessWidget {
                   itemBuilder: (_, index) {
                     final item = items[index];
                     return GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         if (viewModel.deleteMode) {
                           viewModel.toggleSelected(item.id.toString());
                           return;
@@ -56,11 +56,17 @@ class ScheduleDialog extends StatelessWidget {
                         final isAdmin =
                             viewModel.calendar?.user_id ==
                             viewModel.currentUserId;
+
                         context.pop();
-                        context.push(
+
+                        final bool? isDeleted = await context.push<bool>(
                           "/schedule/detail",
                           extra: {"schedule": item, "isAdmin": isAdmin},
                         );
+
+                        if (isDeleted == true) {
+                          await viewModel.fetchSchedules();
+                        }
                       },
                       child: SchedulePreviewCard(item: item),
                     );

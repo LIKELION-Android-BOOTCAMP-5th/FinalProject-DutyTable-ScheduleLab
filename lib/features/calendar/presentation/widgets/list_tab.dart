@@ -211,7 +211,9 @@ class _ListTab extends StatelessWidget {
               ),
             ],
           ),
-          floatingActionButton: CustomFloatingActionButton(),
+          floatingActionButton: CustomFloatingActionButton(
+            calendarId: viewModel.calendar!.id,
+          ),
         );
       },
     );

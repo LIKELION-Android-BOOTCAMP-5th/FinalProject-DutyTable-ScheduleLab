@@ -1,11 +1,14 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
+import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class ScheduleButtonSection extends StatelessWidget {
-  const ScheduleButtonSection({super.key});
+import '../../viewmodels/schedule_edit_view_model.dart';
+
+class ScheduleDetailButtonSection extends StatelessWidget {
+  const ScheduleDetailButtonSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +26,25 @@ class ScheduleButtonSection extends StatelessWidget {
               _ScheduleActionButton(
                 icon: Icons.edit_note,
                 label: "편집",
-                borderColor: AppColors.commonGrey,
-                onTap: () => print("편집"),
+                buttonColor: AppColors.commonGrey,
+                onTap: () async {
+                  if (viewModel.state != DetailViewState.success ||
+                      viewModel.schedule == null) {
+                    return;
+                  }
+
+                  final result = await context.push<bool>(
+                    '/schedule/detail/edit',
+                    extra: {
+                      'schedule': viewModel.schedule!,
+                      'isAdmin': viewModel.isAdmin,
+                    },
+                  );
+
+                  if (result == true) {
+                    await viewModel.fetchUpdatedSchedule();
+                  }
+                },
               ),
               const SizedBox(width: 10),
             ],
@@ -32,7 +52,7 @@ class ScheduleButtonSection extends StatelessWidget {
             _ScheduleActionButton(
               icon: Icons.share,
               label: "공유",
-              borderColor: AppColors.commonBlue,
+              buttonColor: AppColors.commonBlue,
               onTap: () => print("공유"),
             ),
 
@@ -41,7 +61,7 @@ class ScheduleButtonSection extends StatelessWidget {
               _ScheduleActionButton(
                 icon: Icons.delete,
                 label: "삭제",
-                borderColor: AppColors.commonRed,
+                buttonColor: AppColors.commonRed,
                 onTap: () => _showDeleteDialog(context, viewModel),
               ),
             ],
@@ -55,22 +75,18 @@ class ScheduleButtonSection extends StatelessWidget {
 class _ScheduleActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Color borderColor;
-  final Color? textColor;
+  final Color buttonColor;
   final VoidCallback onTap;
 
   const _ScheduleActionButton({
     required this.icon,
     required this.label,
-    required this.borderColor,
+    required this.buttonColor,
     required this.onTap,
-    this.textColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color = textColor ?? borderColor;
-
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -79,19 +95,19 @@ class _ScheduleActionButton extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: AppColors.background(context),
-            border: Border.all(color: borderColor, width: 2),
+            border: Border.all(color: buttonColor, width: 2),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: color),
+              Icon(icon, color: buttonColor),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: color,
+                  color: buttonColor,
                 ),
               ),
             ],
@@ -127,7 +143,7 @@ Future<void> _showDeleteDialog(
                 Expanded(
                   child: _DialogButton(
                     label: "취소",
-                    color: const Color(0xfff3f4f6),
+                    buttonColor: const Color(0xfff3f4f6),
                     onTap: () => context.pop(),
                   ),
                 ),
@@ -138,10 +154,13 @@ Future<void> _showDeleteDialog(
                 Expanded(
                   child: _DialogButton(
                     label: "확인",
-                    color: const Color(0xffef4444),
+                    buttonColor: const Color(0xffef4444),
                     textColor: Colors.white,
                     onTap: () async {
-                      await viewModel.deleteSchedules(viewModel.scheduleId);
+                      await viewModel.deleteSchedule();
+
+                      if (!context.mounted) return;
+
                       context.pop();
                       context.pop(true);
                     },
@@ -158,13 +177,13 @@ Future<void> _showDeleteDialog(
 
 class _DialogButton extends StatelessWidget {
   final String label;
-  final Color color;
+  final Color buttonColor;
   final Color? textColor;
   final VoidCallback onTap;
 
   const _DialogButton({
     required this.label,
-    required this.color,
+    required this.buttonColor,
     required this.onTap,
     this.textColor,
   });
@@ -177,7 +196,7 @@ class _DialogButton extends StatelessWidget {
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: color,
+          color: buttonColor,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
