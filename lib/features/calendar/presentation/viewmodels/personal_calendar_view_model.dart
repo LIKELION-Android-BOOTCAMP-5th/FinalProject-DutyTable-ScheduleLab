@@ -1,7 +1,6 @@
+import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/material.dart';
-
-import '../../data/datasources/calendar_data_source.dart';
 
 enum ViewState { loading, success, error }
 
