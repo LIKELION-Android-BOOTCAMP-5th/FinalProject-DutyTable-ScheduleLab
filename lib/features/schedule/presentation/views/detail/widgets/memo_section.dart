@@ -12,30 +12,31 @@ class MemoSection extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "메모",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
-          ),
+      child: IgnorePointer(
+        ignoring: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "메모",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            ),
 
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-          TextFormField(
-            initialValue: viewModel.memo,
-            maxLength: 300,
-            maxLines: 4,
-            enabled: false,
-            onChanged: (value) => viewModel.memo = value,
-            decoration: InputDecoration(
-              hintText: "메모를 입력하세요 (최대 300자)",
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+            TextFormField(
+              initialValue: viewModel.memo,
+              maxLength: 300,
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: "메모를 입력하세요 (최대 300자)",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

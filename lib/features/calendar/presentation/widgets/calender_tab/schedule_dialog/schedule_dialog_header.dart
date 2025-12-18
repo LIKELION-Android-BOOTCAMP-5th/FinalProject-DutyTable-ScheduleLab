@@ -83,11 +83,11 @@ class ScheduleDialogHeader extends StatelessWidget {
                         content: const Text("선택한 일정을 삭제하시겠습니까?"),
                         actions: [
                           TextButton(
-                            onPressed: () => context.pop(),
+                            onPressed: () => context.pop(false),
                             child: const Text("취소"),
                           ),
                           TextButton(
-                            onPressed: () => context.pop(),
+                            onPressed: () => context.pop(true),
                             child: const Text(
                               "삭제",
                               style: TextStyle(color: Colors.red),
@@ -101,7 +101,10 @@ class ScheduleDialogHeader extends StatelessWidget {
 
                     await viewModel.deleteAllSchedules();
                     await viewModel.fetchSchedules();
-                    context.pop();
+
+                    viewModel.toggleDeleteMode();
+
+                    if (context.mounted) context.pop();
                   },
                   child: Text(
                     viewModel.deleteMode ? "삭제" : "선택삭제",

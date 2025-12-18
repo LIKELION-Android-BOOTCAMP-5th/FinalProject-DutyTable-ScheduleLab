@@ -1,5 +1,6 @@
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class EmotionColorSection extends StatelessWidget {
@@ -15,7 +16,7 @@ class EmotionColorSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(viewModel.emotionTag ?? "", style: TextStyle(fontSize: 26)),
+          Text(viewModel.emotionTag ?? "😢", style: TextStyle(fontSize: 26)),
 
           const SizedBox(width: 16),
 

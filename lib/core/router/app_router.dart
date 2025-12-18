@@ -6,6 +6,7 @@ import 'package:dutytable/features/notification/presentation/views/notification_
 import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/add/schedule_add_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_screen.dart';
+import 'package:dutytable/features/schedule/presentation/views/edit/schedule_detail_edit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -66,7 +67,12 @@ GoRouter createRouter(BuildContext context) {
       // 공유(개인)캘린더 - 일정 - 추가
       GoRoute(
         path: "/schedule/add",
-        builder: (_, __) => const ScheduleAddScreen(),
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          final calendarId = data["calendarId"] as int;
+
+          return ScheduleAddScreen(calendarId: calendarId);
+        },
       ),
 
       // 공유(개인)캘린더 - 일정 - 상세
@@ -76,6 +82,18 @@ GoRouter createRouter(BuildContext context) {
           final data = state.extra as Map<String, dynamic>;
 
           return ScheduleDetailScreen(
+            scheduleDetail: data['schedule'],
+            isAdmin: data['isAdmin'],
+          );
+        },
+      ),
+
+      GoRoute(
+        path: "/schedule/detail/edit",
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+
+          return ScheduleDetailEditScreen(
             scheduleDetail: data['schedule'],
             isAdmin: data['isAdmin'],
           );

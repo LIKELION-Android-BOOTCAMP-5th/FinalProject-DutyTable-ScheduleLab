@@ -15,8 +15,7 @@ class ScheduleModel {
   /// 반복
   final bool isRepeat;
   final int? repeatNum;
-  final String? repeatOption; // day, week, month, year
-  final int? repeatCount;
+  final String? repeatOption; // daily, weekly, monthly, yearly
   final bool? weekendException;
   final bool? holidayException;
 
@@ -43,7 +42,6 @@ class ScheduleModel {
     this.emotionTag,
     this.repeatNum,
     this.repeatOption,
-    this.repeatCount,
     this.weekendException,
     this.holidayException,
     this.address,
@@ -52,9 +50,6 @@ class ScheduleModel {
     this.memo,
   });
 
-  // ----------------------------
-  // fromJson
-  // ----------------------------
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
     return ScheduleModel(
       id: json['id'] as int,
@@ -68,7 +63,6 @@ class ScheduleModel {
       isRepeat: json['is_repeat'] as bool,
       repeatNum: json['repeat_num'] as int?,
       repeatOption: json['repeat_option'] as String?,
-      repeatCount: json['repeat_count'] as int?,
       weekendException: json['weekend_exception'] as bool?,
       holidayException: json['holiday_exception'] as bool?,
       address: json['address'] as String?,
@@ -79,9 +73,6 @@ class ScheduleModel {
     );
   }
 
-  // ----------------------------
-  // toJson (update / insert 용)
-  // ----------------------------
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -95,7 +86,6 @@ class ScheduleModel {
       'is_repeat': isRepeat,
       'repeat_num': repeatNum,
       'repeat_option': repeatOption,
-      'repeat_count': repeatCount,
       'weekend_exception': weekendException,
       'holiday_exception': holidayException,
       'address': address,
@@ -106,14 +96,11 @@ class ScheduleModel {
     };
   }
 
-  // ----------------------------
-  // copyWith (편집 화면 필수)
-  // ----------------------------
   ScheduleModel copyWith({
     bool? isDone,
     bool? isRepeat,
     String? repeatOption,
-    int? repeatCount,
+    int? repeatNum,
     bool? weekendException,
     bool? holidayException,
     String? memo,
@@ -130,7 +117,6 @@ class ScheduleModel {
       isRepeat: isRepeat ?? this.isRepeat,
       repeatNum: repeatNum,
       repeatOption: repeatOption ?? this.repeatOption,
-      repeatCount: repeatCount ?? this.repeatCount,
       weekendException: weekendException ?? this.weekendException,
       holidayException: holidayException ?? this.holidayException,
       address: address,

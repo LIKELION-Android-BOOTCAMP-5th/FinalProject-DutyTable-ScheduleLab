@@ -17,7 +17,7 @@ class CalendarTabBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ScheduleViewModel>(
       builder: (context, viewModel, _) {
-        final dataSource = ScheduleDataSource.fromSchedules(
+        final dataSource = CalendarTabScheduleDataSource.fromSchedules(
           viewModel.schedules,
         );
 
@@ -36,7 +36,7 @@ class CalendarTabBody extends StatelessWidget {
               ),
             ),
             todayHighlightColor: AppColors.commonBlue,
-            onTap: (details) {
+            onTap: (details) async {
               final date = details.date;
               if (date == null) return;
 
@@ -45,10 +45,9 @@ class CalendarTabBody extends StatelessWidget {
               final hasSchedule = viewModel.schedules.any(
                 (s) => s.containsDay(date),
               );
-
               if (!hasSchedule) return;
 
-              showDialog(
+              await showDialog(
                 context: context,
                 builder: (_) => ChangeNotifierProvider.value(
                   value: viewModel,
@@ -60,7 +59,9 @@ class CalendarTabBody extends StatelessWidget {
               appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
             ),
           ),
-          floatingActionButton: const CustomFloatingActionButton(),
+          floatingActionButton: CustomFloatingActionButton(
+            calendarId: viewModel.calendar!.id,
+          ),
         );
       },
     );
@@ -68,13 +69,15 @@ class CalendarTabBody extends StatelessWidget {
 }
 
 /// 일정 - 데이터 소스
-class ScheduleDataSource extends CalendarDataSource {
-  ScheduleDataSource(List<Appointment> source) {
+class CalendarTabScheduleDataSource extends CalendarDataSource {
+  CalendarTabScheduleDataSource(List<Appointment> source) {
     appointments = source;
   }
 
-  factory ScheduleDataSource.fromSchedules(List<ScheduleModel> schedules) {
-    return ScheduleDataSource(
+  factory CalendarTabScheduleDataSource.fromSchedules(
+    List<ScheduleModel> schedules,
+  ) {
+    return CalendarTabScheduleDataSource(
       schedules
           .map(
             (s) => Appointment(

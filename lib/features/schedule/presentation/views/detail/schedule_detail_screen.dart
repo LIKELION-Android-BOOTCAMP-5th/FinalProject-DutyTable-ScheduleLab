@@ -1,7 +1,7 @@
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
-import 'package:dutytable/features/schedule/presentation/views/detail/schedule_button_section.dart';
+import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_button_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_body.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 class ScheduleDetailScreen extends StatelessWidget {
   final ScheduleModel scheduleDetail;
   final bool isAdmin;
-
   const ScheduleDetailScreen({
     super.key,
     required this.scheduleDetail,
@@ -20,10 +19,10 @@ class ScheduleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => ScheduleDetailViewModel(
-        scheduleDetail: scheduleDetail,
+        scheduleId: scheduleDetail.id,
         isAdmin: isAdmin,
       ),
-      child: _ScheduleDetailScreen(),
+      child: const _ScheduleDetailScreen(),
     );
   }
 }
@@ -35,10 +34,18 @@ class _ScheduleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleDetailViewModel>();
 
+    if (viewModel.state == DetailViewState.loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (viewModel.state == DetailViewState.error || !viewModel.hasData) {
+      return const Scaffold(body: Center(child: Text('일정을 불러오지 못했습니다')));
+    }
+
     return Scaffold(
       appBar: BackActionsAppBar(title: Text(viewModel.title)),
-      body: ScheduleDetailBody(),
-      bottomNavigationBar: ScheduleButtonSection(),
+      body: const ScheduleDetailBody(),
+      bottomNavigationBar: const ScheduleDetailButtonSection(),
     );
   }
 }

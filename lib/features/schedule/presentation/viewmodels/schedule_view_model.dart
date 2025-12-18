@@ -162,7 +162,7 @@ class ScheduleViewModel extends ChangeNotifier {
       return;
     } else {
       try {
-        _schedules = await ScheduleDataSource.shared.fetchSchedules(
+        _schedules = await ScheduleDataSource.instance.fetchSchedules(
           _calendar.id,
         );
 
@@ -201,10 +201,15 @@ class ScheduleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> removeScheduleById(int id) async {
+    _schedules.removeWhere((s) => s.id == id);
+    applyFilter();
+  }
+
   /// 일정 선택 삭제(다수 선택)
   Future<void> deleteAllSchedules() async {
     try {
-      await ScheduleDataSource().deleteAllSchedules(selectedIds);
+      await ScheduleDataSource.instance.deleteAllSchedules(selectedIds);
       fetchSchedules();
     } catch (e) {
       rethrow;

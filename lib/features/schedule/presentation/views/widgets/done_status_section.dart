@@ -1,16 +1,21 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_add_view_model.dart';
+import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_edit_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DoneStatusSection extends StatelessWidget {
+  final bool isDone;
+  final ValueChanged<bool> onIsDone;
+
   /// 완료 상태
-  const DoneStatusSection({super.key});
+  const DoneStatusSection({
+    super.key,
+    required this.isDone,
+    required this.onIsDone,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<ScheduleAddViewModel>();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -35,10 +40,7 @@ class DoneStatusSection extends StatelessWidget {
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800),
               ),
 
-              Switch(
-                value: viewModel.isDone,
-                onChanged: (value) => viewModel.isDone = value,
-              ),
+              Switch(value: isDone, onChanged: onIsDone),
             ],
           ),
         ),

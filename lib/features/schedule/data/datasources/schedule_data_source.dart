@@ -1,23 +1,44 @@
 import 'package:dio/dio.dart';
+import 'package:dutytable/core/network/dio_client.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../models/schedule_model.dart';
 
 class ScheduleDataSource {
-  static final ScheduleDataSource _shared = ScheduleDataSource();
-  static ScheduleDataSource get shared => _shared;
+  ScheduleDataSource._();
+  static final ScheduleDataSource instance = ScheduleDataSource._();
 
-  static const String _baseUrl = 'https://eexkppotdipyrzzjakur.supabase.co';
+  final Dio _dio = DioClient.shared.dio;
 
-  static final String apiKey = dotenv.env['SUPABASE_ANON_KEY']!;
+  /// CREATE
+  Future<void> addSchedule(Map<String, dynamic> payload) async {
+    try {
+      await _dio.post(
+        '/rest/v1/schedules',
+        data: payload,
+        options: Options(headers: {'Prefer': 'return=minimal'}),
+      );
+    } catch (e) {
+      throw Exception("create 에러:  $e");
+    }
+  }
 
-  // 인스턴스 초기화
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: _baseUrl,
-      headers: {'apikey': apiKey, 'Content-Type': 'application/json'},
-    ),
-  );
+  /// READ
+  /// 스케줄 단건 조회
+  Future<ScheduleModel> fetchScheduleById(int scheduleId) async {
+    final response = await _dio.get(
+      '/rest/v1/schedules',
+      queryParameters: {'select': '*', 'id': 'eq.$scheduleId'},
+    );
+
+    if (response.statusCode == 200 &&
+        response.data is List &&
+        response.data.isNotEmpty) {
+      return ScheduleModel.fromJson(response.data.first);
+    } else {
+      throw Exception('Failed to load schedule detail');
+    }
+  }
 
   /// 스케줄 조회
   Future<List<ScheduleModel>> fetchSchedules(int calendarId) async {
@@ -34,6 +55,34 @@ class ScheduleDataSource {
     }
   }
 
+  /// UPDATE
+  /// 스케줄 수정
+  Future<void> updateSchedule({
+    required int scheduleId,
+    required Map<String, dynamic> payload,
+  }) async {
+    try {
+      final res = await _dio.patch(
+        '/rest/v1/schedules',
+        queryParameters: {'id': 'eq.$scheduleId'},
+        data: payload,
+        options: Options(
+          headers: {
+            'Prefer': 'return=minimal', // 응답 데이터 필요 없을 때
+          },
+        ),
+      );
+
+      // status 204가 정상
+      if (res.statusCode != 204) {
+        throw Exception('Failed to update schedule');
+      }
+    } catch (e) {
+      throw Exception("update 에러: $e");
+    }
+  }
+
+  /// DELETE
   /// 스케줄 삭제
   Future<void> deleteSchedules(int scheduleId) async {
     final response = await _dio.delete(
