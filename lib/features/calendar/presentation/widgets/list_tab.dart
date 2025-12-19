@@ -1,5 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -33,6 +34,7 @@ class _ListTab extends StatelessWidget {
     // 스케쥴 뷰모델 주입
     return Consumer<ScheduleViewModel>(
       builder: (context, viewModel, child) {
+        final items = viewModel.selectedFilteringList;
         return Scaffold(
           body: Column(
             children: [
@@ -181,6 +183,7 @@ class _ListTab extends StatelessWidget {
                   child: ListView.separated(
                     itemCount: viewModel.selectedFilteringList.length,
                     itemBuilder: (context, index) {
+                      final item = items[index];
                       return CustomScheduleCard(
                         emoji:
                             viewModel.selectedFilteringList[index].emotionTag ??
@@ -200,6 +203,25 @@ class _ListTab extends StatelessWidget {
                             viewModel.selectedFilteringList[index].id
                                 .toString(),
                           );
+                        },
+                        onTap: () async {
+                          print("dwadwdaw");
+                          if (viewModel.deleteMode) {
+                            viewModel.toggleSelected(item.id.toString());
+                            return;
+                          }
+                          final isAdmin =
+                              viewModel.calendar?.user_id ==
+                              viewModel.currentUserId;
+
+                          final bool? isDeleted = await context.push<bool>(
+                            "/schedule/detail",
+                            extra: {"schedule": item, "isAdmin": isAdmin},
+                          );
+
+                          if (isDeleted == true) {
+                            await viewModel.fetchSchedules();
+                          }
                         },
                       );
                     },
@@ -275,6 +297,7 @@ class CustomScheduleCard extends StatelessWidget {
   final bool isDeleteMode;
   final bool isSelected;
   final VoidCallback onChangeSelected;
+  final VoidCallback onTap;
 
   /// 커스텀 일정 카드 UI
   const CustomScheduleCard({
@@ -287,61 +310,70 @@ class CustomScheduleCard extends StatelessWidget {
     required this.isDeleteMode,
     required this.isSelected,
     required this.onChangeSelected,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: isSelected ? 2 : 1,
-          color: isSelected ? AppColors.commonRed : Color(0xFFE5E7EB),
+    return GestureDetector(
+      onTap: () {
+        onTap();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: isSelected ? 2 : 1,
+            color: isSelected ? AppColors.commonRed : Color(0xFFE5E7EB),
+          ),
+          borderRadius: BorderRadius.circular(12),
         ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SizedBox(
-          width: double.maxFinite,
-          height: 52,
-          child: Row(
-            spacing: 8,
-            children: [
-              Container(
-                width: 6,
-                height: double.maxFinite,
-                decoration: BoxDecoration(
-                  color: Color(int.parse(color)),
-                  borderRadius: BorderRadius.circular(3),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+            width: double.maxFinite,
+            height: 52,
+            child: Row(
+              spacing: 8,
+              children: [
+                Container(
+                  width: 6,
+                  height: double.maxFinite,
+                  decoration: BoxDecoration(
+                    color: Color(int.parse(color)),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                 ),
-              ),
-              Text(emoji, style: TextStyle(fontSize: 28)),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(
-                      formatScheduleDate(startedAt, endedAt),
-                      style: TextStyle(
-                        color: Colors.grey,
+                Text(emoji, style: TextStyle(fontSize: 28)),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        formatScheduleDate(startedAt, endedAt),
+                        style: TextStyle(
+                          color: Colors.grey,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              isDeleteMode
-                  ? Checkbox(
-                      value: isSelected,
-                      activeColor: AppColors.commonRed,
-                      onChanged: (_) => onChangeSelected(),
-                    )
-                  : SizedBox.shrink(),
-            ],
+                isDeleteMode
+                    ? Checkbox(
+                        value: isSelected,
+                        activeColor: AppColors.commonRed,
+                        onChanged: (_) => onChangeSelected(),
+                      )
+                    : SizedBox.shrink(),
+              ],
+            ),
           ),
         ),
       ),
