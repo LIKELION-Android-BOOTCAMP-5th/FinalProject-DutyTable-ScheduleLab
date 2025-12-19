@@ -313,9 +313,7 @@ class CustomMyChatCard extends StatelessWidget {
                 isMyChat: isMyChat,
                 chatTime: chatTime,
                 message: message,
-                image: image,
                 id: id,
-                nickname: nickname,
               ),
             ],
           ),
@@ -382,8 +380,6 @@ class CustomOtherChatCard extends StatelessWidget {
               isMyChat: isMyChat,
               chatTime: chatTime,
               message: message,
-              image: image,
-              nickname: nickname,
               id: id,
             ),
           ],
@@ -433,12 +429,6 @@ class CustomChatBox extends StatelessWidget {
   /// 채팅 메세지
   final String message;
 
-  /// 프로필 이미지
-  final image;
-
-  /// 닉네임
-  final nickname;
-
   /// 채팅 아이디
   final id;
 
@@ -449,8 +439,6 @@ class CustomChatBox extends StatelessWidget {
     required this.isMyChat,
     required this.chatTime,
     required this.message,
-    this.image,
-    required this.nickname,
     this.id,
   });
 
