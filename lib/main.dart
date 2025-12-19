@@ -27,23 +27,70 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> initializeNotifications() async {
+  // 1. Android 알림 채널 생성 (이미 작성하신 부분)
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin
       >()
       ?.createNotificationChannel(highImportanceChannel);
 
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true, // 알림 표시
-    badge: true, // 뱃지 표시
-    sound: true, // 소리 재생
+  // 2. Flutter Local Notifications 초기화 설정
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher'); // 앱 아이콘 설정 필요
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: DarwinInitializationSettings(),
   );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  // 3. iOS 포그라운드 알림 설정
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
+  // 4. 포그라운드 메시지 수신 리스너 (핵심!)
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
+
+    // 알림 데이터가 있으면 로컬 알림으로 직접 띄움
+    if (notification != null && android != null) {
+      flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            highImportanceChannel.id,
+            highImportanceChannel.name,
+            channelDescription: highImportanceChannel.description,
+            importance: Importance.max,
+            priority: Priority.high,
+            icon: android.smallIcon,
+          ),
+        ),
+      );
+    }
+  });
 }
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
   await initializeNotifications();
   await Supabase.initialize(
     url: dotenv.get("SUPABASE_URL"),
