@@ -1,18 +1,19 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_add_view_model.dart';
-import 'package:dutytable/features/calendar/presentation/widgets/member_select_dialog/dialog_body.dart';
-import 'package:dutytable/features/calendar/presentation/widgets/member_select_dialog/dialog_button_section.dart';
-import 'package:dutytable/features/calendar/presentation/widgets/member_select_dialog/dialog_header.dart';
-import 'package:dutytable/features/calendar/presentation/widgets/member_select_dialog/error_message.dart';
-import 'package:dutytable/features/calendar/presentation/widgets/member_select_dialog/invite_user_tag.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/dialog_body.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/dialog_button_section.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/error_message.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/invite_user_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MemberSelectDialog extends StatelessWidget {
-  final CalendarAddViewModel viewModel;
+import '../../viewmodels/shared_calendar_view_model.dart';
+import '../member_select_dialog/dialog_header.dart';
 
-  /// 캘린더 추가 - 멤버 추가 다이얼로그
-  const MemberSelectDialog({super.key, required this.viewModel});
+class MemberInviteDialog extends StatelessWidget {
+  final SharedCalendarViewModel viewModel;
+
+  /// 공유 캘린더 - 멤버 추가 다이얼로그
+  const MemberInviteDialog({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class MemberSelectDialog extends StatelessWidget {
       },
       child: ChangeNotifierProvider.value(
         value: viewModel,
-        child: Consumer<CalendarAddViewModel>(
+        child: Consumer<SharedCalendarViewModel>(
           builder: (context, viewModel, _) {
             return Dialog(
               shape: RoundedRectangleBorder(
@@ -62,7 +63,7 @@ class MemberSelectDialog extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     /// 멤버 초대 다이얼로그 - 버튼 세션
-                    DialogButtonSection(),
+                    DialogButtonSection(viewModel: viewModel),
                   ],
                 ),
               ),

@@ -42,16 +42,21 @@ class CalendarDataSource {
     // 초대 멤버 추가 (생성자는 트리거가 처리)
     if (invitedUserIds.isNotEmpty) {
       final members = invitedUserIds
-          .map(
-            (uid) => {
-              'calendar_id': calendarId,
-              'user_id': uid,
-              'is_admin': false,
-            },
-          )
+          .map((uid) => {'calendar_id': calendarId, 'user_id': uid})
           .toList();
 
-      await _dio.post('/rest/v1/calendar_members', data: members);
+      await _dio.post('/rest/v1/invite_notifications', data: members);
+    }
+  }
+
+  /// 멤버 초대
+  Future<void> inviteUsers(int calendarId, List<String> invitedUserIds) async {
+    if (invitedUserIds.isNotEmpty) {
+      final members = invitedUserIds
+          .map((uid) => {'calendar_id': calendarId, 'user_id': uid})
+          .toList();
+
+      await _dio.post('/rest/v1/invite_notifications', data: members);
     }
   }
 

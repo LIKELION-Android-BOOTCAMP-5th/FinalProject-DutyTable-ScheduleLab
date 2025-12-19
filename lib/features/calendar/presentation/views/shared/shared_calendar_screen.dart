@@ -6,7 +6,7 @@ import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/ca
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/custom_calendar_tabview.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
-import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/member_invite_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +39,18 @@ class _SharedCalendarScreen extends StatelessWidget {
             actions: [
               Row(
                 children: [
+                  // 커스텀 캘린더 앱바 아이콘 사용
+                  CustomAppBarIcon(
+                    icon: Icons.person_add_alt,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (_) =>
+                            MemberInviteDialog(viewModel: viewModel),
+                      );
+                    },
+                  ),
                   // 커스텀 캘린더 앱바 아이콘 사용
                   CustomAppBarIcon(
                     icon: Icons.notifications_none,

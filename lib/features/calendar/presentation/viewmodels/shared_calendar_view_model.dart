@@ -3,9 +3,19 @@ import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/supabase_manager.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/datasources/user_data_source.dart';
+
 enum ViewState { loading, success, error }
 
 class SharedCalendarViewModel extends ChangeNotifier {
+  final Map<String, String> _invitedUsers = {};
+
+  String? _inviteError;
+
+  Map<String, String> get invitedUsers => _invitedUsers;
+
+  String? get inviteError => _inviteError;
+
   /// 데이터 로딩 상태(private)
   ViewState _state = ViewState.loading;
 
@@ -94,6 +104,65 @@ class SharedCalendarViewModel extends ChangeNotifier {
       _state = ViewState.loading;
       fetchCalendars();
     }
+  }
+
+  Future<void> addInvitedUserByNickname(String nickname) async {
+    final value = nickname.trim();
+    if (value.isEmpty) {
+      _inviteError = '닉네임을 입력해주세요';
+      notifyListeners();
+      return;
+    }
+
+    try {
+      final user = await UserDataSource.shared.findUserByNickname(value);
+      final memberIds =
+          _calendar!.calendarMemberModel?.map((e) {
+            return e.user_id;
+          }).toList() ??
+          [];
+      if (user == null) {
+        _inviteError = '존재하지 않는 사용자입니다.';
+      } else if (_invitedUsers.containsKey(user['id'])) {
+        _inviteError = '이미 추가된 사용자입니다.';
+      } else if (user['id'] == currentUserId) {
+        _inviteError = '자신은 추가 할 수 없습니다.';
+      } else if (memberIds.contains(user['id'])) {
+        _inviteError = '이미 멤버인 사용자 입니다.';
+      } else {
+        _invitedUsers[user['id']!] = user['nickname']!;
+        _inviteError = null;
+      }
+    } catch (e) {
+      _inviteError = '사용자 확인 중 오류가 발생했습니다.';
+    }
+    notifyListeners();
+  }
+
+  void removeInvitedUser(String userId) {
+    _invitedUsers.remove(userId);
+    notifyListeners();
+  }
+
+  void onConfirm() async {
+    if (_invitedUsers.isEmpty) return;
+
+    try {
+      await CalendarDataSource.instance.inviteUsers(
+        _calendar!.id,
+        _invitedUsers.keys.toList(),
+      );
+    } catch (e) {
+      print("에러 : $e");
+    } finally {
+      _invitedUsers.clear();
+      notifyListeners();
+    }
+  }
+
+  void clearError() {
+    _inviteError = null;
+    notifyListeners();
   }
 
   void setInitialData(List<CalendarModel>? initialData) {
