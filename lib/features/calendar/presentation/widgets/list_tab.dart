@@ -205,7 +205,6 @@ class _ListTab extends StatelessWidget {
                           );
                         },
                         onTap: () async {
-                          print("dwadwdaw");
                           if (viewModel.deleteMode) {
                             viewModel.toggleSelected(item.id.toString());
                             return;
