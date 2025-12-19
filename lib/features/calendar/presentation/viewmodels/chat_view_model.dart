@@ -12,12 +12,18 @@ class ChatMessage {
   final String time;
   final DateTime createdAt; // 날짜 비교를 위한 원본 DateTime (날짜 구분선용)
   final bool isMe;
+  final String? image;
+  final String nickname;
+  final int id;
 
   ChatMessage({
     required this.message,
     required this.time,
     required this.createdAt,
     required this.isMe,
+    required this.image,
+    required this.nickname,
+    required this.id,
   });
 }
 
@@ -44,6 +50,22 @@ class ChatViewModel extends ChangeNotifier {
 
   final ScrollController scrollController = ScrollController();
 
+  Map<int, bool> chatfold = {};
+
+  int? chatLength(int id) {
+    bool isFolded = chatfold[id] ?? true;
+    if (isFolded) {
+      return 5;
+    } else {
+      return 50;
+    }
+  }
+
+  void isFold(int id) {
+    chatfold[id] = !(chatfold[id] ?? true);
+    notifyListeners();
+  }
+
   // 리얼타임 구독하기
   RealtimeChannel _subscribeMessageEvent() {
     return SupabaseManager.shared.supabase
@@ -52,16 +74,29 @@ class ChatViewModel extends ChangeNotifier {
           event: PostgresChangeEvent.insert,
           schema: 'public',
           table: 'chat_messages',
-          callback: (payload) {
+          callback: (payload) async {
             final newMessage = payload.newRecord;
             final createdAtString = newMessage['created_at'] as String;
             final createdAt = DateTime.parse(createdAtString).toLocal();
+            final userImage = await supabase
+                .from('users')
+                .select('profileurl')
+                .eq('id', newMessage['user_id']);
+            final nickname = await supabase
+                .from('users')
+                .select('nickname')
+                .eq('id', newMessage['user_id']);
 
             final newChatMessage = ChatMessage(
+              id: newMessage['id'] as int,
+              image: (userImage.isNotEmpty)
+                  ? userImage[0]['profileurl'] as String?
+                  : null,
               message: newMessage['message'] as String,
               time: createdAtString.toChatTime(),
               createdAt: createdAt,
               isMe: newMessage['user_id'] == user!.id,
+              nickname: nickname[0]['nickname'],
             );
 
             chatMessages.add(newChatMessage);
@@ -106,19 +141,23 @@ class ChatViewModel extends ChangeNotifier {
     try {
       final data = await supabase
           .from('chat_messages')
-          .select('message, created_at, user_id')
+          .select('id,message,created_at,user_id,users (profileurl,nickname)')
           .eq('calendar_id', calendarId)
           .order('created_at', ascending: true);
 
       chatMessages = data.map((row) {
         final createdAtString = row['created_at'] as String;
         final createdAt = DateTime.parse(createdAtString).toLocal();
+        final users = row['users'];
 
         return ChatMessage(
+          id: row['id'] as int,
           message: row['message'] as String,
           time: createdAtString.toChatTime(),
           createdAt: createdAt,
           isMe: row['user_id'] == user!.id,
+          image: users != null ? users['profileurl'] as String? : null,
+          nickname: users['nickname'],
         );
       }).toList();
 
