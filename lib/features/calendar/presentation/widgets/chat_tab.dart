@@ -320,12 +320,7 @@ class CustomMyChatCard extends StatelessWidget {
             ],
           ),
           // 커스텀 프로필 이미지 박스 사용
-          CustomChatProfileImageBox(
-            width: 36,
-            height: 36,
-            imageUrl: image,
-            nickname: nickname,
-          ),
+          CustomChatProfileImageBox(width: 36, height: 36, imageUrl: image),
         ],
       ),
     );
@@ -369,12 +364,7 @@ class CustomOtherChatCard extends StatelessWidget {
       spacing: 12,
       children: [
         // 커스텀 프로필 이미지 박스 사용
-        CustomChatProfileImageBox(
-          width: 36,
-          height: 36,
-          imageUrl: image,
-          nickname: nickname,
-        ),
+        CustomChatProfileImageBox(width: 36, height: 36, imageUrl: image),
         // 커스텀 채팅 박스 사용
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,7 +397,6 @@ class CustomChatProfileImageBox extends StatelessWidget {
   final double width;
   final double height;
   final String? imageUrl;
-  final String? nickname;
 
   /// 커스텀 프로필 이미지 박스
   const CustomChatProfileImageBox({
@@ -415,7 +404,6 @@ class CustomChatProfileImageBox extends StatelessWidget {
     required this.width,
     required this.height,
     this.imageUrl,
-    this.nickname,
   });
 
   @override
