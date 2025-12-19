@@ -82,6 +82,9 @@ class _ChatTab extends StatelessWidget {
                           isMyChat: currentMessage.isMe,
                           chatTime: currentMessage.time,
                           message: currentMessage.message,
+                          image: currentMessage.image,
+                          nickname: currentMessage.nickname,
+                          id: currentMessage.id,
                         ),
                       ],
                     );
@@ -116,6 +119,16 @@ class CustomInputChatMessageBox extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
+              onTap: () async {
+                await Future.delayed(Duration(milliseconds: 1000));
+                if (viewModel.scrollController.hasClients) {
+                  viewModel.scrollController.animateTo(
+                    viewModel.scrollController.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.fastEaseInToSlowEaseOut,
+                  );
+                }
+              },
               controller: viewModel.chatController,
               decoration: InputDecoration(
                 hintText: '메시지를 입력하세요...',
@@ -200,12 +213,24 @@ class CustomChatCard extends StatelessWidget {
   /// 채팅 메세지
   final message;
 
+  /// 프로필 이미지
+  final image;
+
+  /// 닉네임
+  final nickname;
+
+  /// 채팅 아이디
+  final id;
+
   /// 커스텀 채팅 소유자에 따른 UI 변경 카드
   const CustomChatCard({
     super.key,
     required this.isMyChat,
     required this.chatTime,
     required this.message,
+    this.image,
+    required this.nickname,
+    required this.id,
   });
 
   @override
@@ -216,6 +241,9 @@ class CustomChatCard extends StatelessWidget {
         isMyChat: isMyChat,
         chatTime: chatTime,
         message: message,
+        image: image,
+        nickname: nickname,
+        id: id,
       );
     }
     // 다른 유저 채팅 UI 카드 사용
@@ -223,6 +251,9 @@ class CustomChatCard extends StatelessWidget {
       isMyChat: isMyChat,
       chatTime: chatTime,
       message: message,
+      image: image,
+      nickname: nickname,
+      id: id,
     );
   }
 }
@@ -237,12 +268,24 @@ class CustomMyChatCard extends StatelessWidget {
   /// 채팅 메세지
   final String message;
 
+  /// 프로필 이미지
+  final image;
+
+  /// 닉네임
+  final nickname;
+
+  /// 채팅 아이디
+  final id;
+
   /// 내 채팅 UI 카드
   const CustomMyChatCard({
     super.key,
     required this.isMyChat,
     required this.chatTime,
     required this.message,
+    this.image,
+    required this.nickname,
+    required this.id,
   });
 
   @override
@@ -254,14 +297,28 @@ class CustomMyChatCard extends StatelessWidget {
         spacing: 12,
         children: [
           // 커스텀 채팅 박스 사용
-          CustomChatBox(
-            color: Colors.blue,
-            isMyChat: isMyChat,
-            chatTime: chatTime,
-            message: message,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 5.0),
+                child: Text(
+                  nickname,
+                  style: TextStyle(fontSize: 10),
+                  textAlign: TextAlign.right,
+                ),
+              ),
+              CustomChatBox(
+                color: Colors.blue,
+                isMyChat: isMyChat,
+                chatTime: chatTime,
+                message: message,
+                id: id,
+              ),
+            ],
           ),
           // 커스텀 프로필 이미지 박스 사용
-          CustomChatProfileImageBox(width: 36, height: 36),
+          CustomChatProfileImageBox(width: 36, height: 36, imageUrl: image),
         ],
       ),
     );
@@ -278,27 +335,54 @@ class CustomOtherChatCard extends StatelessWidget {
   /// 채팅 메세지
   final String message;
 
+  /// 프로필 이미지
+  final image;
+
+  /// 닉네임
+  final nickname;
+
+  /// 채팅 아이디
+  final id;
+
   /// 다른 유저 채팅 UI 카드
   const CustomOtherChatCard({
     super.key,
     required this.isMyChat,
     required this.chatTime,
     required this.message,
+    this.image,
+    required this.nickname,
+    required this.id,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 12,
       children: [
         // 커스텀 프로필 이미지 박스 사용
-        CustomChatProfileImageBox(width: 36, height: 36),
+        CustomChatProfileImageBox(width: 36, height: 36, imageUrl: image),
         // 커스텀 채팅 박스 사용
-        CustomChatBox(
-          color: Colors.grey,
-          isMyChat: isMyChat,
-          chatTime: chatTime,
-          message: message,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5.0),
+              child: Text(
+                nickname,
+                style: TextStyle(fontSize: 10),
+                textAlign: TextAlign.left,
+              ),
+            ),
+            CustomChatBox(
+              color: Colors.grey,
+              isMyChat: isMyChat,
+              chatTime: chatTime,
+              message: message,
+              id: id,
+            ),
+          ],
         ),
       ],
     );
@@ -309,7 +393,6 @@ class CustomChatProfileImageBox extends StatelessWidget {
   final double width;
   final double height;
   final String? imageUrl;
-  final String? nickname;
 
   /// 커스텀 프로필 이미지 박스
   const CustomChatProfileImageBox({
@@ -317,28 +400,18 @@ class CustomChatProfileImageBox extends StatelessWidget {
     required this.width,
     required this.height,
     this.imageUrl,
-    this.nickname,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
-          // child: Image.network("${imageUrl}"),
-          child: (imageUrl == null)
-              ? ClipOval(child: Icon(Icons.account_circle))
-              : ClipOval(child: Image.network(imageUrl!)),
-        ),
-        Container(
-          width: width,
-          height: height,
-          child: Text("${nickname}", style: TextStyle(fontSize: 8)),
-        ),
-      ],
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+      // child: Image.network("${imageUrl}"),
+      child: (imageUrl == null)
+          ? ClipOval(child: Icon(Icons.account_circle, size: 35))
+          : ClipOval(child: Image.network(imageUrl!)),
     );
   }
 }
@@ -356,6 +429,9 @@ class CustomChatBox extends StatelessWidget {
   /// 채팅 메세지
   final String message;
 
+  /// 채팅 아이디
+  final id;
+
   /// 커스텀 채팅 박스
   const CustomChatBox({
     super.key,
@@ -363,10 +439,12 @@ class CustomChatBox extends StatelessWidget {
     required this.isMyChat,
     required this.chatTime,
     required this.message,
+    this.id,
   });
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<ChatViewModel>();
     return Column(
       crossAxisAlignment: isMyChat
           ? CrossAxisAlignment.end
@@ -383,7 +461,17 @@ class CustomChatBox extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(message),
+            child: (message.length > 1000)
+                ? GestureDetector(
+                    onTap: () => viewModel.isFold(id),
+
+                    child: Text(
+                      message,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: viewModel.chatLength(id),
+                    ),
+                  )
+                : Text(message),
           ),
         ),
         Text(chatTime, style: TextStyle(fontSize: 12, color: Colors.grey)),
