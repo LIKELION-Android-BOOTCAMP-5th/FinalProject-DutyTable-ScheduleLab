@@ -1,156 +1,184 @@
 import 'package:dutytable/features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import '../configs/app_colors.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends StatefulWidget {
   final Widget child;
 
   const AppShell({super.key, required this.child});
 
   @override
+  State<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> {
+  // 마지막으로 뒤로가기 버튼을 누른 시간 기록
+  DateTime? _lastPressedAt;
+
+  @override
   Widget build(BuildContext context) {
     final currentIndex = _calculateIndex(context);
-    final location = GoRouterState.of(context).uri.toString(); // 현재 위치 가져오기
+    final location = GoRouterState.of(context).uri.toString();
 
-    return Theme(
-      // 리플 효과 삭제
-      data: Theme.of(context).copyWith(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        body: child,
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: AppColors.commonGrey, width: 1),
+    return PopScope(
+      canPop: false, // 시스템 뒤로가기 기본 동작을 막음
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        if (didPop) return;
+
+        // 1. 현재 위치가 메인 탭(/shared)이 아닌 경우 메인으로 이동
+        if (location != '/shared') {
+          context.go('/shared');
+          return;
+        }
+
+        // 2. 이미 메인 탭인 경우 "한 번 더 눌러 종료" 로직 실행
+        final now = DateTime.now();
+        if (_lastPressedAt == null ||
+            now.difference(_lastPressedAt!) > const Duration(seconds: 2)) {
+          // 2초 이내에 다시 누르지 않았을 때
+          _lastPressedAt = now;
+
+          // 토스트 메시지 형태의 스낵바 노출
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                '한 번 더 누르면 종료됩니다.',
+                style: TextStyle(color: Colors.white),
+              ),
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
             ),
-          ),
-          child: BottomNavigationBar(
-            currentIndex: currentIndex,
-            onTap: (index) {
-              switch (index) {
-                case 0:
-                  // 이미 공유 캘린더 탭이거나, 공유 캘린더의 상세 페이지에 있는 경우
-                  if (location.startsWith('/shared')) {
-                    // 리스트 화면 새로고침
-                    context.read<SharedCalendarViewModel>().fetchCalendars();
-                  }
-                  context.go('/shared');
-                  break;
-                case 1:
-                  if (location.startsWith('/personal')) {
-                    // 개인 캘린더 화면 새로고침
-                    context.read<PersonalCalendarViewModel>().fetchCalendar();
-                  }
-                  context.go('/personal');
-                  break;
-                case 2:
-                  context.go('/profile');
-                  break;
-              }
-            },
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            type: BottomNavigationBarType.fixed,
-            // 클릭된 바텀 네비게이션 탭 라벨
-            showSelectedLabels: true,
-            // 클릭되지 않은 바텀 네비게이션 탭 라벨
-            showUnselectedLabels: true,
-            // 클릭된 바텀 네비게이션 라벨 텍스트 스타일
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            // 클릭되지 않은 바텀 네비게이션 라벨 텍스트 스타일
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            // 클릭된 바텀 네비게이션 탭 색
-            selectedItemColor: AppColors.commonBlue,
-            // 클릭되지 않은 바텀 네비게이션 탭 색
-            unselectedItemColor: AppColors.commonGrey,
-            items: [
-              // 공유 캘린더 - active: false(클릭되지 않은) / true(클릭된)
-              BottomNavigationBarItem(
-                icon: _buildSharedCalendarIcon(
-                  active: false,
-                  icon: _buildSharedCalendarInnerIcon(active: false),
-                ),
-                activeIcon: _buildSharedCalendarIcon(
-                  active: true,
-                  icon: _buildSharedCalendarInnerIcon(active: true),
-                ),
-                label: "공유 캘린더",
+          );
+        } else {
+          // 2초 이내에 다시 누른 경우 앱 종료
+          SystemNavigator.pop();
+        }
+      },
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: Scaffold(
+          body: widget.child,
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: AppColors.commonGrey, width: 1),
               ),
-
-              // 내 캘린더 - active: false(클릭되지 않은) / true(클릭된)
-              BottomNavigationBarItem(
-                icon: _buildSharedCalendarIcon(
-                  active: false,
-                  icon: const Icon(
-                    Icons.calendar_month,
-                    size: 22,
-                    color: AppColors.commonWhite,
-                  ),
-                ),
-                activeIcon: _buildSharedCalendarIcon(
-                  active: true,
-                  icon: const Icon(
-                    Icons.calendar_month,
-                    size: 22,
-                    color: AppColors.commonWhite,
-                  ),
-                ),
-                label: "내 캘린더",
+            ),
+            child: BottomNavigationBar(
+              currentIndex: currentIndex,
+              onTap: (index) {
+                switch (index) {
+                  case 0:
+                    if (location.startsWith('/shared')) {
+                      context.read<SharedCalendarViewModel>().fetchCalendars();
+                    }
+                    context.go('/shared');
+                    break;
+                  case 1:
+                    if (location.startsWith('/personal')) {
+                      context.read<PersonalCalendarViewModel>().fetchCalendar();
+                    }
+                    context.go('/personal');
+                    break;
+                  case 2:
+                    context.go('/profile');
+                    break;
+                }
+              },
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              type: BottomNavigationBarType.fixed,
+              showSelectedLabels: true,
+              showUnselectedLabels: true,
+              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
               ),
-
-              // 프로필 - active: false(클릭되지 않은) / true(클릭된)
-              BottomNavigationBarItem(
-                icon: _buildSharedCalendarIcon(
-                  active: false,
-                  icon: Icon(
-                    Icons.person_outline,
-                    size: 22,
-                    color: AppColors.commonWhite,
+              selectedItemColor: AppColors.commonBlue,
+              unselectedItemColor: AppColors.commonGrey,
+              items: [
+                BottomNavigationBarItem(
+                  icon: _buildSharedCalendarIcon(
+                    active: false,
+                    icon: _buildSharedCalendarInnerIcon(active: false),
                   ),
-                ),
-                activeIcon: _buildSharedCalendarIcon(
-                  active: true,
-                  icon: Icon(
-                    Icons.person,
-                    size: 22,
-                    color: AppColors.commonWhite,
+                  activeIcon: _buildSharedCalendarIcon(
+                    active: true,
+                    icon: _buildSharedCalendarInnerIcon(active: true),
                   ),
+                  label: "공유 캘린더",
                 ),
-                label: "프로필",
-              ),
-            ],
+                BottomNavigationBarItem(
+                  icon: _buildSharedCalendarIcon(
+                    active: false,
+                    icon: const Icon(
+                      Icons.calendar_month,
+                      size: 22,
+                      color: AppColors.commonWhite,
+                    ),
+                  ),
+                  activeIcon: _buildSharedCalendarIcon(
+                    active: true,
+                    icon: const Icon(
+                      Icons.calendar_month,
+                      size: 22,
+                      color: AppColors.commonWhite,
+                    ),
+                  ),
+                  label: "내 캘린더",
+                ),
+                BottomNavigationBarItem(
+                  icon: _buildSharedCalendarIcon(
+                    active: false,
+                    icon: const Icon(
+                      Icons.person_outline,
+                      size: 22,
+                      color: AppColors.commonWhite,
+                    ),
+                  ),
+                  activeIcon: _buildSharedCalendarIcon(
+                    active: true,
+                    icon: const Icon(
+                      Icons.person,
+                      size: 22,
+                      color: AppColors.commonWhite,
+                    ),
+                  ),
+                  label: "프로필",
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // 현재 위치 index 값
   int _calculateIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-
-    if (location.startsWith('/shared')) {
-      return 0;
-    } else if (location.startsWith('/personal')) {
-      return 1;
-    } else if (location.startsWith('/profile')) {
-      return 2;
-    }
+    if (location.startsWith('/shared')) return 0;
+    if (location.startsWith('/personal')) return 1;
+    if (location.startsWith('/profile')) return 2;
     return 0;
   }
 }
 
-// 공유 캘린더 아이콘 - 원(캘린더 + 유저 그룹 아이콘 합침)
+// 아이콘 빌더 함수들 (기존과 동일)
 Widget _buildSharedCalendarInnerIcon({required bool active}) {
   final Color bgColor = active
       ? AppColors.commonBlue
       : AppColors.commonGreyShade400;
-
   return Container(
     width: 48,
     height: 48,
@@ -161,14 +189,18 @@ Widget _buildSharedCalendarInnerIcon({required bool active}) {
     child: Stack(
       alignment: Alignment.center,
       children: [
-        Icon(Icons.calendar_month, size: 22, color: AppColors.commonWhite),
+        const Icon(
+          Icons.calendar_month,
+          size: 22,
+          color: AppColors.commonWhite,
+        ),
         Positioned(
           right: 0,
           bottom: 0,
           child: Container(
             width: 16,
             height: 16,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.commonWhite,
               shape: BoxShape.circle,
             ),
@@ -180,12 +212,10 @@ Widget _buildSharedCalendarInnerIcon({required bool active}) {
   );
 }
 
-// 내 캘린더 및 프로필 아이콘 - 원(캘린더 또는 유저 아이콘)
 Widget _buildSharedCalendarIcon({required bool active, required Widget icon}) {
   final Color bgColor = active
       ? AppColors.commonBlue
       : AppColors.commonGreyShade400;
-
   return Padding(
     padding: const EdgeInsets.all(4.0),
     child: Container(
