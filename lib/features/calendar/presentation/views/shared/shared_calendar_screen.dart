@@ -39,18 +39,21 @@ class _SharedCalendarScreen extends StatelessWidget {
             actions: [
               Row(
                 children: [
-                  // 커스텀 캘린더 앱바 아이콘 사용
-                  CustomAppBarIcon(
-                    icon: Icons.person_add_alt,
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (_) =>
-                            MemberInviteDialog(viewModel: viewModel),
-                      );
-                    },
-                  ),
+                  viewModel.calendar!.user_id == viewModel.currentUserId
+                      ?
+                        // 커스텀 캘린더 앱바 아이콘 사용
+                        CustomAppBarIcon(
+                          icon: Icons.person_add_alt,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (_) =>
+                                  MemberInviteDialog(viewModel: viewModel),
+                            );
+                          },
+                        )
+                      : SizedBox.shrink(),
                   // 커스텀 캘린더 앱바 아이콘 사용
                   CustomAppBarIcon(
                     icon: Icons.notifications_none,
