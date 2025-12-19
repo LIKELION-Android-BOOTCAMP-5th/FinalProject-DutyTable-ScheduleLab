@@ -233,7 +233,6 @@ class SharedCalendarViewModel extends ChangeNotifier {
       );
 
       if (_isDisposed) return;
-      await Future.delayed(const Duration(milliseconds: 200));
       _state = ViewState.success;
     } catch (e) {
       if (_isDisposed) return;
