@@ -27,6 +27,11 @@ class CalendarAddViewModel extends ChangeNotifier {
 
   bool get isValid => _title.trim().isNotEmpty;
 
+  void clearError() {
+    _inviteError = null;
+    notifyListeners();
+  }
+
   void addInvitedUser({required String userId, required String nickname}) {
     if (_invitedUsers.containsKey(userId)) return;
 
