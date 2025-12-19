@@ -1,8 +1,8 @@
-import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_edit_view_model.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/color_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/done_status_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/emotion_section.dart';
+import 'package:dutytable/features/schedule/presentation/views/widgets/location_search_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_option_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/start_and_end_date_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/start_and_end_time_section.dart';
@@ -123,7 +123,21 @@ class ScheduleDetailEditBody extends StatelessWidget {
               const SizedBox(height: 24),
 
               /// 주소 - 선택 사항
-              // LocationSection(),
+              LocationSection(
+                address: viewModel.address,
+                latitude: viewModel.latitude,
+                longitude: viewModel.longitude,
+                addressController: viewModel.addressController,
+                onSearch: () async {
+                  final selected = await showLocationDialog(context);
+
+                  if (selected != null) {
+                    await viewModel.updateLocationAction(selected.address);
+                  }
+                },
+                onClear: () => viewModel.clearAddress(),
+              ),
+
               const SizedBox(height: 24),
 
               /// 메모 - 선택 사항(300자 제한)

@@ -1,11 +1,15 @@
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
+import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 enum EditViewState { idle, loading, success, error }
 
 class ScheduleEditViewModel extends ChangeNotifier {
   final ScheduleModel _scheduleFromEdit;
+
+  final TextEditingController addressController = TextEditingController();
 
   EditViewState _state = EditViewState.idle;
 
@@ -116,7 +120,44 @@ class ScheduleEditViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// ===== update =====
+  Future<void> updateLocationAction(String newAddress) async {
+    try {
+      final geo = await geocodeAddress(newAddress);
+      if (geo == null) return;
+
+      _address = newAddress;
+      _latitude = geo['latitude']!.toString();
+      _longitude = geo['longitude']!.toString();
+
+      addressController.text = newAddress;
+      notifyListeners();
+    } catch (e) {
+      debugPrint("❌ updateLocationAction error: $e");
+    }
+  }
+
+  void clearAddress() {
+    _address = null;
+    _latitude = null;
+    _longitude = null;
+    addressController.clear();
+    notifyListeners();
+  }
+
+  Future<Map<String, double>?> geocodeAddress(String address) async {
+    final response = await supabase.functions.invoke(
+      'hyper-endpoint',
+      body: {'type': 'geocode', 'address': address},
+    );
+
+    if (response.data == null) return null;
+
+    return {
+      'latitude': (response.data['latitude'] as num).toDouble(),
+      'longitude': (response.data['longitude'] as num).toDouble(),
+    };
+  }
+
   Future<void> updateSchedule() async {
     _state = EditViewState.loading;
     notifyListeners();
@@ -166,5 +207,11 @@ class ScheduleEditViewModel extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    addressController.dispose();
+    super.dispose();
   }
 }

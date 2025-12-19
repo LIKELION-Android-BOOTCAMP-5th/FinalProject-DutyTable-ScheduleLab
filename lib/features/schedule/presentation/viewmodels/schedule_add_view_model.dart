@@ -1,10 +1,13 @@
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 enum ViewState { idle, loading, success, error }
 
 class ScheduleAddViewModel extends ChangeNotifier {
+  final TextEditingController addressController = TextEditingController();
+
   /// 데이터 로딩 상태(private)
   ViewState _state = ViewState.idle;
 
@@ -144,11 +147,18 @@ class ScheduleAddViewModel extends ChangeNotifier {
     _address = address;
     _latitude = latitude;
     _longitude = longitude;
+
+    // 컨트롤러 텍스트 동기화
+    addressController.text = address;
     notifyListeners();
   }
 
   void clearAddress() {
     _address = null;
+    _latitude = null;
+    _longitude = null;
+
+    addressController.clear();
     notifyListeners();
   }
 
@@ -156,6 +166,21 @@ class ScheduleAddViewModel extends ChangeNotifier {
     if (value.length <= 300) {
       _memo = value;
       notifyListeners();
+    }
+  }
+
+  Future<void> updateLocationAction(String newAddress) async {
+    try {
+      final geo = await geocodeAddress(newAddress);
+      if (geo == null) return;
+
+      setLocation(
+        address: newAddress,
+        latitude: geo['latitude']!.toString(),
+        longitude: geo['longitude']!.toString(),
+      );
+    } catch (e) {
+      debugPrint("❌ updateLocationAction error: $e");
     }
   }
 
@@ -224,5 +249,11 @@ class ScheduleAddViewModel extends ChangeNotifier {
       'latitude': (response.data['latitude'] as num).toDouble(),
       'longitude': (response.data['longitude'] as num).toDouble(),
     };
+  }
+
+  @override
+  void dispose() {
+    addressController.dispose();
+    super.dispose();
   }
 }
