@@ -27,7 +27,6 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> initializeNotifications() async {
-  // 1. Android 알림 채널 생성 (이미 작성하신 부분)
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin
@@ -36,7 +35,7 @@ Future<void> initializeNotifications() async {
 
   // 2. Flutter Local Notifications 초기화 설정
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher'); // 앱 아이콘 설정 필요
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
@@ -52,7 +51,6 @@ Future<void> initializeNotifications() async {
     sound: true,
   );
 
-  // 4. 포그라운드 메시지 수신 리스너 (핵심!)
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
