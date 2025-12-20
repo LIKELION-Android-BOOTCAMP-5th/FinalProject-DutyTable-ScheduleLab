@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
+import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../calendar/data/datasources/calendar_data_source.dart';
 import '../../data/datasources/notification_data_source.dart';
@@ -46,6 +48,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void dispose() {
     _inviteSubscription?.cancel(); // 초대 알림 스트림 구독 취소
     _reminderSubscription?.cancel(); // 리마인더 알림 스트림 구독 취소
+    _recheckUnreadNotificationsStatus(); // 화면이 닫힐 때 읽지 않은 알림 상태 재확인
     super.dispose();
   }
 
@@ -53,8 +56,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// 초대 알림과 리마인더 알림을 모두 가져와 합친 후, 최신순으로 정렬
   Future<void> _loadInitialNotifications() async {
     try {
-      final inviteFuture = NotificationDataSource.shared.getInviteNotifications();
-      final reminderFuture = NotificationDataSource.shared.getReminderNotifications();
+      final inviteFuture =
+      NotificationDataSource.shared.getInviteNotifications();
+      final reminderFuture =
+      NotificationDataSource.shared.getReminderNotifications();
 
       final results = await Future.wait([inviteFuture, reminderFuture]);
 
@@ -81,7 +86,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
         });
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('알림을 불러오는 중 오류가 발생했습니다: $e')));
+        ).showSnackBar(
+            SnackBar(content: Text('알림을 불러오는 중 오류가 발생했습니다: $e')));
       }
     }
   }
@@ -90,19 +96,23 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// 새로운 알림이 수신되면 목록의 가장 위에 추가하고 UI를 업데이트
   void _setupRealtimeListeners() {
     // 초대 알림 스트림을 구독
-    _inviteSubscription = NotificationDataSource.shared.newInviteNotifications.listen((
-        notification,
-        ) {
-      // 위젯이 마운트된 상태일 때만 UI를 업데이트
-      if (mounted) {
-        setState(() {
-          _notifications.insert(0, notification); // 새로운 알림을 목록의 맨 앞에 추가
-        });
-      }
-    });
+    _inviteSubscription =
+        NotificationDataSource.shared.newInviteNotifications.listen(
+              (
+              notification,
+              ) {
+            // 위젯이 마운트된 상태일 때만 UI를 업데이트
+            if (mounted) {
+              setState(() {
+                _notifications.insert(0, notification); // 새로운 알림을 목록의 맨 앞에 추가
+              });
+            }
+          },
+        );
 
     // 리마인더 알림 스트림을 구독
-    NotificationDataSource.shared.newReminderNotifications.listen((notification) {
+    NotificationDataSource.shared.newReminderNotifications
+        .listen((notification) {
       // 위젯이 마운트된 상태일 때만 UI를 업데이트
       if (mounted) {
         setState(() {
@@ -129,6 +139,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             setState(() {
               _notifications.clear(); // 로컬 알림 목록 비우기
             });
+            _recheckUnreadNotificationsStatus(); // 모든 알림 삭제 후 읽지 않은 알림 상태 재확인
           }
         } catch (e) {
           // 삭제 중 에러 발생 시 스낵바 표시
@@ -162,20 +173,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     // 캘린더 화면으로 이동
     try {
-      final groupCalendarsFuture =
-      CalendarDataSource.instance.fetchCalendarFinalList('group');
-      final personalCalendarFuture =
-      CalendarDataSource.instance.fetchPersonalCalendar();
-      final results =
-      await Future.wait([groupCalendarsFuture, personalCalendarFuture]);
-      final groupCalendars = results[0] as List;
-      final personalCalendar = results[1];
-      final allCalendars = [...groupCalendars, personalCalendar];
-
-      final targetCalendar = allCalendars.firstWhere(
-            (c) => c.id == notification.calendarId,
-        orElse: () => throw Exception('캘린더를 찾을 수 없습니다.'),
-      );
+      final targetCalendar = await CalendarDataSource.instance
+          .fetchSharedCalendarFromId(notification.calendarId);
 
       if (context.mounted) {
         if (targetCalendar.type == 'group') {
@@ -190,6 +189,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
           SnackBar(content: Text('화면 이동 중 오류가 발생했습니다: $e')),
         );
       }
+    }
+  }
+
+  // 앱 전역의 읽지 않은 알림 상태를 재확인하고 업데이트하는 메서드
+  Future<void> _recheckUnreadNotificationsStatus() async {
+    try {
+      final inviteFuture =
+      NotificationDataSource.shared.getInviteNotifications();
+      final reminderFuture =
+      NotificationDataSource.shared.getReminderNotifications();
+      final results = await Future.wait([inviteFuture, reminderFuture]);
+      final hasUnread =
+      [...results[0], ...results[1]].any((n) => (n as dynamic).isRead == false);
+      if (mounted) {
+        context.read<NotificationState>().setHasNewNotifications(hasUnread);
+      }
+    } catch (e) {
+      debugPrint("Failed to re-check notification status: $e");
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/calendar_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
+import 'package:dutytable/features/notification/presentation/widgets/notification_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -68,11 +69,7 @@ class _PersonalCalendarScreen extends StatelessWidget {
       appBar: LogoActionsAppBar(
         rightActions: Row(
           children: [
-            // 커스텀 캘린더 앱바 아이콘 사용
-            CustomAppBarIcon(
-              icon: Icons.notifications,
-              onTap: () => context.push("/notification"),
-            ),
+            const NotificationIcon(),
             // 커스텀 캘린더 앱바 아이콘 사용
             CustomAppBarIcon(
               icon: Icons.menu,
