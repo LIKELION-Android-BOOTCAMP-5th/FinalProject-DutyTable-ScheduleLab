@@ -1,9 +1,9 @@
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_add_view_model.dart';
-import 'package:dutytable/features/schedule/presentation/views/widgets/location_search_screen.dart';
-import 'package:dutytable/features/schedule/presentation/views/widgets/location_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/color_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/done_status_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/emotion_section.dart';
+import 'package:dutytable/features/schedule/presentation/views/widgets/location_search_screen.dart';
+import 'package:dutytable/features/schedule/presentation/views/widgets/location_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/memo_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_option_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_section.dart';

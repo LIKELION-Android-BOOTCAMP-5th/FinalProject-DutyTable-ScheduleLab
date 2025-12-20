@@ -1,7 +1,6 @@
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_naver_map/flutter_naver_map.dart';
 
 enum ViewState { idle, loading, success, error }
 
@@ -137,6 +136,16 @@ class ScheduleAddViewModel extends ChangeNotifier {
   set holidayException(bool value) {
     _holidayException = value;
     notifyListeners();
+  }
+
+  ScheduleAddViewModel(DateTime? date) {
+    if (date != null) {
+      _startDate = date;
+      _endDate = date;
+    } else {
+      _startDate = DateTime.now();
+      _endDate = DateTime.now();
+    }
   }
 
   void setLocation({
