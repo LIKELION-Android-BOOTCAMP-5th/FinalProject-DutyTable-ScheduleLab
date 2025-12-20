@@ -19,6 +19,11 @@ class ScheduleAddButtonSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleAddViewModel>();
 
+    // 제목이 입력되었고, 로딩 중이 아닐 때만 활성화
+    final bool isEnabled =
+        viewModel.title.trim().isNotEmpty &&
+        viewModel.state != ViewState.loading;
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
@@ -52,20 +57,23 @@ class ScheduleAddButtonSection extends StatelessWidget {
             /// 일정 추가 - 저장 버튼
             Expanded(
               child: GestureDetector(
-                onTap: viewModel.state == ViewState.loading
-                    ? null
-                    : () async {
+                onTap: isEnabled
+                    ? () async {
                         await viewModel.addSchedule(calendarId);
-                        if (context.mounted) {
+                        if (context.mounted &&
+                            viewModel.state == ViewState.success) {
                           context.pop(true);
                         }
-                      },
+                      }
+                    : null,
                 child: Container(
                   height: 48,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: AppColors.actionPositive(context),
+                    color: isEnabled
+                        ? AppColors.actionPositive(context)
+                        : AppColors.commonGrey.withOpacity(0.5),
                   ),
                   child: viewModel.state == ViewState.loading
                       ? const SizedBox(
