@@ -5,9 +5,14 @@ import 'package:provider/provider.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
   final int calendarId;
+  final DateTime? date;
 
   /// 커스텀 플로팅 액션 버튼(제스처 디텍터 사용)
-  const CustomFloatingActionButton({super.key, required this.calendarId});
+  const CustomFloatingActionButton({
+    super.key,
+    required this.calendarId,
+    this.date,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +20,7 @@ class CustomFloatingActionButton extends StatelessWidget {
       onTap: () async {
         final result = await context.push(
           "/schedule/add",
-          extra: {"calendarId": calendarId},
+          extra: {"calendarId": calendarId, "date": date},
         );
 
         if (result == true && context.mounted) {

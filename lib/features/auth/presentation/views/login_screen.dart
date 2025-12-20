@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dutytable/features/auth/presentation/viewmodels/login_viewmodel.dart';
 import 'package:dutytable/features/onboarding/presentation/views/onboarding_screen.dart';
 import 'package:flutter/material.dart';
@@ -150,17 +152,21 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: SignInWithAppleButton(
-                              onPressed: () => viewmodel.signInWithApple(
-                                context,
-                                isAutoLogin: _isAutoLogin,
+                          // 아이폰만 표시
+                          //TODO: 나중에 안드로이드에서도 애플 로그인 지원 여부 검토
+                          if (Platform.isIOS) ...[
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: SignInWithAppleButton(
+                                onPressed: () => viewmodel.signInWithApple(
+                                  context,
+                                  isAutoLogin: _isAutoLogin,
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ],
                       );
                     },

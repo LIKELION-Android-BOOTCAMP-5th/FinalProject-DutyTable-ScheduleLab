@@ -61,7 +61,10 @@ class CalendarTabBody extends StatelessWidget {
           ),
           floatingActionButton:
               viewModel.calendar!.user_id == viewModel.currentUserId
-              ? CustomFloatingActionButton(calendarId: viewModel.calendar!.id)
+              ? CustomFloatingActionButton(
+                  calendarId: viewModel.calendar!.id,
+                  date: viewModel.selectedDay,
+                )
               : null,
         );
       },
