@@ -178,8 +178,18 @@ class ChatViewModel extends ChangeNotifier {
     }
   }
 
+  // last_read_at 업데이트 하기
+  Future<void> updateLastReadAt(int calendarId) async {
+    await supabase
+        .from('calendar_members')
+        .update({'last_read_at': DateTime.now().toUtc().toIso8601String()})
+        .eq('user_id', user!.id)
+        .eq('calendar_id', calendarId);
+  }
+
   @override
-  void dispose() {
+  Future<void> dispose() async {
+    await updateLastReadAt(calendarId);
     channel?.unsubscribe();
     chatController.dispose();
     scrollController.dispose();

@@ -77,6 +77,7 @@ class _CalendarListItem extends StatelessWidget {
         isAdmin: isAdmin,
         members: calendar.calendarMemberModel?.length ?? 0,
         isSelected: isSelected,
+        calendarId: calendar.id,
         onChangeSelected: () => context
             .read<SharedCalendarViewModel>()
             .toggleSelected(calendar.id.toString()),
