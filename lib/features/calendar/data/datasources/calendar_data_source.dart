@@ -65,12 +65,14 @@ class CalendarDataSource {
   Future<bool> updateCalendarInfo(
     String title,
     String description,
+    String? imageURL,
     int calendarId,
   ) async {
     try {
       final Map<String, dynamic> data = {
         'title': title,
         'description': description,
+        'imageURL': imageURL,
       };
 
       final response = await _dio.patch(

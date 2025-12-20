@@ -13,7 +13,8 @@ class EditButtonSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final isContentChange =
         viewModel.titleController.text != viewModel.calendar.title ||
-        viewModel.descController.text != viewModel.calendar.description;
+        viewModel.descController.text != viewModel.calendar.description ||
+        viewModel.image?.path != viewModel.calendar.imageURL;
 
     return SafeArea(
       child: Padding(

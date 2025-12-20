@@ -8,6 +8,8 @@ import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'custom_calendar_image_box.dart';
+
 class CalendarSettingBody extends StatelessWidget {
   /// 캘린더 설정 화면 - 바디
   const CalendarSettingBody({super.key});
@@ -20,8 +22,11 @@ class CalendarSettingBody extends StatelessWidget {
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            CustomCalendarImageBox(imageUrl: viewModel.calendar.imageURL),
+            const SizedBox(height: 40),
             CustomCalendarSettingContentBox(
               title: const Text(
                 "캘린더 이름",
@@ -199,3 +204,18 @@ class _KickButton extends StatelessWidget {
     );
   }
 }
+
+// Widget calendarImage(String? url) {
+//   if (url == null || url.isEmpty) {
+//     return Image.asset("assets/images/calendar_logo.png", fit: BoxFit.cover);
+//   }
+//   if (url.startsWith("http")) {
+//     return Image.network(
+//       url,
+//       fit: BoxFit.cover,
+//       errorBuilder: (_, __, ___) =>
+//           Image.asset("assets/images/calendar_logo.png"),
+//     );
+//   }
+//   return Image.asset(url, fit: BoxFit.cover);
+// }
