@@ -1,7 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_edit_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ColorSection extends StatelessWidget {
   /// 색 리스트
@@ -38,26 +36,33 @@ class ColorSection extends StatelessWidget {
         const SizedBox(height: 10),
 
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: colorList.map((color) {
             final isSelected = color == selectColor;
 
-            return GestureDetector(
-              onTap: () => onColorSelected(color),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: AnimatedScale(
-                  scale: isSelected ? 1.25 : 1.0,
-                  duration: const Duration(milliseconds: 180),
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Color(int.parse(color)),
-                      shape: BoxShape.circle,
-                      border: isSelected
-                          ? Border.all(color: AppColors.commonGrey, width: 2)
-                          : null,
+            return Expanded(
+              // 부모 Row의 공간을 똑같이 나눠 가짐
+              child: GestureDetector(
+                onTap: () => onColorSelected(color),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: AnimatedScale(
+                    scale: isSelected ? 1.1 : 1.0,
+                    duration: const Duration(milliseconds: 180),
+                    child: AspectRatio(
+                      aspectRatio: 1.0, // 가로세로 1:1 비율 유지 (원형)
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Color(int.parse(color)),
+                          shape: BoxShape.circle,
+                          border: isSelected
+                              ? Border.all(
+                                  color: AppColors.commonGrey,
+                                  width: 2,
+                                )
+                              : null,
+                        ),
+                      ),
                     ),
                   ),
                 ),
