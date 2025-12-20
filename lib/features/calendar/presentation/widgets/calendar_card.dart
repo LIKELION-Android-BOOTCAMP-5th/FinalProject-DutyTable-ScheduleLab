@@ -1,5 +1,8 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../viewmodels/shared_calendar_view_model.dart';
 
 class CalendarCard extends StatelessWidget {
   final String title;
@@ -9,6 +12,7 @@ class CalendarCard extends StatelessWidget {
   final bool isSelected;
   final int members;
   final VoidCallback onChangeSelected;
+  final int? calendarId;
 
   const CalendarCard({
     super.key,
@@ -19,6 +23,7 @@ class CalendarCard extends StatelessWidget {
     required this.isSelected,
     required this.members,
     required this.onChangeSelected,
+    this.calendarId,
   });
 
   @override
@@ -153,6 +158,7 @@ class CalendarCard extends StatelessWidget {
   //   오른쪽 영역 (알림, 체크박스, 삭제 불가)
   // ------------------------------
   Widget _buildRightArea(BuildContext context, bool applyBlur) {
+    final viewModel = context.watch<SharedCalendarViewModel>();
     if (!deleteMode) {
       /// 일반 모드 → 알림 표시
       return Container(
@@ -163,8 +169,8 @@ class CalendarCard extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         alignment: Alignment.center,
-        child: const Text(
-          "99+",
+        child: Text(
+          "${viewModel.unreadCount[calendarId ?? 0] ?? 0}",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       );

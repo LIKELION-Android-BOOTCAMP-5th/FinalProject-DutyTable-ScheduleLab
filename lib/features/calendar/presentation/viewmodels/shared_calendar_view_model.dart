@@ -2,7 +2,9 @@ import 'package:dutytable/features/calendar/data/datasources/calendar_data_sourc
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/supabase_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../main.dart';
 import '../../data/datasources/user_data_source.dart';
 
 enum ViewState { loading, success, error }
@@ -176,6 +178,9 @@ class SharedCalendarViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    for (var channel in _channels) {
+      channel.unsubscribe();
+    }
     _isDisposed = true;
     super.dispose();
   }
@@ -234,6 +239,11 @@ class SharedCalendarViewModel extends ChangeNotifier {
 
       if (_isDisposed) return;
       _state = ViewState.success;
+      if (_calendarList != null) {
+        for (var calendar in _calendarList!) {
+          await loadUnreadCount(calendar.id);
+        }
+      }
     } catch (e) {
       if (_isDisposed) return;
 
@@ -244,6 +254,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
       if (!_isDisposed) {
         notifyListeners();
       }
+      _subscribeToNewMessages();
     }
   }
 
@@ -282,6 +293,88 @@ class SharedCalendarViewModel extends ChangeNotifier {
       _errorMessage = e.toString();
     } finally {
       notifyListeners();
+    }
+  }
+
+  Map<int, int> unreadCount = {};
+
+  // 채팅 개수 가져오기
+  Future<int> chatCount(int calendarId) async {
+    final List lastReadData = await supabase
+        .from('calendar_members')
+        .select('last_read_at')
+        .eq('user_id', currentUserId)
+        .eq('calendar_id', calendarId)
+        .limit(1);
+
+    if (lastReadData.isEmpty) {
+      return 0;
+    }
+
+    final DateTime lastReadAt = DateTime.parse(
+      lastReadData[0]['last_read_at'],
+    ).toUtc();
+
+    final List data = await supabase
+        .from('chat_messages')
+        .select('id')
+        .eq('calendar_id', calendarId)
+        .gt('created_at', lastReadAt.toIso8601String());
+
+    return data.length;
+  }
+
+  Future<void> loadUnreadCount(int calendarId) async {
+    final int count = await chatCount(calendarId);
+    unreadCount[calendarId] = count;
+    notifyListeners();
+  }
+
+  List<RealtimeChannel> _channels = [];
+
+  // 리얼타임구독
+  void _subscribeToNewMessages() {
+    if (_calendarList == null) return;
+
+    for (var calendar in _calendarList!) {
+      // 새 채팅
+      final chatChannel = supabase
+          .channel('unread_count_${calendar.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'chat_messages',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'calendar_id',
+              value: calendar.id,
+            ),
+            callback: (payload) {
+              loadUnreadCount(calendar.id);
+            },
+          )
+          .subscribe();
+
+      // 채팅 읽은 후
+      final memberChannel = supabase
+          .channel('member_update_${calendar.id}')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'calendar_members',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'calendar_id',
+              value: calendar.id,
+            ),
+            callback: (payload) {
+              loadUnreadCount(calendar.id);
+            },
+          )
+          .subscribe();
+
+      _channels.add(chatChannel);
+      _channels.add(memberChannel);
     }
   }
 }
