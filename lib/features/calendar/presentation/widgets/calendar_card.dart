@@ -105,6 +105,8 @@ class CalendarCard extends StatelessWidget {
   //   가운데 텍스트 정보
   // ------------------------------
   Widget _buildInfoText(BuildContext context) {
+    final viewModel = context.watch<SharedCalendarViewModel>();
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,9 +129,18 @@ class CalendarCard extends StatelessWidget {
 
           const SizedBox(height: 6),
 
-          Text(
-            "다음 일정: 12월 5일",
-            style: TextStyle(fontSize: 12, color: AppColors.commonGrey),
+          Row(
+            children: [
+              Text(
+                "다음 일정 : ${viewModel.nextScheduleDateMonth[calendarId ?? " "]}월 ${viewModel.nextScheduleDateDay[calendarId ?? " "]}일 ",
+                style: TextStyle(fontSize: 12, color: AppColors.commonGrey),
+              ),
+              Padding(padding: EdgeInsets.only(right: 10)),
+              Text(
+                "${viewModel.nextScheduleTitle[calendarId ?? " "]}",
+                style: TextStyle(fontSize: 12, color: AppColors.commonGrey),
+              ),
+            ],
           ),
         ],
       ),

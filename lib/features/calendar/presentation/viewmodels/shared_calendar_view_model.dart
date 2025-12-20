@@ -242,6 +242,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
       if (_calendarList != null) {
         for (var calendar in _calendarList!) {
           await loadUnreadCount(calendar.id);
+          await nextSchedule(calendar.id);
         }
       }
     } catch (e) {
@@ -376,5 +377,36 @@ class SharedCalendarViewModel extends ChangeNotifier {
       _channels.add(chatChannel);
       _channels.add(memberChannel);
     }
+  }
+
+  Map<int, String?> nextScheduleTitle = {};
+  Map<int, String?> nextScheduleDateMonth = {};
+  Map<int, String?> nextScheduleDateDay = {};
+
+  Future<void> nextSchedule(int? calendarId) async {
+    if (calendarId == null) return;
+    final titleData = await supabase
+        .from('schedules')
+        .select('title')
+        .eq('calendar_id', calendarId)
+        .gt('started_at', DateTime.now().toUtc().toIso8601String())
+        .order('started_at', ascending: true)
+        .limit(1);
+    final dateData = await supabase
+        .from('schedules')
+        .select('started_at')
+        .eq('calendar_id', calendarId)
+        .gt('started_at', DateTime.now().toUtc().toIso8601String())
+        .order('started_at', ascending: true)
+        .limit(1);
+    nextScheduleTitle[calendarId] = titleData.isNotEmpty
+        ? titleData[0]['title']
+        : "";
+    nextScheduleDateMonth[calendarId] = dateData.isNotEmpty
+        ? dateData[0]['started_at'].substring(5, 7)
+        : "";
+    nextScheduleDateDay[calendarId] = dateData.isNotEmpty
+        ? dateData[0]['started_at'].substring(8, 10)
+        : "";
   }
 }
