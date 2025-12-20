@@ -232,9 +232,10 @@ class _ListTab extends StatelessWidget {
               ),
             ],
           ),
-          floatingActionButton: CustomFloatingActionButton(
-            calendarId: viewModel.calendar!.id,
-          ),
+          floatingActionButton:
+              viewModel.calendar!.user_id == viewModel.currentUserId
+              ? CustomFloatingActionButton(calendarId: viewModel.calendar!.id)
+              : null,
         );
       },
     );
