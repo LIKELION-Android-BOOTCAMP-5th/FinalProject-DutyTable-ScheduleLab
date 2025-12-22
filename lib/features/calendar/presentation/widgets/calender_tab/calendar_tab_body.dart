@@ -21,9 +21,8 @@ class CalendarTabBody extends StatelessWidget {
           viewModel.displaySchedules,
         );
 
-        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
         return Scaffold(
+          backgroundColor: AppColors.background(context),
           body: Column(
             children: [
               if (viewModel.calendar!.type != "personal") ...[

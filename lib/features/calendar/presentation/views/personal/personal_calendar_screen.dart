@@ -69,6 +69,7 @@ class _PersonalCalendarScreen extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: AppColors.background(context),
       appBar: LogoActionsAppBar(
         rightActions: Row(
           children: [
