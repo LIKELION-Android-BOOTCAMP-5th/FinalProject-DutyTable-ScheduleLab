@@ -43,134 +43,160 @@ class _ListTab extends StatelessWidget {
                   horizontal: 20.0,
                   vertical: 8.0,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                child: Column(
                   children: [
                     Row(
-                      spacing: 8,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // 커스텀 드롭다운 버튼 사용
-                        CustomDropdownButton(
-                          // 기본 선택 값
-                          defaultValue: viewModel.selectedFilterYears,
-                          // 눌렀을 떄 나오는 아이템들
-                          items: viewModel.filterYears
-                              .map<DropdownMenuItem<int>>((int year) {
-                                return DropdownMenuItem<int>(
-                                  value: year,
-                                  child: Text("${year.toString()}년"),
-                                );
-                              })
-                              .toList(),
-                          // 아이템 눌렀을 떄 실행 할 함수
-                          onChanged: (dynamic newValue) {
-                            viewModel.selectedYear(newValue ?? 0);
-                          },
+                        Row(
+                          spacing: 8,
+                          children: [
+                            // 커스텀 드롭다운 버튼 사용
+                            CustomDropdownButton(
+                              // 기본 선택 값
+                              defaultValue: viewModel.selectedFilterYears,
+                              // 눌렀을 떄 나오는 아이템들
+                              items: viewModel.filterYears
+                                  .map<DropdownMenuItem<int>>((int year) {
+                                    return DropdownMenuItem<int>(
+                                      value: year,
+                                      child: Text("${year.toString()}년"),
+                                    );
+                                  })
+                                  .toList(),
+                              // 아이템 눌렀을 떄 실행 할 함수
+                              onChanged: (dynamic newValue) {
+                                viewModel.selectedYear(newValue ?? 0);
+                              },
+                            ),
+                            // 커스텀 드롭다운 버튼 사용
+                            CustomDropdownButton(
+                              // 기본 선택 값
+                              defaultValue: viewModel.selectedFilterMonth,
+                              // 눌렀을 떄 나오는 아이템들
+                              items: viewModel.filterMonths
+                                  .map<DropdownMenuItem<int>>((int month) {
+                                    return DropdownMenuItem<int>(
+                                      value: month,
+                                      child: Text("${month.toString()}월"),
+                                    );
+                                  })
+                                  .toList(),
+                              // 아이템 눌렀을 떄 실행 할 함수
+                              onChanged: (dynamic newValue) {
+                                viewModel.selectedMonth(newValue ?? 0);
+                              },
+                            ),
+                            // 커스텀 드롭다운 버튼 사용
+                            CustomDropdownButton(
+                              // 기본 선택 값
+                              defaultValue: viewModel.selectedFilterColor,
+                              // 눌렀을 떄 나오는 아이템들
+                              items: viewModel.filterColors
+                                  .map<DropdownMenuItem<String>>((
+                                    String color,
+                                  ) {
+                                    return DropdownMenuItem<String>(
+                                      value: color,
+                                      child: color == '전체'
+                                          ? Text(color)
+                                          : Container(
+                                              width: 28,
+                                              height: 28,
+                                              decoration: BoxDecoration(
+                                                color: Color(int.parse(color)),
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                    );
+                                  })
+                                  .toList(),
+                              // 아이템 눌렀을 떄 실행 할 함수
+                              onChanged: (dynamic newValue) {
+                                viewModel.selectedColor(newValue ?? "");
+                              },
+                            ),
+                          ],
                         ),
-                        // 커스텀 드롭다운 버튼 사용
-                        CustomDropdownButton(
-                          // 기본 선택 값
-                          defaultValue: viewModel.selectedFilterMonth,
-                          // 눌렀을 떄 나오는 아이템들
-                          items: viewModel.filterMonths
-                              .map<DropdownMenuItem<int>>((int month) {
-                                return DropdownMenuItem<int>(
-                                  value: month,
-                                  child: Text("${month.toString()}월"),
-                                );
-                              })
-                              .toList(),
-                          // 아이템 눌렀을 떄 실행 할 함수
-                          onChanged: (dynamic newValue) {
-                            viewModel.selectedMonth(newValue ?? 0);
-                          },
-                        ),
-                        // 커스텀 드롭다운 버튼 사용
-                        CustomDropdownButton(
-                          // 기본 선택 값
-                          defaultValue: viewModel.selectedFilterColor,
-                          // 눌렀을 떄 나오는 아이템들
-                          items: viewModel.filterColors
-                              .map<DropdownMenuItem<String>>((String color) {
-                                return DropdownMenuItem<String>(
-                                  value: color,
-                                  child: color == '전체'
-                                      ? Text(color)
-                                      : Container(
-                                          width: 28,
-                                          height: 28,
-                                          decoration: BoxDecoration(
-                                            color: Color(int.parse(color)),
-                                            shape: BoxShape.circle,
+                        // TODO: 방장만 표시
+                        viewModel.calendar?.user_id == viewModel.currentUserId
+                            ? viewModel.deleteMode
+                                  ? Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            viewModel.cancelDeleteMode();
+                                          },
+                                          child: Text(
+                                            "취소",
+                                            style: TextStyle(
+                                              color: AppColors.commonBlue,
+                                            ),
                                           ),
                                         ),
-                                );
-                              })
-                              .toList(),
-                          // 아이템 눌렀을 떄 실행 할 함수
-                          onChanged: (dynamic newValue) {
-                            viewModel.selectedColor(newValue ?? "");
-                          },
-                        ),
+                                        SizedBox(width: 16),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (viewModel
+                                                .selectedIds
+                                                .isNotEmpty) {
+                                              CustomConfirmationDialog.show(
+                                                context,
+                                                content: '정말 삭제 하시겠습니까?',
+                                                confirmColor:
+                                                    AppColors.commonRed,
+                                                onConfirm: () async {
+                                                  await viewModel
+                                                      .deleteAllSchedules();
+                                                  viewModel.cancelDeleteMode();
+                                                },
+                                              );
+                                            } else {
+                                              null;
+                                            }
+                                          },
+                                          child: Text(
+                                            "삭제",
+                                            style: TextStyle(
+                                              color:
+                                                  viewModel
+                                                      .selectedIds
+                                                      .isNotEmpty
+                                                  ? AppColors.commonRed
+                                                  : AppColors.commonGrey,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : GestureDetector(
+                                      onTap: () {
+                                        viewModel.toggleDeleteMode();
+                                      },
+                                      child: Text(
+                                        "선택삭제",
+                                        style: TextStyle(
+                                          color: Color(0xFF3C82F6),
+                                        ),
+                                      ),
+                                    )
+                            : SizedBox.shrink(),
                       ],
                     ),
-                    // TODO: 방장만 표시
-                    viewModel.calendar?.user_id == viewModel.currentUserId
-                        ? viewModel.deleteMode
-                              ? Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        viewModel.cancelDeleteMode();
-                                      },
-                                      child: Text(
-                                        "취소",
-                                        style: TextStyle(
-                                          color: AppColors.commonBlue,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 16),
-                                    GestureDetector(
-                                      onTap: () {
-                                        if (viewModel.selectedIds.isNotEmpty) {
-                                          CustomConfirmationDialog.show(
-                                            context,
-                                            content: '정말 삭제 하시겠습니까?',
-                                            confirmColor: AppColors.commonRed,
-                                            onConfirm: () async {
-                                              await viewModel
-                                                  .deleteAllSchedules();
-                                              viewModel.cancelDeleteMode();
-                                            },
-                                          );
-                                        } else {
-                                          null;
-                                        }
-                                      },
-                                      child: Text(
-                                        "삭제",
-                                        style: TextStyle(
-                                          color:
-                                              viewModel.selectedIds.isNotEmpty
-                                              ? AppColors.commonRed
-                                              : AppColors.commonGrey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : GestureDetector(
-                                  onTap: () {
-                                    viewModel.toggleDeleteMode();
-                                  },
-                                  child: Text(
-                                    "선택삭제",
-                                    style: TextStyle(color: Color(0xFF3C82F6)),
-                                  ),
-                                )
-                        : SizedBox.shrink(),
+                    if (viewModel.calendar!.type != "personal") ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Checkbox(
+                            value: viewModel.isFetchMySchedule,
+                            onChanged: (_) => viewModel.toggleFetchMySchedule(),
+                          ),
+                          const Text("내 일정 불러오기"),
+                          const SizedBox(width: 8),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
