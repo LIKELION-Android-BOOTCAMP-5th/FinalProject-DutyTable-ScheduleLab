@@ -97,6 +97,8 @@ class ScheduleModel {
   }
 
   ScheduleModel copyWith({
+    String? title,
+    String? colorValue,
     bool? isDone,
     bool? isRepeat,
     String? repeatOption,
@@ -108,14 +110,14 @@ class ScheduleModel {
     return ScheduleModel(
       id: id,
       calendarId: calendarId,
-      title: title,
-      colorValue: colorValue,
+      title: title ?? this.title,
+      colorValue: colorValue ?? this.colorValue,
       emotionTag: emotionTag,
       isDone: isDone ?? this.isDone,
       startedAt: startedAt,
       endedAt: endedAt,
       isRepeat: isRepeat ?? this.isRepeat,
-      repeatNum: repeatNum,
+      repeatNum: repeatNum ?? this.repeatNum,
       repeatOption: repeatOption ?? this.repeatOption,
       weekendException: weekendException ?? this.weekendException,
       holidayException: holidayException ?? this.holidayException,

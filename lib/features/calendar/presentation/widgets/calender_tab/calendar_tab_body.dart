@@ -18,46 +18,66 @@ class CalendarTabBody extends StatelessWidget {
     return Consumer<ScheduleViewModel>(
       builder: (context, viewModel, _) {
         final dataSource = CalendarTabScheduleDataSource.fromSchedules(
-          viewModel.schedules,
+          viewModel.displaySchedules,
         );
 
         return Scaffold(
-          body: SfCalendar(
-            view: CalendarView.month,
-            dataSource: dataSource,
-            headerDateFormat: 'yyyy년 MM월',
-            headerStyle: CalendarHeaderStyle(
-              textAlign: TextAlign.center,
-              backgroundColor: AppColors.background(context),
-              textStyle: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: AppColors.text(context),
-              ),
-            ),
-            todayHighlightColor: AppColors.commonBlue,
-            onTap: (details) async {
-              final date = details.date;
-              if (date == null) return;
-
-              viewModel.changeSelectedDay(date);
-
-              final hasSchedule = viewModel.schedules.any(
-                (s) => s.containsDay(date),
-              );
-              if (!hasSchedule) return;
-
-              await showDialog(
-                context: context,
-                builder: (_) => ChangeNotifierProvider.value(
-                  value: viewModel,
-                  child: ScheduleDialog(day: date),
+          body: Column(
+            children: [
+              if (viewModel.calendar!.type != "personal") ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Checkbox(
+                      value: viewModel.isFetchMySchedule,
+                      onChanged: (_) => viewModel.toggleFetchMySchedule(),
+                    ),
+                    const Text("내 일정 불러오기"),
+                    const SizedBox(width: 8),
+                  ],
                 ),
-              );
-            },
-            monthViewSettings: const MonthViewSettings(
-              appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
-            ),
+              ],
+              Expanded(
+                child: SfCalendar(
+                  view: CalendarView.month,
+                  dataSource: dataSource,
+                  headerDateFormat: 'yyyy년 MM월',
+                  headerStyle: CalendarHeaderStyle(
+                    textAlign: TextAlign.center,
+                    backgroundColor: AppColors.background(context),
+                    textStyle: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.text(context),
+                    ),
+                  ),
+                  todayHighlightColor: AppColors.commonBlue,
+                  onTap: (details) async {
+                    final date = details.date;
+                    if (date == null) return;
+
+                    viewModel.changeSelectedDay(date);
+
+                    final hasSchedule = viewModel.displaySchedules.any(
+                      (s) => s.containsDay(date),
+                    );
+                    if (!hasSchedule) return;
+
+                    await showDialog(
+                      context: context,
+                      builder: (_) => ChangeNotifierProvider.value(
+                        value: viewModel,
+                        child: ScheduleDialog(day: date),
+                      ),
+                    );
+                  },
+                  monthViewSettings: const MonthViewSettings(
+                    appointmentDisplayMode:
+                        MonthAppointmentDisplayMode.appointment,
+                  ),
+                ),
+              ),
+            ],
           ),
           floatingActionButton:
               viewModel.calendar!.user_id == viewModel.currentUserId

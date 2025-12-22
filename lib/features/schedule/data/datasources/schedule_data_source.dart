@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dutytable/main.dart';
 
 import '../models/schedule_model.dart';
 
@@ -45,6 +45,37 @@ class ScheduleDataSource {
     final response = await _dio.get(
       '/rest/v1/schedules',
       queryParameters: {'select': '*', 'calendar_id': 'eq.$calendarId'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = response.data;
+      return jsonList.map((json) => ScheduleModel.fromJson(json)).toList();
+    } else {
+      throw Exception("Failed to load schedules");
+    }
+  }
+
+  /// 내 일정 불러오기
+  Future<List<ScheduleModel>> fetchMySchedules() async {
+    final currentUserId = supabase.auth.currentUser?.id;
+    final data = await _dio.get(
+      '/rest/v1/calendars',
+      queryParameters: {
+        'select': 'id',
+        'user_id': 'eq.$currentUserId',
+        'type': 'eq.personal',
+      },
+    );
+
+    final List<dynamic> jsonData = data.data;
+
+    if (jsonData.isEmpty) return [];
+
+    final myCalendarId = jsonData.first['id'];
+
+    final response = await _dio.get(
+      '/rest/v1/schedules',
+      queryParameters: {'select': '*', 'calendar_id': 'eq.$myCalendarId'},
     );
 
     if (response.statusCode == 200) {
