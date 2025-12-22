@@ -3,8 +3,9 @@ class InviteNotificationModel {
   final String userId;
   final int calendarId;
   final String message;
-  final bool isRead;
+  bool isRead;
   final DateTime createdAt;
+  final bool is_accepted;
 
   InviteNotificationModel({
     required this.id,
@@ -13,6 +14,7 @@ class InviteNotificationModel {
     required this.message,
     required this.isRead,
     required this.createdAt,
+    this.is_accepted = false,
   });
 
   factory InviteNotificationModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class InviteNotificationModel {
       message: json['message'] as String,
       isRead: json['is_read'] as bool,
       createdAt: DateTime.parse(json['created_at'] as String),
+      is_accepted: json['is_accepted'] ?? false,
     );
   }
 
@@ -34,11 +37,12 @@ class InviteNotificationModel {
       'message': message,
       'is_read': isRead,
       'created_at': createdAt.toIso8601String(),
+      'is_accepted': is_accepted,
     };
   }
 
   @override
   String toString() {
-    return 'InviteNotificationModel(id: $id, userId: $userId, calendarId: $calendarId, message: $message, isRead: $isRead, createdAt: $createdAt)';
+    return 'InviteNotificationModel(id: $id, userId: $userId, calendarId: $calendarId, message: $message, isRead: $isRead, createdAt: $createdAt, is_accepted: $is_accepted)';
   }
 }
