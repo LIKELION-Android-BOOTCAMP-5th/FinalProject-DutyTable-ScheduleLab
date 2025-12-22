@@ -115,6 +115,34 @@ class NotificationDataSource {
         .update({'is_read': true}).eq('id', notificationId);
   }
 
+  /// 초대 수락
+  Future<void> acceptInvitation(InviteNotificationModel notification) async {
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) throw Exception("User not logged in");
+
+    // 사용자가 이미 멤버인지 확인
+    final existingMember = await supabase
+        .from('calendar_members')
+        .select()
+        .eq('calendar_id', notification.calendarId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    // 멤버가 아닌 경우에만 추가
+    if (existingMember == null) {
+      await supabase.from('calendar_members').insert({
+        'calendar_id': notification.calendarId,
+        'user_id': userId,
+      });
+    }
+
+    // invite_notifications 테이블에서 is_accepted를 true로 업데이트하고 읽음 처리
+    await supabase.from('invite_notifications').update({
+      'is_accepted': true,
+      'is_read': true,
+    }).eq('id', notification.id);
+  }
+
   /// Realtime 알림 리스너 시작
   void startRealtimeListeners() {
     final userId = supabase.auth.currentUser?.id;

@@ -4,7 +4,7 @@ class ReminderNotificationModel {
   final int scheduleId;
   final String userId;
   final String firstMessage;
-  final bool isRead;
+  bool isRead;
   final DateTime createdAt;
 
   ReminderNotificationModel({
