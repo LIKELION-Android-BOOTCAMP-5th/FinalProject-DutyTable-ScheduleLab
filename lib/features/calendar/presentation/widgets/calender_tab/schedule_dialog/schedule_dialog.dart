@@ -21,7 +21,7 @@ class ScheduleDialog extends StatelessWidget {
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Consumer<ScheduleViewModel>(
         builder: (_, viewModel, __) {
-          final items = viewModel.schedules
+          final items = viewModel.displaySchedules
               .where((s) => s.containsDay(day))
               .toList();
 

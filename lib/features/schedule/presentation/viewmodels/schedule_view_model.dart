@@ -22,6 +22,12 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 불러온 일정 리스트(public)
   List<ScheduleModel> get schedules => _schedules;
 
+  /// 내 일정 리스트(private)
+  List<ScheduleModel> _mySchedules = [];
+
+  /// 내 일정 리스트(public)
+  List<ScheduleModel> get mySchedules => _mySchedules;
+
   /// 일정 날짜만 담을 리스트(private)
   List<DateTime?> _scheduleDate = [];
 
@@ -61,8 +67,16 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 선택된 필터 드롭다운 컬러
   String selectedFilterColor = "전체";
 
-  // 화면에 표시될 필터링된 일정 리스트
+  /// 내 캘린더 불러오기(private)
+  bool _isShowMySchedule = false;
+
+  /// 내 캘린더 불러오기(public)
+  bool get isFetchMySchedule => _isShowMySchedule;
+
+  /// 화면에 표시될 필터링된 일정 리스트(private)
   List<ScheduleModel> _selectedFilteringList = [];
+
+  /// 화면에 표시될 필터링된 일정 리스트(public)
   List<ScheduleModel> get selectedFilteringList => _selectedFilteringList;
 
   /// 캘린더 선택된 날짜
@@ -80,6 +94,41 @@ class ScheduleViewModel extends ChangeNotifier {
   /// 초기화 함수 실행
   ScheduleViewModel({CalendarModel? calendar}) : _calendar = calendar {
     _init();
+  }
+
+  /// 실제로 화면(캘린더)에 그려질 일정 리스트
+  List<ScheduleModel> get displaySchedules {
+    List<ScheduleModel> combined = _isShowMySchedule
+        ? [..._schedules, ..._mySchedules]
+        : _schedules;
+
+    // 시간순 정렬
+    combined.sort((a, b) => a.startedAt.compareTo(b.startedAt));
+
+    return combined;
+  }
+
+  /// 내 일정 불러오기
+  Future<void> fetchMySchedules() async {
+    try {
+      final List<ScheduleModel> rawSchedules = await ScheduleDataSource.instance
+          .fetchMySchedules();
+
+      _mySchedules = rawSchedules.map((schedule) {
+        return schedule.copyWith(title: "My : ${schedule.title}");
+      }).toList();
+    } catch (e) {
+      debugPrint("내 일정 로드 실패: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  /// 내 일정 불러오기 모드
+  void toggleFetchMySchedule() {
+    _isShowMySchedule = !_isShowMySchedule;
+    applyFilter();
+    notifyListeners();
   }
 
   /// 선택 삭제 모드
@@ -130,6 +179,7 @@ class ScheduleViewModel extends ChangeNotifier {
     selectedFilterYears = DateTime.now().year;
     selectedFilterMonth = DateTime.now().month;
     fetchSchedules();
+    fetchMySchedules();
   }
 
   /// 캘린더 날짜 선택
@@ -179,18 +229,16 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 일정 목록 필터링
   void applyFilter() {
-    _selectedFilteringList = _schedules.where((schedule) {
-      final startedAt = schedule.startedAt;
+    final List<ScheduleModel> baseList = _isShowMySchedule
+        ? [..._schedules, ..._mySchedules]
+        : _schedules;
 
-      // 년도 필터링
+    _selectedFilteringList = baseList.where((schedule) {
+      final startedAt = schedule.startedAt;
       final isYearMatch =
           selectedFilterYears == null || startedAt.year == selectedFilterYears;
-
-      // 월 필터링
       final isMonthMatch =
           selectedFilterMonth == null || startedAt.month == selectedFilterMonth;
-
-      // 컬러 필터링
       final isColorMatch =
           selectedFilterColor == "전체" ||
           schedule.colorValue == selectedFilterColor;
@@ -198,12 +246,17 @@ class ScheduleViewModel extends ChangeNotifier {
       return isYearMatch && isMonthMatch && isColorMatch;
     }).toList();
 
-    notifyListeners();
-  }
+    // 시간순 정렬
+    _selectedFilteringList.sort((a, b) {
+      // 1차 기준: 시작 시간
+      int compare = a.startedAt.compareTo(b.startedAt);
+      if (compare != 0) return compare;
 
-  Future<void> removeScheduleById(int id) async {
-    _schedules.removeWhere((s) => s.id == id);
-    applyFilter();
+      // 2차 기준: 시작 시간이 같다면 제목 순 정렬
+      return a.title.compareTo(b.title);
+    });
+
+    notifyListeners();
   }
 
   /// 일정 선택 삭제(다수 선택)
