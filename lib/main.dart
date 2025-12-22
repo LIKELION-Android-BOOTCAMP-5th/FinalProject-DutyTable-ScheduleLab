@@ -122,10 +122,6 @@ Future<void> main() async {
       MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (context) => NotificationState()),
-          ChangeNotifierProvider(
-              create: (context) => SharedCalendarViewModel()),
-          ChangeNotifierProvider(
-              create: (context) => PersonalCalendarViewModel()),
         ],
         child: const MyApp(),
       ),
