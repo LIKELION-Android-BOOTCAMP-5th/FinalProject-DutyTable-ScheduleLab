@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/invite_notification_model.dart';
@@ -32,6 +34,34 @@ class NotificationDataSource {
 
   NotificationDataSource() {
     debugPrint("NotificationDataSource init");
+  }
+
+  /// 알림 리스너와 초기 상태를 설정하는 통합 메서드
+  Future<void> setupNotificationListenersAndState(BuildContext context) async {
+    // context가 유효할 때만 provider를 읽어옴
+    if (!context.mounted) return;
+    final notificationState = context.read<NotificationState>();
+
+    // 실시간 리스너 시작 및 구독
+    startRealtimeListeners();
+    newInviteNotifications.listen((_) {
+      notificationState.setHasNewNotifications(true);
+    });
+    newReminderNotifications.listen((_) {
+      notificationState.setHasNewNotifications(true);
+    });
+
+    // 기존 알림을 확인하여 초기 뱃지 상태 설정
+    try {
+      final inviteFuture = getInviteNotifications();
+      final reminderFuture = getReminderNotifications();
+      final results = await Future.wait([inviteFuture, reminderFuture]);
+      final hasUnread = [...results[0], ...results[1]]
+          .any((n) => (n as dynamic).isRead == false);
+      notificationState.setHasNewNotifications(hasUnread);
+    } catch (e) {
+      debugPrint("Failed to check initial notification status: $e");
+    }
   }
 
   /// 과거 초대 알림 목록 가져오기
@@ -93,6 +123,9 @@ class NotificationDataSource {
       return;
     }
 
+    // 기존 리스너가 있다면 중복 생성을 막기 위해 먼저 중지
+    stopRealtimeListeners();
+
     // 초대 알림 채널 생성 및 구독
     _inviteNotificationChannel = supabase
         .channel('invite-notifications-channel')
@@ -112,8 +145,7 @@ class NotificationDataSource {
         _inviteNotificationController.sink.add(notification);
         debugPrint('새로운 초대 알림: ${notification.message}');
       },
-    )
-        .subscribe();
+    ).subscribe();
 
     // 리마인더 알림 채널 생성 및 구독
     _reminderNotificationChannel = supabase
@@ -136,8 +168,7 @@ class NotificationDataSource {
           '새로운 리마인더 알림: ${notification.firstMessage}',
         );
       },
-    )
-        .subscribe();
+    ).subscribe();
 
     debugPrint('실시간 리스너 시작 (사용자: $userId)');
   }
@@ -147,12 +178,12 @@ class NotificationDataSource {
     // 채널 구독 해제
     if (_inviteNotificationChannel != null) {
       await supabase.removeChannel(_inviteNotificationChannel!);
+      _inviteNotificationChannel = null;
     }
     if (_reminderNotificationChannel != null) {
       await supabase.removeChannel(_reminderNotificationChannel!);
+      _reminderNotificationChannel = null;
     }
-    _inviteNotificationChannel = null;
-    _reminderNotificationChannel = null;
     debugPrint('실시간 리스너 중지됨.');
   }
 

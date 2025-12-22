@@ -1,5 +1,8 @@
+import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
+import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -47,10 +50,10 @@ class _SplashScreenState extends State<SplashScreen> {
       final session = Supabase.instance.client.auth.currentSession;
       final isLoggedIn = isAutoLogin && session != null;
 
-      if (!mounted) return;
-
       if (isLoggedIn) {
-        // 로그인 상태인 경우, 데이터 로드를 시도
+        // 로그인 상태인 경우, 데이터 로드 및 알림 리스너 설정
+        await NotificationDataSource.shared
+            .setupNotificationListenersAndState(context);
         sharedCalendars = await CalendarDataSource.instance
             .fetchCalendarFinalList("group");
       } else {

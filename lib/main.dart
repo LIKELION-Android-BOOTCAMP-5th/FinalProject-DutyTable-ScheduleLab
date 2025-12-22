@@ -1,3 +1,6 @@
+import 'package:dutytable/features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
+import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
+import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as timezone;
 
@@ -114,14 +118,13 @@ Future<void> main() async {
   timezone.initializeTimeZones();
 
   initializeDateFormatting().then(
-    (_) => runApp(
-      const MyApp(),
-      // MultiProvider(
-      //   providers: [
-      //     ChangeNotifierProvider(create: (context) => CalendarTabViewModel()),
-      //   ],
-      //   child: const MyApp(),
-      // ),
+        (_) => runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => NotificationState()),
+        ],
+        child: const MyApp(),
+      ),
     ),
   );
 }

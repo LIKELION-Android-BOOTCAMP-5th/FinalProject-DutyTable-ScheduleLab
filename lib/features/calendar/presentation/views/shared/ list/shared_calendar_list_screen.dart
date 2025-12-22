@@ -3,6 +3,7 @@ import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/shared/%20list/widgets/shared_calendar_body.dart';
+import 'package:dutytable/features/notification/presentation/widgets/notification_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -15,12 +16,9 @@ class SharedCalendarListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.read<SharedCalendarViewModel>();
-    final state = GoRouterState.of(context);
-    final extra = state.extra as Map<String, dynamic>?;
 
-    // build가 여러 번 호출되어도 viewModel 내부에서 중복 실행을 막아줌
-    if (extra != null) {
-      Future.microtask(() => viewModel.fetchCalendarsWithSignal(extra));
+    if (initialCalendars != null) {
+      Future.microtask(() => viewModel.setInitialData(initialCalendars!));
     }
 
     return const _SharedCalendarListScreen();
@@ -140,29 +138,7 @@ class _NormalActions extends StatelessWidget {
         ),
 
         const SizedBox(width: 16),
-
-        GestureDetector(
-          onTap: () => context.push("/notification"),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.notifications_none, size: 26),
-              Positioned(
-                right: -1,
-                top: -1,
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: AppColors.commonRed,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-
+        const NotificationIcon(),
         const SizedBox(width: 16),
 
         GestureDetector(
