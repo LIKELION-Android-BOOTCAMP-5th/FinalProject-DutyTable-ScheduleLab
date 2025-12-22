@@ -14,6 +14,9 @@ class NotificationCard extends StatelessWidget {
   /// 알림 읽음 여부
   final bool isRead;
 
+  /// 초대 수락 여부 (초대 알림에만 해당)
+  final bool? isAccepted;
+
   /// 알림 카드
   const NotificationCard({
     super.key,
@@ -21,6 +24,7 @@ class NotificationCard extends StatelessWidget {
     required this.type,
     required this.createdAt,
     required this.isRead,
+    this.isAccepted,
   });
 
   @override
@@ -70,12 +74,24 @@ class NotificationCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    title,
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                        fontWeight:
-                        isRead ? FontWeight.normal : FontWeight.w800),
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontWeight:
+                            isRead ? FontWeight.normal : FontWeight.w800),
+                      ),
+                      if (type == "invite")
+                        Text(
+                          isAccepted == true ? " (수락됨)" : " (대기중)",
+                          style: const TextStyle(
+                            fontSize: 12.0,
+                            color: Colors.grey,
+                          ),
+                        ),
+                    ],
                   ),
                   Text(
                     createdAt.timeAgo(),

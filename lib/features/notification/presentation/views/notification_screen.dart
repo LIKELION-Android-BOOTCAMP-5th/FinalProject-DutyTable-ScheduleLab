@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
+import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/invitation_dialog.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -156,25 +158,49 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// 위젯의 UI를 빌드
   /// 로딩 상태, 알림 없음 상태, 또는 알림 목록을 표시
   void _onNotificationTapped(dynamic notification) async {
-    // 읽지 않은 상태일 때만 읽음 처리 실행
-    if (!notification.isRead) {
-      try {
-        final type =
-        notification is InviteNotificationModel ? 'invite' : 'reminder';
-        await NotificationDataSource.shared.markAsRead(notification.id, type);
-        setState(() {
-          notification.isRead = true;
-        });
-      } catch (e) {
-        // 읽음 처리 실패는 화면 이동을 막지 않음
-        debugPrint('읽음 처리 실패: $e');
+    if (notification is InviteNotificationModel) {
+      if (notification.is_accepted) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('이미 수락된 초대입니다.')),
+          );
+        }
+        return;
       }
-    }
 
-    // 캘린더 화면으로 이동
+      final result = await showDialog<bool>(
+        context: context,
+        builder: (context) => InvitationDialog(
+          notification: notification,
+        ),
+      );
+
+      if (result == true) {
+        await _navigateToCalendar(notification.calendarId);
+      } else {
+        await _loadInitialNotifications();
+      }
+    } else {
+      // 리마인더 알림 처리
+      if (!notification.isRead) {
+        try {
+          await NotificationDataSource.shared
+              .markAsRead(notification.id, 'reminder');
+          setState(() {
+            notification.isRead = true;
+          });
+        } catch (e) {
+        }
+      }
+      await _navigateToCalendar(notification.calendarId);
+    }
+  }
+
+  Future<void> _navigateToCalendar(int calendarId) async {
+    if (!context.mounted) return;
     try {
-      final targetCalendar = await CalendarDataSource.instance
-          .fetchSharedCalendarFromId(notification.calendarId);
+      final targetCalendar =
+      await CalendarDataSource.instance.fetchSharedCalendarFromId(calendarId);
 
       if (context.mounted) {
         if (targetCalendar.type == 'group') {
@@ -285,6 +311,7 @@ class NotificationBody extends StatelessWidget {
                 createdAt: notification.createdAt,
                 type: "invite",
                 isRead: notification.isRead,
+                isAccepted: notification.is_accepted,
               );
             } else if (notification is ReminderNotificationModel) {
               return NotificationCard(
