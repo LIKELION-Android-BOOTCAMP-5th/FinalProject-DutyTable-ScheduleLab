@@ -19,6 +19,8 @@ class NaverMapSection extends StatelessWidget {
     final lng = double.tryParse(longitude) ?? 0.0;
     final latLng = NLatLng(lat, lng);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(10.0),
       child: SizedBox(
@@ -29,6 +31,7 @@ class NaverMapSection extends StatelessWidget {
             initialCameraPosition: NCameraPosition(target: latLng, zoom: 15),
             zoomGesturesEnable: true,
             logoClickEnable: false,
+            nightModeEnable: isDark,
           ),
 
           onMapReady: (controller) {

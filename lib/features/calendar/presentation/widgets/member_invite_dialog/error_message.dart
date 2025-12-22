@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +22,10 @@ class ErrorMessage extends StatelessWidget {
                   child: Text(
                     viewModel.inviteError!,
                     key: ValueKey(viewModel.inviteError),
-                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                    style: TextStyle(
+                      color: AppColors.danger(context),
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ),

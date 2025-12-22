@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/chat_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,61 +44,64 @@ class _ChatTab extends StatelessWidget {
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.separated(
-                  controller: viewModel.scrollController,
-                  itemCount: chatMessages.length,
-                  itemBuilder: (context, index) {
-                    final currentMessage = chatMessages[index];
+      child: Scaffold(
+        backgroundColor: AppColors.background(context),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView.separated(
+                    controller: viewModel.scrollController,
+                    itemCount: chatMessages.length,
+                    itemBuilder: (context, index) {
+                      final currentMessage = chatMessages[index];
 
-                    // 이전 메시지가 있는지 확인
-                    final isFirstMessage = index == 0;
-                    final previousMessage = isFirstMessage
-                        ? null
-                        : chatMessages[index - 1];
+                      // 이전 메시지가 있는지 확인
+                      final isFirstMessage = index == 0;
+                      final previousMessage = isFirstMessage
+                          ? null
+                          : chatMessages[index - 1];
 
-                    // 날짜가 변경되었는지 확인 (첫 메시지이거나 이전 메시지와 날짜가 다를 경우)
-                    final bool showDateDivider =
-                        isFirstMessage ||
-                        !_isSameDay(
-                          currentMessage.createdAt,
-                          previousMessage!.createdAt,
-                        );
+                      // 날짜가 변경되었는지 확인 (첫 메시지이거나 이전 메시지와 날짜가 다를 경우)
+                      final bool showDateDivider =
+                          isFirstMessage ||
+                          !_isSameDay(
+                            currentMessage.createdAt,
+                            previousMessage!.createdAt,
+                          );
 
-                    return Column(
-                      children: [
-                        // 날짜가 변경되었을 때만 날짜 구분선 표시
-                        if (showDateDivider)
-                          CustomNextDayLine(
-                            date: _formatDate(currentMessage.createdAt),
+                      return Column(
+                        children: [
+                          // 날짜가 변경되었을 때만 날짜 구분선 표시
+                          if (showDateDivider)
+                            CustomNextDayLine(
+                              date: _formatDate(currentMessage.createdAt),
+                            ),
+
+                          // 커스텀 채팅 소유자에 따른 UI 변경 카드 사용
+                          CustomChatCard(
+                            isMyChat: currentMessage.isMe,
+                            chatTime: currentMessage.time,
+                            message: currentMessage.message,
+                            image: currentMessage.image,
+                            nickname: currentMessage.nickname,
+                            id: currentMessage.id,
                           ),
-
-                        // 커스텀 채팅 소유자에 따른 UI 변경 카드 사용
-                        CustomChatCard(
-                          isMyChat: currentMessage.isMe,
-                          chatTime: currentMessage.time,
-                          message: currentMessage.message,
-                          image: currentMessage.image,
-                          nickname: currentMessage.nickname,
-                          id: currentMessage.id,
-                        ),
-                      ],
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const SizedBox(height: 12.0);
-                  },
+                        ],
+                      );
+                    },
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(height: 12.0);
+                    },
+                  ),
                 ),
               ),
-            ),
-            // 커스텀 채팅 입력창 사용
-            CustomInputChatMessageBox(),
-          ],
+              // 커스텀 채팅 입력창 사용
+              CustomInputChatMessageBox(),
+            ],
+          ),
         ),
       ),
     );
@@ -112,8 +116,12 @@ class CustomInputChatMessageBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ChatViewModel>();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: AppColors.background(context),
+        border: Border(top: BorderSide(color: AppColors.textSub(context))),
+      ),
       child: Row(
         spacing: 8,
         children: [
@@ -130,13 +138,16 @@ class CustomInputChatMessageBox extends StatelessWidget {
                 }
               },
               controller: viewModel.chatController,
+              style: TextStyle(color: AppColors.textMain(context)),
               decoration: InputDecoration(
                 hintText: '메시지를 입력하세요...',
+                hintStyle: TextStyle(color: AppColors.textSub(context)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20.0),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
+                fillColor: AppColors.surface(context),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 10,
@@ -146,7 +157,6 @@ class CustomInputChatMessageBox extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              print("전송 눌림");
               viewModel.chatInsert();
               viewModel.chatController.clear();
             },
@@ -154,14 +164,14 @@ class CustomInputChatMessageBox extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: AppColors.primaryBlue,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 "전송",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppColors.pureWhite,
                 ),
               ),
             ),
@@ -186,13 +196,14 @@ class CustomNextDayLine extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.grey[300],
+            color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.textSub(context)),
           ),
           child: Text(
             date,
-            style: const TextStyle(
-              color: Colors.black,
+            style: TextStyle(
+              color: AppColors.textSub(context),
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
@@ -304,12 +315,15 @@ class CustomMyChatCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 5.0),
                 child: Text(
                   nickname,
-                  style: TextStyle(fontSize: 10),
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textSub(context),
+                  ),
                   textAlign: TextAlign.right,
                 ),
               ),
               CustomChatBox(
-                color: Colors.blue,
+                color: AppColors.primaryBlue,
                 isMyChat: isMyChat,
                 chatTime: chatTime,
                 message: message,
@@ -371,12 +385,15 @@ class CustomOtherChatCard extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 5.0),
               child: Text(
                 nickname,
-                style: TextStyle(fontSize: 10),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textSub(context),
+                ),
                 textAlign: TextAlign.left,
               ),
             ),
             CustomChatBox(
-              color: Colors.grey,
+              color: AppColors.surface(context),
               isMyChat: isMyChat,
               chatTime: chatTime,
               message: message,
@@ -407,10 +424,19 @@ class CustomChatProfileImageBox extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
-      // child: Image.network("${imageUrl}"),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.surface(context),
+        border: Border.all(color: AppColors.textSub(context)),
+      ),
       child: (imageUrl == null)
-          ? ClipOval(child: Icon(Icons.account_circle, size: 35))
+          ? ClipOval(
+              child: Icon(
+                Icons.account_circle,
+                size: 35,
+                color: AppColors.textSub(context),
+              ),
+            )
           : ClipOval(child: Image.network(imageUrl!)),
     );
   }
@@ -467,14 +493,31 @@ class CustomChatBox extends StatelessWidget {
 
                     child: Text(
                       message,
-                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isMyChat
+                            ? AppColors.pureWhite
+                            : AppColors.textMain(context),
+                      ),
+                      overflow: viewModel.chatfold[id] ?? true
+                          ? TextOverflow.ellipsis
+                          : null,
                       maxLines: viewModel.chatLength(id),
                     ),
                   )
-                : Text(message),
+                : Text(
+                    message,
+                    style: TextStyle(
+                      color: isMyChat
+                          ? AppColors.pureWhite
+                          : AppColors.textMain(context),
+                    ),
+                  ),
           ),
         ),
-        Text(chatTime, style: TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(
+          chatTime,
+          style: TextStyle(fontSize: 12, color: AppColors.textSub(context)),
+        ),
       ],
     );
   }

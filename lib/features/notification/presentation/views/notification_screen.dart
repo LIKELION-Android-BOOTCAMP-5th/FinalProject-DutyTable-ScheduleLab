@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:flutter/material.dart';
@@ -56,10 +57,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// 초대 알림과 리마인더 알림을 모두 가져와 합친 후, 최신순으로 정렬
   Future<void> _loadInitialNotifications() async {
     try {
-      final inviteFuture =
-      NotificationDataSource.shared.getInviteNotifications();
-      final reminderFuture =
-      NotificationDataSource.shared.getReminderNotifications();
+      final inviteFuture = NotificationDataSource.shared
+          .getInviteNotifications();
+      final reminderFuture = NotificationDataSource.shared
+          .getReminderNotifications();
 
       final results = await Future.wait([inviteFuture, reminderFuture]);
 
@@ -86,8 +87,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         });
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(
-            SnackBar(content: Text('알림을 불러오는 중 오류가 발생했습니다: $e')));
+        ).showSnackBar(SnackBar(content: Text('알림을 불러오는 중 오류가 발생했습니다: $e')));
       }
     }
   }
@@ -96,23 +96,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// 새로운 알림이 수신되면 목록의 가장 위에 추가하고 UI를 업데이트
   void _setupRealtimeListeners() {
     // 초대 알림 스트림을 구독
-    _inviteSubscription =
-        NotificationDataSource.shared.newInviteNotifications.listen(
-              (
-              notification,
-              ) {
-            // 위젯이 마운트된 상태일 때만 UI를 업데이트
-            if (mounted) {
-              setState(() {
-                _notifications.insert(0, notification); // 새로운 알림을 목록의 맨 앞에 추가
-              });
-            }
-          },
-        );
+    _inviteSubscription = NotificationDataSource.shared.newInviteNotifications
+        .listen((notification) {
+          // 위젯이 마운트된 상태일 때만 UI를 업데이트
+          if (mounted) {
+            setState(() {
+              _notifications.insert(0, notification); // 새로운 알림을 목록의 맨 앞에 추가
+            });
+          }
+        });
 
     // 리마인더 알림 스트림을 구독
-    NotificationDataSource.shared.newReminderNotifications
-        .listen((notification) {
+    NotificationDataSource.shared.newReminderNotifications.listen((
+      notification,
+    ) {
       // 위젯이 마운트된 상태일 때만 UI를 업데이트
       if (mounted) {
         setState(() {
@@ -159,8 +156,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     // 읽지 않은 상태일 때만 읽음 처리 실행
     if (!notification.isRead) {
       try {
-        final type =
-        notification is InviteNotificationModel ? 'invite' : 'reminder';
+        final type = notification is InviteNotificationModel
+            ? 'invite'
+            : 'reminder';
         await NotificationDataSource.shared.markAsRead(notification.id, type);
         setState(() {
           notification.isRead = true;
@@ -185,9 +183,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('화면 이동 중 오류가 발생했습니다: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('화면 이동 중 오류가 발생했습니다: $e')));
       }
     }
   }
@@ -195,13 +193,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
   // 앱 전역의 읽지 않은 알림 상태를 재확인하고 업데이트하는 메서드
   Future<void> _recheckUnreadNotificationsStatus() async {
     try {
-      final inviteFuture =
-      NotificationDataSource.shared.getInviteNotifications();
-      final reminderFuture =
-      NotificationDataSource.shared.getReminderNotifications();
+      final inviteFuture = NotificationDataSource.shared
+          .getInviteNotifications();
+      final reminderFuture = NotificationDataSource.shared
+          .getReminderNotifications();
       final results = await Future.wait([inviteFuture, reminderFuture]);
-      final hasUnread =
-      [...results[0], ...results[1]].any((n) => (n as dynamic).isRead == false);
+      final hasUnread = [
+        ...results[0],
+        ...results[1],
+      ].any((n) => (n as dynamic).isRead == false);
       if (mounted) {
         context.read<NotificationState>().setHasNewNotifications(hasUnread);
       }
@@ -213,19 +213,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background(context),
       appBar: BackActionsAppBar(
-        title: const Text(
+        title: Text(
           "알림",
-          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
         actions: [
           if (!_isLoading && _notifications.isNotEmpty)
             GestureDetector(
               onTap: _handleDeleteAll,
-              child: const Text(
+              child: Text(
                 "전체삭제",
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: AppColors.primaryBlue,
                   fontSize: 12.0,
                   fontWeight: FontWeight.w800,
                 ),
@@ -234,13 +239,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ],
       ),
       body: SafeArea(
-        child: Container(
-          color: const Color(0xfff9fafb),
-          child: NotificationBody(
-            isLoading: _isLoading,
-            notifications: _notifications,
-            onNotificationTapped: _onNotificationTapped,
-          ),
+        child: NotificationBody(
+          isLoading: _isLoading,
+          notifications: _notifications,
+          onNotificationTapped: _onNotificationTapped,
         ),
       ),
     );
@@ -262,11 +264,16 @@ class NotificationBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: CircularProgressIndicator(color: AppColors.primary(context)),
+      );
     }
     if (notifications.isEmpty) {
-      return const Center(
-        child: Text('새로운 알림이 없습니다.', style: TextStyle(color: Colors.grey)),
+      return Center(
+        child: Text(
+          '새로운 알림이 없습니다.',
+          style: TextStyle(color: AppColors.textSub(context)),
+        ),
       );
     }
     return ListView.separated(

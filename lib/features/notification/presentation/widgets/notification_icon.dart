@@ -17,22 +17,26 @@ class NotificationIcon extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          const Icon(Icons.notifications_none, size: 26),
+          Icon(
+            Icons.notifications_none,
+            size: 26,
+            color: AppColors.textMain(context),
+          ),
           Consumer<NotificationState>(
             builder: (context, state, child) {
               return state.hasNewNotifications
                   ? Positioned(
-                right: -1,
-                top: -1,
-                child: Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: AppColors.commonRed,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              )
+                      right: -1,
+                      top: -1,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: AppColors.danger(context),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    )
                   : const SizedBox.shrink();
             },
           ),

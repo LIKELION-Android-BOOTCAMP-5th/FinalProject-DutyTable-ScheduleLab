@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/calendar_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
@@ -32,7 +33,9 @@ class _PersonalCalendarScreen extends StatelessWidget {
     switch (viewModel.state) {
       case ViewState.loading:
         // 데이터 로드 중일 때 로딩 인디케이터 표시
-        bodyContent = const Center(child: CircularProgressIndicator());
+        bodyContent = Center(
+          child: CircularProgressIndicator(color: AppColors.primary(context)),
+        );
         break;
 
       case ViewState.error:
@@ -41,7 +44,7 @@ class _PersonalCalendarScreen extends StatelessWidget {
           child: Text(
             "데이터 로드 실패: ${viewModel.errorMessage ?? '알 수 없는 오류'}",
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.red),
+            style: const TextStyle(color: AppColors.pureDanger),
           ),
         );
         break;
@@ -112,7 +115,7 @@ class CustomAppBarIcon extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Icon(icon, size: 28),
+        child: Icon(icon, size: 28, color: AppColors.textMain(context)),
       ),
     );
   }

@@ -82,7 +82,7 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.text(context),
+                            color: AppColors.textMain(context),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -90,7 +90,7 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                           "DutyTable에 오신걸 환영합니다!",
                           style: TextStyle(
                             fontSize: 16,
-                            color: AppColors.subText(context),
+                            color: AppColors.textSub(context),
                           ),
                         ),
                       ],
@@ -112,7 +112,7 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                           child: Checkbox(
                             value: _isAutoLogin,
                             activeColor: AppColors.primaryBlue,
-                            checkColor: Colors.white,
+                            checkColor: AppColors.pureWhite,
                             side: BorderSide(
                               color: isDarkMode
                                   ? AppColors.dBorder
@@ -164,7 +164,7 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                                   '구글로 계속하기',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white,
+                                    color: AppColors.pureWhite,
                                   ),
                                 ),
                               ),

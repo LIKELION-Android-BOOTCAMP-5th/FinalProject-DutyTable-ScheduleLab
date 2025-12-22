@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
@@ -34,6 +35,7 @@ class _SharedCalendarScreen extends StatelessWidget {
     return Consumer<SharedCalendarViewModel>(
       builder: (context, viewModel, child) {
         return Scaffold(
+          backgroundColor: AppColors.background(context),
           appBar: BackActionsAppBar(
             title: const SizedBox.shrink(),
             actions: [

@@ -35,8 +35,10 @@ class ScheduleAddButtonSection extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: AppColors.card(context),
-                  border: Border.all(color: AppColors.commonGrey, width: 1),
+                  border: Border.all(
+                    color: AppColors.textSub(context),
+                    width: 1,
+                  ),
                 ),
                 child: GestureDetector(
                   onTap: () => context.pop(),
@@ -45,6 +47,7 @@ class ScheduleAddButtonSection extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w800,
+                      color: AppColors.textSub(context),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -72,22 +75,22 @@ class ScheduleAddButtonSection extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: isEnabled
-                        ? AppColors.actionPositive(context)
-                        : AppColors.commonGrey.withOpacity(0.5),
+                        ? AppColors.primary(context)
+                        : AppColors.textSub(context),
                   ),
                   child: viewModel.state == ViewState.loading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 24,
                           height: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: AppColors.primary(context),
                           ),
                         )
                       : const Text(
                           "저장",
                           style: TextStyle(
-                            color: AppColors.commonWhite,
+                            color: AppColors.pureWhite,
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
                           ),

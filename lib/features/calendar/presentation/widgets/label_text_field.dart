@@ -48,7 +48,7 @@ class LabeledTextField extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: AppColors.text(context),
+            color: AppColors.textMain(context),
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
@@ -63,27 +63,25 @@ class LabeledTextField extends StatelessWidget {
           readOnly: readOnly,
           onTap: onTap,
           onChanged: onChanged,
+          style: TextStyle(color: AppColors.textMain(context)),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: AppColors.commonGrey,
+              color: AppColors.textSub(context),
               fontWeight: FontWeight.w600,
             ),
             filled: true,
-            fillColor: AppColors.card(context),
+            fillColor: AppColors.surface(context),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: AppColors.cardBorder(context),
+                color: AppColors.textSub(context),
                 width: 2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(
-                color: AppColors.cardBorder(context),
-                width: 2,
-              ),
+              borderSide: BorderSide(color: AppColors.primaryBlue, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,

@@ -28,19 +28,22 @@ class EditButtonSection extends StatelessWidget {
                 CustomConfirmationDialog.show(
                   context,
                   content: "수정 완료하시겠습니까?",
-                  confirmColor: AppColors.commonBlue,
+                  confirmColor: AppColors.primaryBlue,
                   onConfirm: () async {
                     final bool result = await viewModel.updateCalendarInfo();
 
                     if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
                           result ? '수정이 완료 되었습니다' : '알 수 없는 에러가 발생하였습니다',
                         ),
                         backgroundColor: result
-                            ? Colors.green
-                            : AppColors.commonRed,
+                            ? AppColors.pureSuccess
+                            : AppColors.pureDanger,
                         duration: const Duration(seconds: 3),
                       ),
                     );
@@ -53,15 +56,15 @@ class EditButtonSection extends StatelessWidget {
             },
             child: BottomAppBar(
               color: isContentChange
-                  ? AppColors.commonBlue
-                  : AppColors.commonGrey,
+                  ? AppColors.primaryBlue
+                  : AppColors.textSub(context),
               height: 52,
               child: Center(
                 child: Text(
                   "수정 완료",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.commonWhite,
+                    color: AppColors.pureWhite,
                   ),
                 ),
               ),

@@ -29,7 +29,7 @@ class _SignupScreenUI extends StatelessWidget {
   // 프로필 이미지 선택 위젯을 빌드하는 함수
   Widget _buildImagePicker(BuildContext context, SignupViewModel viewModel) {
     ImageProvider? imageProvider;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // 회원가입 화면에서는 기존 이미지 URL이 없으므로 FileImage만 처리
     if (viewModel.selectedImage != null) {
@@ -46,7 +46,7 @@ class _SignupScreenUI extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.boxShadow(context),
+                color: isDark ? AppColors.dBorder : AppColors.lBorder,
                 blurRadius: 15,
                 spreadRadius: 2,
                 offset: const Offset(0, 5),
@@ -73,7 +73,7 @@ class _SignupScreenUI extends StatelessWidget {
               color: AppColors.background(context),
               shape: BoxShape.circle,
               border: Border.all(
-                color: isDarkMode ? AppColors.dBorder : AppColors.lBorder,
+                color: isDark ? AppColors.dBorder : AppColors.lBorder,
                 width: 2,
               ),
             ),
@@ -95,7 +95,7 @@ class _SignupScreenUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 테마 및 색상 설정
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // 화면의 다른 곳을 탭하면 키보드를 숨기기 위한 GestureDetector
     return GestureDetector(
@@ -152,7 +152,7 @@ class _SignupScreenUI extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.boxShadow(context),
+                          color: isDark ? AppColors.dBorder : AppColors.lBorder,
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -214,11 +214,11 @@ class _SignupScreenUI extends StatelessWidget {
                                   child:
                                       viewmodel.isLoading &&
                                           !viewmodel.isNicknameChecked
-                                      ? const SizedBox(
+                                      ? SizedBox(
                                           width: 14,
                                           height: 14,
                                           child: CircularProgressIndicator(
-                                            color: Colors.white,
+                                            color: AppColors.primary(context),
                                             strokeWidth: 2,
                                           ),
                                         )
@@ -226,7 +226,7 @@ class _SignupScreenUI extends StatelessWidget {
                                           '중복 체크',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.white,
+                                            color: AppColors.pureWhite,
                                           ),
                                         ),
                                 ),
@@ -243,8 +243,8 @@ class _SignupScreenUI extends StatelessWidget {
                               viewmodel.nicknameMessage!,
                               style: TextStyle(
                                 color: viewmodel.isNicknameMessageError
-                                    ? Colors.red
-                                    : Colors.green,
+                                    ? AppColors.pureDanger
+                                    : AppColors.pureSuccess,
                                 fontSize: 12,
                               ),
                             ),
@@ -265,7 +265,7 @@ class _SignupScreenUI extends StatelessWidget {
                               side: BorderSide(
                                 color: AppColors.iconSub(context),
                               ),
-                              checkColor: Colors.white,
+                              checkColor: AppColors.pureWhite,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
@@ -329,11 +329,11 @@ class _SignupScreenUI extends StatelessWidget {
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: viewmodel.isLoading
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: AppColors.primary(context),
                                     strokeWidth: 2,
                                   ),
                                 )
@@ -341,7 +341,7 @@ class _SignupScreenUI extends StatelessWidget {
                                   '완료',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white,
+                                    color: AppColors.pureWhite,
                                   ),
                                 ),
                         ),

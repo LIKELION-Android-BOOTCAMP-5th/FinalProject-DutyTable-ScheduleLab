@@ -15,17 +15,20 @@ class SchedulePreviewCard extends StatelessWidget {
     final viewModel = context.watch<ScheduleViewModel>();
     final isSelected = viewModel.isSelected(item.id.toString());
     final color = Color(int.parse(item.colorValue));
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.2),
+          color: isDarkMode
+              ? color.withValues(alpha: 0.15)
+              : color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: viewModel.deleteMode && isSelected
-              ? Border.all(color: AppColors.commonRed)
-              : null,
+              ? Border.all(color: AppColors.pureDanger, width: 2)
+              : Border.all(color: Colors.transparent, width: 2),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -52,9 +55,10 @@ class SchedulePreviewCard extends StatelessWidget {
                         item.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
+                          color: AppColors.textMain(context),
                         ),
                       ),
                     ),
@@ -71,7 +75,8 @@ class SchedulePreviewCard extends StatelessWidget {
                   value: isSelected,
                   onChanged: (_) =>
                       viewModel.toggleSelected(item.id.toString()),
-                  activeColor: AppColors.commonRed,
+                  activeColor: AppColors.pureDanger,
+                  side: BorderSide(color: AppColors.textSub(context)),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
               ),

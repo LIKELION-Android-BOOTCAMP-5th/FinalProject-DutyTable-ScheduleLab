@@ -41,9 +41,12 @@ class CalendarEditBody extends StatelessWidget {
 
               /// 캘린더 이름
               CustomCalendarEditTextField(
-                title: const Text(
+                title: Text(
                   "캘린더 이름",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: AppColors.textMain(context),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 controller: viewModel.titleController,
               ),
@@ -57,9 +60,12 @@ class CalendarEditBody extends StatelessWidget {
 
               /// 캘린더 설명
               CustomCalendarEditTextField(
-                title: const Text(
+                title: Text(
                   "캘린더 설명",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: AppColors.textMain(context),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 controller: viewModel.descController,
               ),
@@ -78,9 +84,15 @@ class _CalendarMemberSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Text("캘린더 멤버", style: TextStyle(fontWeight: FontWeight.bold)),
-        SizedBox(height: 8),
+      children: [
+        Text(
+          "캘린더 멤버",
+          style: TextStyle(
+            color: AppColors.textMain(context),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
         _CalendarMemberList(),
       ],
     );
@@ -143,7 +155,10 @@ class _PersonalOwnerTile extends StatelessWidget {
                 imageUrl: profileUrl,
               ),
               const SizedBox(width: 4),
-              Text(nickname),
+              Text(
+                nickname,
+                style: TextStyle(color: AppColors.textMain(context)),
+              ),
             ],
           ),
           const Text("👑", style: TextStyle(fontSize: 24)),
@@ -177,7 +192,10 @@ class _SharedMemberTile extends StatelessWidget {
                 imageUrl: member.profileUrl,
               ),
               const SizedBox(width: 4),
-              Text(member.nickname),
+              Text(
+                member.nickname,
+                style: TextStyle(color: AppColors.textMain(context)),
+              ),
             ],
           ),
           isPersonalCalendar
@@ -204,7 +222,7 @@ class _RoleButton extends StatelessWidget {
         CustomConfirmationDialog.show(
           context,
           content: "방장 권한을 넘기시겠습니까?",
-          confirmColor: AppColors.commonBlue,
+          confirmColor: AppColors.primaryBlue,
           onConfirm: () async {
             await viewModel.transferAdminRole(newAdminId);
 
@@ -217,10 +235,10 @@ class _RoleButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.commonBlue),
+          border: Border.all(color: AppColors.primaryBlue),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Text("권한", style: TextStyle(color: AppColors.commonBlue)),
+        child: const Text("권한", style: TextStyle(color: AppColors.primaryBlue)),
       ),
     );
   }

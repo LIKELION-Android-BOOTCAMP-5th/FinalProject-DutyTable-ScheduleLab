@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -237,15 +238,16 @@ class LoginViewModel extends ChangeNotifier {
         } catch (e) {}
 
         // 알림 리스너 및 상태 설정
-        await NotificationDataSource.shared
-            .setupNotificationListenersAndState(context);
+        await NotificationDataSource.shared.setupNotificationListenersAndState(
+          context,
+        );
 
         // 프로필 정보가 있으면 (기존 사용자) 로그인 성공 스낵바 표시 후 메인 화면으로 이동
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('로그인이 성공하였습니다.'),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.pureSuccess,
             ),
           );
           GoRouter.of(context).go('/shared');

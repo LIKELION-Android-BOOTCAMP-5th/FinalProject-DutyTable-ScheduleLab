@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomCalendarImageBox extends StatelessWidget {
@@ -12,9 +13,13 @@ class CustomCalendarImageBox extends StatelessWidget {
     return Container(
       width: 120,
       height: 120,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.grey,
+        color: AppColors.surface(context),
+        border: Border.all(
+          color: AppColors.textSub(context).withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: _buildImage(),
     );

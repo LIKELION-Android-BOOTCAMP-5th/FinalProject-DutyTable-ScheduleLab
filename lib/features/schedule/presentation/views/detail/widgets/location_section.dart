@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/naver_map_section.dart';
 import 'package:flutter/material.dart';
@@ -19,11 +20,17 @@ class LocationSection extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.location_pin),
+                    Icon(Icons.location_pin, color: AppColors.iconSub(context)),
                     const SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [Text(address), const SizedBox(height: 10)],
+                      children: [
+                        Text(
+                          address,
+                          style: TextStyle(color: AppColors.textMain(context)),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                     ),
                   ],
                 ),
@@ -41,11 +48,14 @@ class LocationSection extends StatelessWidget {
                   ),
               ],
             )
-          : const Row(
+          : Row(
               children: [
-                Icon(Icons.location_pin),
+                Icon(Icons.location_pin, color: AppColors.iconSub(context)),
                 SizedBox(width: 10),
-                Text("일정 장소가 없습니다"),
+                Text(
+                  "일정 장소가 없습니다",
+                  style: TextStyle(color: AppColors.textSub(context)),
+                ),
               ],
             ),
     );

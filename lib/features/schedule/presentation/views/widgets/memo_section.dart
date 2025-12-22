@@ -12,12 +12,18 @@ class MemoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "메모",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
         const SizedBox(height: 10),
 
@@ -26,28 +32,31 @@ class MemoSection extends StatelessWidget {
           maxLength: 300,
           maxLines: 4,
           onChanged: onMemo,
+          style: TextStyle(color: AppColors.textMain(context)),
           decoration: InputDecoration(
             hintText: "메모를 입력하세요 (최대 300자)",
+            hintStyle: TextStyle(color: AppColors.textSub(context)),
+            counterStyle: TextStyle(color: AppColors.textSub(context)),
             filled: true,
-            fillColor: AppColors.card(context),
+            fillColor: AppColors.surface(context),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: AppColors.cardBorder(context),
+                color: isDark ? AppColors.dBorder : AppColors.lBorder,
                 width: 2,
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: AppColors.cardBorder(context),
+                color: isDark ? AppColors.dBorder : AppColors.lBorder,
                 width: 2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: AppColors.cardBorder(context),
+                color: AppColors.primary(context),
                 width: 2,
               ),
             ),

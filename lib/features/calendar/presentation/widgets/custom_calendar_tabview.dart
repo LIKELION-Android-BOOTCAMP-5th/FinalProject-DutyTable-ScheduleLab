@@ -22,9 +22,9 @@ class CustomCalendarTabView extends StatefulWidget {
 
 class _CustomCalendarTabViewState extends State<CustomCalendarTabView> {
   final List<Color> _tabColors = const [
-    AppColors.primaryChatTextLight,
-    AppColors.primaryListTextLight,
-    AppColors.chatMyMessageLight,
+    AppColors.pureDanger,
+    AppColors.reminderPurple,
+    AppColors.primaryBlue,
   ];
 
   int _selectedIndex = 0;
@@ -82,7 +82,7 @@ class _CustomCalendarTabViewState extends State<CustomCalendarTabView> {
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border(
-          bottom: BorderSide(color: AppColors.commonGrey, width: 1),
+          bottom: BorderSide(color: AppColors.textSub(context), width: 1),
         ),
       ),
       child: Row(
@@ -104,16 +104,15 @@ class _CustomCalendarTabViewState extends State<CustomCalendarTabView> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? _tabColors[index]
-                        // TODO: 민석님
-                        : AppColors.card(context),
+                        : AppColors.surface(context),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                   child: Text(
                     widget.tabNameList[index],
                     style: TextStyle(
                       color: isSelected
-                          ? AppColors.commonWhite
-                          : AppColors.commonGrey,
+                          ? AppColors.pureWhite
+                          : AppColors.textSub(context),
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.normal,

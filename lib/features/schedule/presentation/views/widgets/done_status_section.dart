@@ -16,12 +16,18 @@ class DoneStatusSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           "일정 완료 상태",
-          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
 
         const SizedBox(height: 10),
@@ -29,18 +35,39 @@ class DoneStatusSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10.0),
           decoration: BoxDecoration(
+            color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.cardBorder(context), width: 2),
+            border: Border.all(
+              color: isDark ? AppColors.dBorder : AppColors.lBorder,
+              width: 2,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "일정 완료 상태",
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800),
+                isDone ? "완료됨" : "미완료",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w800,
+                  color: isDone
+                      ? AppColors.primary(context)
+                      : AppColors.textSub(context),
+                ),
               ),
 
-              Switch(value: isDone, onChanged: onIsDone),
+              Switch(
+                value: isDone,
+                onChanged: onIsDone,
+                activeThumbColor: AppColors.pureWhite,
+                activeTrackColor: AppColors.primary(context),
+                inactiveThumbColor: isDark
+                    ? AppColors.textSub(context)
+                    : AppColors.pureWhite,
+                inactiveTrackColor: isDark
+                    ? AppColors.dBorder
+                    : AppColors.lBorder,
+              ),
             ],
           ),
         ),

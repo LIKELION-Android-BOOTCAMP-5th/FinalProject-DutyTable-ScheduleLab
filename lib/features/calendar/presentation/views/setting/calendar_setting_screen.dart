@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
@@ -29,10 +30,15 @@ class _CalendarSettingScreen extends StatelessWidget {
     final viewModel = context.watch<CalendarSettingViewModel>();
 
     return Scaffold(
+      backgroundColor: AppColors.background(context),
       appBar: BackActionsAppBar(
-        title: const Text(
+        title: Text(
           "캘린더 설정",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
         actions: viewModel.calendar.user_id == viewModel.currentUser!.id
             ? [_EditButton()]
@@ -65,7 +71,7 @@ class _EditButton extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.blue,
+            color: AppColors.primaryBlue,
           ),
         ),
       ),

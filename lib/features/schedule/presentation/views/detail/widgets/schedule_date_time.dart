@@ -32,7 +32,7 @@ class ScheduleDateTime extends StatelessWidget {
                         .toDateTime()
                         .koreanShortDateWithWeekday,
                     style: TextStyle(
-                      color: AppColors.text(context),
+                      color: AppColors.textMain(context),
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                     ),
@@ -43,7 +43,7 @@ class ScheduleDateTime extends StatelessWidget {
                   Text(
                     "~",
                     style: TextStyle(
-                      color: AppColors.text(context),
+                      color: AppColors.textMain(context),
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                     ),
@@ -57,7 +57,7 @@ class ScheduleDateTime extends StatelessWidget {
                         .toDateTime()
                         .koreanShortDateWithWeekday,
                     style: TextStyle(
-                      color: AppColors.text(context),
+                      color: AppColors.textMain(context),
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                     ),
@@ -71,7 +71,7 @@ class ScheduleDateTime extends StatelessWidget {
                   Text(
                     viewModel.startedAt.toString().toDateTime().koreanAmPmTime,
                     style: TextStyle(
-                      color: AppColors.commonGrey,
+                      color: AppColors.textSub(context),
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -80,13 +80,13 @@ class ScheduleDateTime extends StatelessWidget {
                   Icon(
                     Icons.arrow_right_alt_rounded,
                     size: 30,
-                    color: AppColors.commonGrey,
+                    color: AppColors.iconSub(context),
                   ),
 
                   Text(
                     viewModel.endedAt.toString().toDateTime().koreanAmPmTime,
                     style: TextStyle(
-                      color: AppColors.commonGrey,
+                      color: AppColors.textSub(context),
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),

@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ class EmotionColorSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleDetailViewModel>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -26,6 +28,10 @@ class EmotionColorSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: Color(int.parse(viewModel.colorValue)),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: isDark ? AppColors.dBorder : AppColors.lBorder,
+                width: 1,
+              ),
             ),
           ),
         ],

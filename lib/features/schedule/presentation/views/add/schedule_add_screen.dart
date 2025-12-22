@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_add_view_model.dart';
 import 'package:dutytable/features/schedule/presentation/views/add/schedule_add_body.dart';
@@ -29,10 +30,15 @@ class _ScheduleAddScreen extends StatelessWidget {
     final _formKey = GlobalKey<FormState>();
 
     return Scaffold(
+      backgroundColor: AppColors.background(context),
       appBar: BackActionsAppBar(
         title: Text(
           "일정 추가",
-          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
       ),
 

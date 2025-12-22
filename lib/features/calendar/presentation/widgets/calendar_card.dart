@@ -34,13 +34,13 @@ class CalendarCard extends StatelessWidget {
       children: [
         Card(
           elevation: 2,
-          color: AppColors.card(context),
+          color: AppColors.surface(context),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
               color: isSelected && !applyBlur
-                  ? AppColors.commonRed
-                  : AppColors.cardBorder(context),
+                  ? AppColors.danger(context)
+                  : AppColors.textSub(context),
               width: isSelected && !applyBlur ? 2 : 1,
             ),
           ),
@@ -56,7 +56,7 @@ class CalendarCard extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: AppColors.cardBlur(context),
+                color: AppColors.background(context).withOpacity(0.6),
               ),
             ),
           ),
@@ -91,7 +91,7 @@ class CalendarCard extends StatelessWidget {
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: const Color(0xFF3A7BFF),
+        color: AppColors.primaryBlue,
         borderRadius: BorderRadius.circular(16),
       ),
       child: ClipRRect(
@@ -115,9 +115,10 @@ class CalendarCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
+                  color: AppColors.textMain(context),
                 ),
               ),
 
@@ -133,12 +134,18 @@ class CalendarCard extends StatelessWidget {
             children: [
               Text(
                 "다음 일정 : ${viewModel.nextScheduleDateMonth[calendarId ?? " "]}월 ${viewModel.nextScheduleDateDay[calendarId ?? " "]}일 ",
-                style: TextStyle(fontSize: 12, color: AppColors.commonGrey),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSub(context),
+                ),
               ),
               Padding(padding: EdgeInsets.only(right: 10)),
               Text(
                 "${viewModel.nextScheduleTitle[calendarId ?? " "]}",
-                style: TextStyle(fontSize: 12, color: AppColors.commonGrey),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSub(context),
+                ),
               ),
             ],
           ),
@@ -151,13 +158,13 @@ class CalendarCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.chip(context),
+        color: AppColors.background(context),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
         "$members 명",
         style: TextStyle(
-          color: AppColors.chipText(context),
+          color: AppColors.textSub(context),
           fontSize: 10,
           fontWeight: FontWeight.w600,
         ),
@@ -175,14 +182,17 @@ class CalendarCard extends StatelessWidget {
       return Container(
         width: 42,
         height: 42,
-        decoration: const BoxDecoration(
-          color: Colors.red,
+        decoration: BoxDecoration(
+          color: AppColors.danger(context),
           shape: BoxShape.circle,
         ),
         alignment: Alignment.center,
         child: Text(
           "${viewModel.unreadCount[calendarId ?? 0] ?? 0}",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: AppColors.pureWhite,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       );
     }
@@ -193,13 +203,13 @@ class CalendarCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: AppColors.chip(context),
+          color: AppColors.textSub(context),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text(
           "삭제 불가",
           style: TextStyle(
-            color: AppColors.chipText(context),
+            color: AppColors.textMain(context),
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
@@ -210,7 +220,7 @@ class CalendarCard extends StatelessWidget {
     /// 일반 사용자 → 체크박스
     return Checkbox(
       value: isSelected,
-      activeColor: AppColors.commonRed,
+      activeColor: AppColors.danger(context),
       onChanged: (_) => onChangeSelected(),
     );
   }

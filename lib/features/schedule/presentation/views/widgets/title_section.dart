@@ -12,12 +12,18 @@ class TitleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           "일정 제목",
-          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
 
         const SizedBox(height: 10),
@@ -25,25 +31,26 @@ class TitleSection extends StatelessWidget {
         TextFormField(
           initialValue: title,
           onChanged: onTitle,
+          style: TextStyle(color: AppColors.textMain(context)),
           decoration: InputDecoration(
             hintText: "일정 제목을 추가해주세요",
             hintStyle: TextStyle(
-              color: AppColors.commonGrey,
+              color: AppColors.textSub(context),
               fontWeight: FontWeight.w600,
             ),
             filled: true,
-            fillColor: AppColors.card(context),
+            fillColor: AppColors.surface(context),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: AppColors.cardBorder(context),
+                color: isDark ? AppColors.dBorder : AppColors.lBorder,
                 width: 2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(
-                color: AppColors.cardBorder(context),
+                color: AppColors.primary(context),
                 width: 2,
               ),
             ),

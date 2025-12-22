@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 void showFullScreenLoading(BuildContext context) {
@@ -7,6 +8,7 @@ void showFullScreenLoading(BuildContext context) {
     builder: (context) {
       return Center(
         child: CircularProgressIndicator(
+          color: AppColors.primary(context),
           strokeWidth: 4,
           strokeCap: StrokeCap.round,
         ),

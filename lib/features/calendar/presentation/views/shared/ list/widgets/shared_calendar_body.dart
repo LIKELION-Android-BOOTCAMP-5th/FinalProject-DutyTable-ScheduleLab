@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calendar_card.dart';
@@ -17,14 +18,16 @@ class SharedCalendarBody extends StatelessWidget {
 
     switch (state) {
       case ViewState.loading:
-        return const Center(child: CircularProgressIndicator());
+        return Center(
+          child: CircularProgressIndicator(color: AppColors.primary(context)),
+        );
 
       case ViewState.error:
         final message = context.read<SharedCalendarViewModel>().errorMessage;
         return Center(
           child: Text(
             message ?? '알 수 없는 오류',
-            style: const TextStyle(color: Colors.red),
+            style: TextStyle(color: AppColors.danger(context)),
           ),
         );
 
@@ -32,7 +35,12 @@ class SharedCalendarBody extends StatelessWidget {
         final calendars = context.read<SharedCalendarViewModel>().calendarList;
 
         if (calendars == null || calendars.isEmpty) {
-          return const Center(child: Text('공유 캘린더가 없습니다.'));
+          return Center(
+            child: Text(
+              '공유 캘린더가 없습니다.',
+              style: TextStyle(color: AppColors.textSub(context)),
+            ),
+          );
         }
 
         return ListView.separated(

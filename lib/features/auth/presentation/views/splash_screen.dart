@@ -1,8 +1,7 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
-import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -81,9 +80,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     // 데이터 로딩 중에는 로딩 인디케이터만 표시
-    return const Scaffold(
+    return Scaffold(
+      backgroundColor: AppColors.background(context),
       body: Center(
-        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+        child: CircularProgressIndicator(
+          color: AppColors.primary(context),
+          strokeWidth: 2,
+        ),
       ),
     );
   }

@@ -121,7 +121,7 @@ class _ProfileScreen extends StatelessWidget {
                                     child: const Icon(
                                       Icons.camera_alt_outlined,
                                       size: 14,
-                                      color: Colors.white,
+                                      color: AppColors.pureWhite,
                                     ),
                                   ),
                                 ),
@@ -303,7 +303,7 @@ class _ProfileScreen extends StatelessWidget {
                             viewModel.activeNotification();
                             viewModel.updateNotification(viewModel.user!.id);
                           },
-                          activeThumbColor: Colors.white,
+                          activeThumbColor: AppColors.pureWhite,
                           activeTrackColor: AppColors.primaryBlue,
                         ),
                       ),
@@ -367,9 +367,7 @@ class _ProfileScreen extends StatelessWidget {
                                     "탈퇴 시 모든 데이터가 삭제되며 \n복구할 수 없습니다",
                                     style: TextStyle(
                                       fontSize: 10,
-                                      color: isDarkMode
-                                          ? Colors.white
-                                          : Colors.black87,
+                                      color: AppColors.textMain(context),
                                     ),
                                     textAlign: TextAlign.center,
                                   ),

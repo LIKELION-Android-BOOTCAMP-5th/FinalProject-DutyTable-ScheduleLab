@@ -36,7 +36,7 @@ class _SharedCalendarListScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: AppColors.background(context),
       appBar: LogoActionsAppBar(
         leftActions: const _LeftActions(),
         rightActions: deleteMode
@@ -72,7 +72,7 @@ class _LeftActions extends StatelessWidget {
         Text(
           "DutyTable",
           style: TextStyle(
-            color: AppColors.text(context),
+            color: AppColors.textMain(context),
             fontSize: 20,
             fontWeight: FontWeight.w800,
           ),
@@ -95,12 +95,15 @@ class _DeleteModeActions extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: viewModel.cancelDeleteMode,
-          child: const Text("취소"),
+          child: Text(
+            "취소",
+            style: TextStyle(color: AppColors.textSub(context)),
+          ),
         ),
         const SizedBox(width: 16),
         GestureDetector(
           onTap: viewModel.outSelectedCalendars,
-          child: const Text("삭제"),
+          child: Text("삭제", style: TextStyle(color: AppColors.danger(context))),
         ),
       ],
     );
@@ -122,7 +125,7 @@ class _NormalActions extends StatelessWidget {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: AppColors.commonBlue,
+            color: AppColors.primaryBlue,
             shape: BoxShape.circle,
           ),
           child: GestureDetector(
@@ -133,7 +136,7 @@ class _NormalActions extends StatelessWidget {
                 context.read<SharedCalendarViewModel>().fetchCalendars();
               }
             },
-            child: Icon(Icons.add, color: AppColors.commonWhite),
+            child: Icon(Icons.add, color: AppColors.pureWhite),
           ),
         ),
 
@@ -143,7 +146,11 @@ class _NormalActions extends StatelessWidget {
 
         GestureDetector(
           onTap: () => viewModel.toggleDeleteMode(),
-          child: const Icon(Icons.delete_outline, size: 26),
+          child: Icon(
+            Icons.delete_outline,
+            size: 26,
+            color: AppColors.textMain(context),
+          ),
         ),
       ],
     );

@@ -10,6 +10,7 @@ class SuccessStatusSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleDetailViewModel>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -21,12 +22,23 @@ class SuccessStatusSection extends StatelessWidget {
             Text(
               "완료",
               style: TextStyle(
-                color: AppColors.text(context),
+                color: AppColors.textMain(context),
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
               ),
             ),
-            Switch(value: viewModel.isDone, onChanged: (_) => viewModel.isDone),
+            Switch(
+              value: viewModel.isDone,
+              onChanged: (_) => viewModel.isDone,
+              activeThumbColor: AppColors.pureWhite,
+              activeTrackColor: AppColors.primary(context),
+              inactiveThumbColor: isDark
+                  ? AppColors.textSub(context)
+                  : AppColors.pureWhite,
+              inactiveTrackColor: isDark
+                  ? AppColors.dBorder
+                  : AppColors.lBorder,
+            ),
           ],
         ),
       ),

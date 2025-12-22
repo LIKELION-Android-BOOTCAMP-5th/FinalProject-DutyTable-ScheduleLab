@@ -21,6 +21,8 @@ class CalendarTabBody extends StatelessWidget {
           viewModel.displaySchedules,
         );
 
+        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
         return Scaffold(
           body: Column(
             children: [
@@ -31,8 +33,14 @@ class CalendarTabBody extends StatelessWidget {
                     Checkbox(
                       value: viewModel.isFetchMySchedule,
                       onChanged: (_) => viewModel.toggleFetchMySchedule(),
+                      activeColor: AppColors.primaryBlue,
+                      checkColor: AppColors.pureWhite,
+                      side: BorderSide(color: AppColors.textSub(context)),
                     ),
-                    const Text("내 일정 불러오기"),
+                    Text(
+                      "내 일정 불러오기",
+                      style: TextStyle(color: AppColors.textMain(context)),
+                    ),
                     const SizedBox(width: 8),
                   ],
                 ),
@@ -42,16 +50,41 @@ class CalendarTabBody extends StatelessWidget {
                   view: CalendarView.month,
                   dataSource: dataSource,
                   headerDateFormat: 'yyyy년 MM월',
+                  backgroundColor: AppColors.background(context),
                   headerStyle: CalendarHeaderStyle(
                     textAlign: TextAlign.center,
                     backgroundColor: AppColors.background(context),
                     textStyle: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.text(context),
+                      color: AppColors.textMain(context),
                     ),
                   ),
-                  todayHighlightColor: AppColors.commonBlue,
+                  todayHighlightColor: AppColors.primaryBlue,
+                  todayTextStyle: TextStyle(color: AppColors.pureWhite),
+                  selectionDecoration: BoxDecoration(
+                    border: Border.all(color: AppColors.primaryBlue, width: 2),
+                  ),
+                  viewHeaderStyle: ViewHeaderStyle(
+                    dayTextStyle: TextStyle(
+                      color: AppColors.textMain(context),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  monthViewSettings: MonthViewSettings(
+                    appointmentDisplayMode:
+                        MonthAppointmentDisplayMode.appointment,
+                    // 날짜 숫자 텍스트 스타일
+                    monthCellStyle: MonthCellStyle(
+                      textStyle: TextStyle(color: AppColors.textMain(context)),
+                      trailingDatesTextStyle: TextStyle(
+                        color: AppColors.textSub(context),
+                      ),
+                      leadingDatesTextStyle: TextStyle(
+                        color: AppColors.textSub(context),
+                      ),
+                    ),
+                  ),
                   onTap: (details) async {
                     final date = details.date;
                     if (date == null) return;
@@ -71,10 +104,6 @@ class CalendarTabBody extends StatelessWidget {
                       ),
                     );
                   },
-                  monthViewSettings: const MonthViewSettings(
-                    appointmentDisplayMode:
-                        MonthAppointmentDisplayMode.appointment,
-                  ),
                 ),
               ),
             ],

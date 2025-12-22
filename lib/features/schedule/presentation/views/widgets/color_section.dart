@@ -30,7 +30,11 @@ class ColorSection extends StatelessWidget {
       children: [
         Text(
           "색 선정",
-          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
 
         const SizedBox(height: 10),
@@ -44,10 +48,11 @@ class ColorSection extends StatelessWidget {
               // 부모 Row의 공간을 똑같이 나눠 가짐
               child: GestureDetector(
                 onTap: () => onColorSelected(color),
+                behavior: HitTestBehavior.opaque,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: AnimatedScale(
-                    scale: isSelected ? 1.1 : 1.0,
+                    scale: isSelected ? 1.1 : 0.8,
                     duration: const Duration(milliseconds: 180),
                     child: AspectRatio(
                       aspectRatio: 1.0, // 가로세로 1:1 비율 유지 (원형)
@@ -57,7 +62,7 @@ class ColorSection extends StatelessWidget {
                           shape: BoxShape.circle,
                           border: isSelected
                               ? Border.all(
-                                  color: AppColors.commonGrey,
+                                  color: AppColors.textSub(context),
                                   width: 2,
                                 )
                               : null,

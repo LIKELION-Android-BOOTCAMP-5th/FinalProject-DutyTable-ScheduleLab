@@ -35,34 +35,50 @@ class StartAndEndTimeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "일정 시간",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
         const SizedBox(height: 10),
 
         Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
+            color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.cardBorder(context), width: 2),
+            border: Border.all(
+              color: isDark ? AppColors.dBorder : AppColors.lBorder,
+              width: 2,
+            ),
           ),
           child: Row(
             children: [
               Expanded(
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       "시작시간",
-                      style: TextStyle(fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textSub(context),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () => _pickTime(context, startTime, onStartTime),
-                      child: Text(startTime.format(context)),
+                      child: Text(
+                        startTime.format(context),
+                        style: TextStyle(color: AppColors.textMain(context)),
+                      ),
                     ),
                   ],
                 ),
@@ -73,14 +89,20 @@ class StartAndEndTimeSection extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       "종료시간",
-                      style: TextStyle(fontWeight: FontWeight.w800),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textSub(context),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () => _pickTime(context, endTime, onEndTime),
-                      child: Text(endTime.format(context)),
+                      child: Text(
+                        endTime.format(context),
+                        style: TextStyle(color: AppColors.textMain(context)),
+                      ),
                     ),
                   ],
                 ),

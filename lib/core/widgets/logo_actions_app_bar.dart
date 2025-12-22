@@ -19,7 +19,9 @@ class LogoActionsAppBar extends StatelessWidget implements PreferredSizeWidget {
       height: preferredSize.height + MediaQuery.of(context).padding.top,
       decoration: BoxDecoration(
         color: AppColors.background(context),
-        border: Border(bottom: BorderSide(color: Colors.grey, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: AppColors.textSub(context), width: 1),
+        ),
       ),
       child: Row(
         children: [

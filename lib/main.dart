@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as timezone;
 
-import 'core/configs/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'features/notification/presentation/viewmodels/notification_state.dart';
 import 'firebase_options.dart';
@@ -146,9 +145,9 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeProvider.themeMode,
+      themeMode: ThemeMode.system,
+      theme: ThemeData(brightness: Brightness.light),
+      darkTheme: ThemeData(brightness: Brightness.dark),
       debugShowCheckedModeBanner: false,
       routerConfig: createRouter(context),
       title: "DutyTable",

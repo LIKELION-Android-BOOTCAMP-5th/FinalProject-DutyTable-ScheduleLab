@@ -27,7 +27,7 @@ class ScheduleDialog extends StatelessWidget {
 
           return Container(
             decoration: BoxDecoration(
-              color: AppColors.card(context),
+              color: AppColors.surface(context),
               borderRadius: BorderRadius.circular(18),
             ),
             child: Column(

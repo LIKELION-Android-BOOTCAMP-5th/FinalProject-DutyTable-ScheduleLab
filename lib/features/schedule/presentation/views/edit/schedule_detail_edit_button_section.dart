@@ -19,7 +19,7 @@ class ScheduleDetailEditButtonSection extends StatelessWidget {
             _ScheduleActionButton(
               icon: Icons.cancel_outlined,
               label: "취소",
-              buttonColor: AppColors.commonRed,
+              buttonColor: AppColors.danger(context),
               onTap: () => context.pop(),
             ),
 
@@ -28,7 +28,7 @@ class ScheduleDetailEditButtonSection extends StatelessWidget {
             _ScheduleActionButton(
               icon: Icons.edit_note,
               label: "수정",
-              buttonColor: AppColors.commonBlue,
+              buttonColor: AppColors.primary(context),
               onTap: () async {
                 await viewModel.updateSchedule();
 

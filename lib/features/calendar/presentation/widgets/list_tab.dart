@@ -36,6 +36,7 @@ class _ListTab extends StatelessWidget {
       builder: (context, viewModel, child) {
         final items = viewModel.selectedFilteringList;
         return Scaffold(
+          backgroundColor: AppColors.background(context),
           body: Column(
             children: [
               Padding(
@@ -107,6 +108,11 @@ class _ListTab extends StatelessWidget {
                                               decoration: BoxDecoration(
                                                 color: Color(int.parse(color)),
                                                 shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: AppColors.textSub(
+                                                    context,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                     );
@@ -131,7 +137,7 @@ class _ListTab extends StatelessWidget {
                                           child: Text(
                                             "취소",
                                             style: TextStyle(
-                                              color: AppColors.commonBlue,
+                                              color: AppColors.primaryBlue,
                                             ),
                                           ),
                                         ),
@@ -144,8 +150,9 @@ class _ListTab extends StatelessWidget {
                                               CustomConfirmationDialog.show(
                                                 context,
                                                 content: '정말 삭제 하시겠습니까?',
-                                                confirmColor:
-                                                    AppColors.commonRed,
+                                                confirmColor: AppColors.danger(
+                                                  context,
+                                                ),
                                                 onConfirm: () async {
                                                   await viewModel
                                                       .deleteAllSchedules();
@@ -163,8 +170,8 @@ class _ListTab extends StatelessWidget {
                                                   viewModel
                                                       .selectedIds
                                                       .isNotEmpty
-                                                  ? AppColors.commonRed
-                                                  : AppColors.commonGrey,
+                                                  ? AppColors.pureDanger
+                                                  : AppColors.textSub(context),
                                             ),
                                           ),
                                         ),
@@ -177,7 +184,7 @@ class _ListTab extends StatelessWidget {
                                       child: Text(
                                         "선택삭제",
                                         style: TextStyle(
-                                          color: Color(0xFF3C82F6),
+                                          color: AppColors.primaryBlue,
                                         ),
                                       ),
                                     )
@@ -190,9 +197,15 @@ class _ListTab extends StatelessWidget {
                         children: [
                           Checkbox(
                             value: viewModel.isFetchMySchedule,
+                            activeColor: AppColors.primaryBlue,
                             onChanged: (_) => viewModel.toggleFetchMySchedule(),
                           ),
-                          const Text("내 일정 불러오기"),
+                          Text(
+                            "내 일정 불러오기",
+                            style: TextStyle(
+                              color: AppColors.textMain(context),
+                            ),
+                          ),
                           const SizedBox(width: 8),
                         ],
                       ),
@@ -290,8 +303,9 @@ class CustomDropdownButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.commonLightGrey,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.textSub(context)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       child: DropdownButton(
@@ -299,14 +313,15 @@ class CustomDropdownButton extends StatelessWidget {
         items: items,
         onChanged: onChanged,
         underline: const SizedBox.shrink(), // 기본 밑줄 제거
-        icon: const Icon(
+        dropdownColor: AppColors.surface(context),
+        icon: Icon(
           Icons.keyboard_arrow_down,
           size: 18,
-          color: Color(0xFF6B7280),
-        ), // 아이콘 커스텀
+          color: AppColors.textSub(context),
+        ),
         isDense: true,
-        style: const TextStyle(
-          color: Colors.black87,
+        style: TextStyle(
+          color: AppColors.textMain(context),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -341,6 +356,8 @@ class CustomScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
         onTap();
@@ -349,7 +366,9 @@ class CustomScheduleCard extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(
             width: isSelected ? 2 : 1,
-            color: isSelected ? AppColors.commonRed : Color(0xFFE5E7EB),
+            color: isSelected
+                ? AppColors.pureDanger
+                : (isDarkMode ? AppColors.dBorder : AppColors.lBorder),
           ),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -377,12 +396,15 @@ class CustomScheduleCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textMain(context),
+                        ),
                       ),
                       Text(
                         formatScheduleDate(startedAt, endedAt),
                         style: TextStyle(
-                          color: Colors.grey,
+                          color: AppColors.textSub(context),
                           overflow: TextOverflow.ellipsis,
                         ),
                         maxLines: 1,
@@ -394,7 +416,7 @@ class CustomScheduleCard extends StatelessWidget {
                 isDeleteMode
                     ? Checkbox(
                         value: isSelected,
-                        activeColor: AppColors.commonRed,
+                        activeColor: AppColors.pureDanger,
                         onChanged: (_) => onChangeSelected(),
                       )
                     : SizedBox.shrink(),

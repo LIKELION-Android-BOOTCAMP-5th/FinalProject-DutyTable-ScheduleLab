@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +17,8 @@ class CustomFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () async {
         final result = await context.push(
@@ -31,18 +34,18 @@ class CustomFloatingActionButton extends StatelessWidget {
         width: 56.0,
         height: 56.0,
         decoration: BoxDecoration(
-          color: Colors.blue,
+          color: AppColors.primaryBlue,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.25),
+              color: isDark ? AppColors.dBorder : AppColors.lBorder,
               blurRadius: 6.0,
               offset: const Offset(0, 3),
             ),
           ],
         ),
         // 버튼 내부에 아이콘을 중앙에 배치합니다.
-        child: const Center(child: Icon(Icons.add, color: Colors.white)),
+        child: Center(child: Icon(Icons.add, color: AppColors.pureWhite)),
       ),
     );
   }

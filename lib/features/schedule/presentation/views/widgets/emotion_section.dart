@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_add_view_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_edit_view_model.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,11 @@ class EmotionSection extends StatelessWidget {
       children: [
         Text(
           "감정 설정",
-          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
 
         const SizedBox(height: 10),
@@ -36,6 +41,7 @@ class EmotionSection extends StatelessWidget {
 
             return GestureDetector(
               onTap: () => onEmotionSelected(emotion),
+              behavior: HitTestBehavior.opaque,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: AnimatedScale(
