@@ -74,6 +74,11 @@ class ChatViewModel extends ChangeNotifier {
           event: PostgresChangeEvent.insert,
           schema: 'public',
           table: 'chat_messages',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'calendar_id',
+            value: calendarId,
+          ),
           callback: (payload) async {
             final newMessage = payload.newRecord;
             final createdAtString = newMessage['created_at'] as String;
