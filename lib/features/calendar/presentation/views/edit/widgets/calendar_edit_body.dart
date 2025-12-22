@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../setting/widgets/custom_calendar_image_box.dart';
+
 class CalendarEditBody extends StatelessWidget {
   final CalendarEditViewModel viewModel;
   const CalendarEditBody({super.key, required this.viewModel});
@@ -22,8 +24,21 @@ class CalendarEditBody extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              GestureDetector(
+                onTap: () {
+                  viewModel.getImage();
+                },
+                child: CustomCalendarImageBox(
+                  imageUrl: viewModel.image != null
+                      ? viewModel.image!.path
+                      : viewModel.calendar.imageURL,
+                ),
+              ),
+              const SizedBox(height: 40),
+
               /// 캘린더 이름
               CustomCalendarEditTextField(
                 title: const Text(

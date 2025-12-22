@@ -70,8 +70,9 @@ GoRouter createRouter(BuildContext context) {
         builder: (context, state) {
           final data = state.extra as Map<String, dynamic>;
           final calendarId = data["calendarId"] as int;
+          final date = data["date"] as DateTime?;
 
-          return ScheduleAddScreen(calendarId: calendarId);
+          return ScheduleAddScreen(calendarId: calendarId, date: date);
         },
       ),
 

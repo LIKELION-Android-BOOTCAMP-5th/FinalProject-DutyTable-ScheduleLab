@@ -7,13 +7,14 @@ import 'package:provider/provider.dart';
 
 class ScheduleAddScreen extends StatelessWidget {
   final int calendarId;
+  final DateTime? date;
 
-  const ScheduleAddScreen({super.key, required this.calendarId});
+  const ScheduleAddScreen({super.key, required this.calendarId, this.date});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ScheduleAddViewModel(),
+      create: (_) => ScheduleAddViewModel(date),
       child: _ScheduleAddScreen(calendarId: calendarId),
     );
   }
