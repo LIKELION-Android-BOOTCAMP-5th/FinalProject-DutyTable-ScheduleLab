@@ -51,6 +51,8 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       children: [
         Scaffold(
@@ -109,6 +111,13 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                           height: 24,
                           child: Checkbox(
                             value: _isAutoLogin,
+                            activeColor: AppColors.primaryBlue,
+                            checkColor: Colors.white,
+                            side: BorderSide(
+                              color: isDarkMode
+                                  ? AppColors.dBorder
+                                  : AppColors.lBorder,
+                            ),
                             onChanged: (value) {
                               if (value == null) return;
                               setState(() {
@@ -118,7 +127,10 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const Text('자동 로그인'),
+                        Text(
+                          '자동 로그인',
+                          style: TextStyle(color: AppColors.textMain(context)),
+                        ),
                       ],
                     ),
                   ),
@@ -132,13 +144,19 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                             width: double.infinity,
                             height: 50,
                             child: GestureDetector(
-                              onTap: () => viewmodel.googleSignIn(
-                                context,
-                                isAutoLogin: _isAutoLogin,
-                              ),
+                              onTap: () {
+                                /// 에러 방지를 위해 호출 전 기존 스낵바 제거
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).hideCurrentSnackBar();
+                                viewmodel.googleSignIn(
+                                  context,
+                                  isAutoLogin: _isAutoLogin,
+                                );
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: AppColors.actionPositive(context),
+                                  color: AppColors.primaryBlue,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 alignment: Alignment.center,
@@ -160,10 +178,16 @@ class _LoginScreenUIState extends State<_LoginScreenUI> {
                               width: double.infinity,
                               height: 50,
                               child: SignInWithAppleButton(
-                                onPressed: () => viewmodel.signInWithApple(
-                                  context,
-                                  isAutoLogin: _isAutoLogin,
-                                ),
+                                onPressed: () {
+                                  /// 안드로이드와 마찬가지 - 스낵바 에러 방지를 위해 호출 전 기존 스낵바 제거
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).hideCurrentSnackBar();
+                                  viewmodel.signInWithApple(
+                                    context,
+                                    isAutoLogin: _isAutoLogin,
+                                  );
+                                },
                               ),
                             ),
                           ],

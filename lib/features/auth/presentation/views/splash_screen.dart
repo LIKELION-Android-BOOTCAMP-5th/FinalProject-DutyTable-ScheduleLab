@@ -52,8 +52,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (isLoggedIn) {
         // 로그인 상태인 경우, 데이터 로드 및 알림 리스너 설정
-        await NotificationDataSource.shared
-            .setupNotificationListenersAndState(context);
+        await NotificationDataSource.shared.setupNotificationListenersAndState(
+          context,
+        );
         sharedCalendars = await CalendarDataSource.instance
             .fetchCalendarFinalList("group");
       } else {
@@ -80,6 +81,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     // 데이터 로딩 중에는 로딩 인디케이터만 표시
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+      ),
+    );
   }
 }

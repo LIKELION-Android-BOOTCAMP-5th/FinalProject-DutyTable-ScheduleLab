@@ -1,6 +1,4 @@
-import 'package:dutytable/features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
-import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
-import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
+import 'package:dutytable/core/providers/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +13,7 @@ import 'package:timezone/data/latest_all.dart' as timezone;
 
 import 'core/configs/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'features/notification/presentation/viewmodels/notification_state.dart';
 import 'firebase_options.dart';
 
 // 전역에서 사용할 채널 ID 정의
@@ -118,9 +117,10 @@ Future<void> main() async {
   timezone.initializeTimeZones();
 
   initializeDateFormatting().then(
-        (_) => runApp(
+    (_) => runApp(
       MultiProvider(
         providers: [
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
           ChangeNotifierProvider(create: (context) => NotificationState()),
         ],
         child: const MyApp(),
@@ -136,6 +136,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp.router(
       locale: const Locale("ko", "KR"),
       supportedLocales: const [Locale("ko", "KR")],
@@ -146,7 +148,7 @@ class MyApp extends StatelessWidget {
       ],
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeProvider.themeMode,
       debugShowCheckedModeBanner: false,
       routerConfig: createRouter(context),
       title: "DutyTable",

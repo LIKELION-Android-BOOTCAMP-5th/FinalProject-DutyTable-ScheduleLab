@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'onboarding_data.dart';
@@ -26,15 +27,19 @@ class OnboardingPageItem extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             data.title,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textMain(context),
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           Text(
             data.body,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.grey,
+              color: AppColors.textSub(context),
               height: 1.5,
             ),
             textAlign: TextAlign.center,
