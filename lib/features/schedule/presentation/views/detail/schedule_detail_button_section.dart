@@ -26,7 +26,7 @@ class ScheduleDetailButtonSection extends StatelessWidget {
               _ScheduleActionButton(
                 icon: Icons.edit_note,
                 label: "편집",
-                buttonColor: AppColors.commonGrey,
+                buttonColor: AppColors.textSub(context),
                 onTap: () async {
                   if (viewModel.state != DetailViewState.success ||
                       viewModel.schedule == null) {
@@ -52,7 +52,7 @@ class ScheduleDetailButtonSection extends StatelessWidget {
             _ScheduleActionButton(
               icon: Icons.share,
               label: "공유",
-              buttonColor: AppColors.commonBlue,
+              buttonColor: AppColors.primary(context),
               onTap: () => print("공유"),
             ),
 
@@ -61,7 +61,7 @@ class ScheduleDetailButtonSection extends StatelessWidget {
               _ScheduleActionButton(
                 icon: Icons.delete,
                 label: "삭제",
-                buttonColor: AppColors.commonRed,
+                buttonColor: AppColors.danger(context),
                 onTap: () => _showDeleteDialog(context, viewModel),
               ),
             ],
@@ -132,9 +132,13 @@ Future<void> _showDeleteDialog(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               "일정을 삭제하시겠습니까?",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textMain(context),
+              ),
             ),
             const SizedBox(height: 14),
             Row(
@@ -143,7 +147,8 @@ Future<void> _showDeleteDialog(
                 Expanded(
                   child: _DialogButton(
                     label: "취소",
-                    buttonColor: const Color(0xfff3f4f6),
+                    buttonColor: AppColors.textSub(context),
+                    textColor: AppColors.pureWhite,
                     onTap: () => context.pop(),
                   ),
                 ),
@@ -154,8 +159,8 @@ Future<void> _showDeleteDialog(
                 Expanded(
                   child: _DialogButton(
                     label: "확인",
-                    buttonColor: const Color(0xffef4444),
-                    textColor: Colors.white,
+                    buttonColor: AppColors.danger(context),
+                    textColor: AppColors.pureWhite,
                     onTap: () async {
                       await viewModel.deleteSchedule();
 
@@ -204,7 +209,7 @@ class _DialogButton extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: textColor ?? Colors.black,
+            color: textColor ?? AppColors.textMain(context),
           ),
         ),
       ),

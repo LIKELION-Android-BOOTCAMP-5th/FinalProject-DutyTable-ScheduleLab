@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/extensions.dart';
 import 'package:flutter/material.dart';
 
@@ -33,41 +34,34 @@ class NotificationCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: isRead
-            ? []
-            : [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            offset: const Offset(1.95, 1.95),
-            blurRadius: 2.6,
-          ),
-        ],
       ),
       child: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
-              color: type == "invite"
-                  ? const Color(0xff3c82f6)
-                  : const Color(0xffa855f7),
+              color: AppColors.notificationCardBg(
+                context,
+                type: type,
+                isRead: isRead,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             width: deviceWidth,
             height: 80,
           ),
           Positioned(
-            right: 0,
+            right: 2,
             child: Container(
-              width: deviceWidth * 0.91,
+              width: deviceWidth * 0.9,
               height: 80,
               decoration: BoxDecoration(
-                color: isRead
-                    ? Colors.white
-                    : (type == "invite"
-                    ? const Color(0xffd7e6f8)
-                    : const Color(0xfffaf5ff)),
+                color: AppColors.notificationCardPoint(
+                  context,
+                  type: type,
+                  isRead: isRead,
+                ),
                 borderRadius: BorderRadius.circular(14),
               ),
               padding: const EdgeInsets.all(16.0),
@@ -80,15 +74,16 @@ class NotificationCard extends StatelessWidget {
                         title,
                         textAlign: TextAlign.start,
                         style: TextStyle(
-                            fontWeight:
-                            isRead ? FontWeight.normal : FontWeight.w800),
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textMain(context),
+                        ),
                       ),
                       if (type == "invite")
                         Text(
                           isAccepted == true ? " (수락됨)" : " (대기중)",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12.0,
-                            color: Colors.grey,
+                            color: AppColors.textSub(context),
                           ),
                         ),
                     ],
@@ -97,7 +92,7 @@ class NotificationCard extends StatelessWidget {
                     createdAt.timeAgo(),
                     textAlign: TextAlign.end,
                     style: TextStyle(
-                      color: Colors.grey.shade400,
+                      color: AppColors.textMain(context),
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),

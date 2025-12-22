@@ -22,13 +22,13 @@ class DeleteButtonSection extends StatelessWidget {
                 ? CustomConfirmationDialog.show(
                     context,
                     content: "캘린더를 삭제하시겠습니까?",
-                    confirmColor: AppColors.commonRed,
+                    confirmColor: AppColors.danger(context),
                     onConfirm: () async {
                       CustomConfirmationDialog.show(
                         context,
                         content: "정말 삭제 하시겠습니까?",
-                        contentColor: AppColors.commonRed,
-                        confirmColor: AppColors.commonRed,
+                        contentColor: AppColors.danger(context),
+                        confirmColor: AppColors.danger(context),
                         onConfirm: () async {
                           await viewModel.deleteCalendar();
                           context.go(
@@ -46,7 +46,7 @@ class DeleteButtonSection extends StatelessWidget {
                 : CustomConfirmationDialog.show(
                     context,
                     content: "캘린더를 나가시겠습니까?",
-                    confirmColor: AppColors.commonRed,
+                    confirmColor: AppColors.danger(context),
                     onConfirm: () async {
                       await viewModel.outCalendar();
                       context.go(
@@ -64,14 +64,14 @@ class DeleteButtonSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: BottomAppBar(
               height: 52,
-              color: AppColors.commonRed,
+              color: AppColors.danger(context),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   isAdmin
                       ? const Icon(
                           Icons.delete_outline,
-                          color: AppColors.commonWhite,
+                          color: AppColors.pureWhite,
                         )
                       : SizedBox.shrink(),
                   const SizedBox(width: 4),
@@ -79,7 +79,7 @@ class DeleteButtonSection extends StatelessWidget {
                     isAdmin ? "캘린더 삭제" : "캘린더 나가기",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.commonWhite,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                 ],

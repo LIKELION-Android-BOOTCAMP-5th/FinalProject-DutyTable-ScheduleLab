@@ -25,12 +25,18 @@ class RepeatSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           "일정 반복",
-          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
 
         const SizedBox(height: 10),
@@ -43,16 +49,25 @@ class RepeatSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Checkbox(
-                    activeColor: AppColors.commonBlue,
+                    activeColor: AppColors.primary(context),
+                    checkColor: AppColors.pureWhite,
+                    side: BorderSide(
+                      color: isDark ? AppColors.dBorder : AppColors.lBorder,
+                      width: 2,
+                    ),
                     value: isRepeat,
                     onChanged: (value) => onRepeatToggle(value ?? false),
                   ),
 
                   const SizedBox(width: 10),
 
-                  const Text(
+                  Text(
                     "일정 반복",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textMain(context),
+                    ),
                   ),
                 ],
               ),
@@ -75,6 +90,7 @@ class RepeatSection extends StatelessWidget {
                           textAlign: TextAlign.center,
                           initialValue: repeatNum.toString(),
                           keyboardType: TextInputType.number,
+                          style: TextStyle(color: AppColors.textMain(context)),
                           onChanged: (value) =>
                               onRepeatNum(int.tryParse(value) ?? 1),
                           decoration: _inputDecoration(context),
@@ -87,6 +103,8 @@ class RepeatSection extends StatelessWidget {
                       Expanded(
                         flex: 2,
                         child: DropdownButtonFormField<String>(
+                          dropdownColor: AppColors.surface(context),
+                          style: TextStyle(color: AppColors.textMain(context)),
                           initialValue: repeatOption,
                           onChanged: (value) {
                             if (value != null) onRepeatOption(value);
@@ -125,25 +143,29 @@ class RepeatSection extends StatelessWidget {
 }
 
 InputDecoration _inputDecoration(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+
   return InputDecoration(
     filled: true,
-    fillColor: AppColors.card(context),
+    fillColor: AppColors.surface(context),
     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: AppColors.commonGrey, width: 2),
+      borderSide: BorderSide(
+        color: isDark ? AppColors.dBorder : AppColors.lBorder,
+        width: 2,
+      ),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: AppColors.commonGrey, width: 2),
-    ),
-    disabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: AppColors.commonGrey, width: 2),
+      borderSide: BorderSide(
+        color: isDark ? AppColors.dBorder : AppColors.lBorder,
+        width: 2,
+      ),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: AppColors.commonGrey, width: 2),
+      borderSide: BorderSide(color: AppColors.primary(context), width: 2),
     ),
   );
 }

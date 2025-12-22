@@ -16,7 +16,10 @@ class InviteUserTag extends StatelessWidget {
           .map(
             (e) => Chip(
               backgroundColor: AppColors.background(context),
-              label: Text(e.value),
+              label: Text(
+                e.value,
+                style: TextStyle(color: AppColors.textMain(context)),
+              ),
               onDeleted: () => viewModel.removeInvitedUser(e.key),
             ),
           )

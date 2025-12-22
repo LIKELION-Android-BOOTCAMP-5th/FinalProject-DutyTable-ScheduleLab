@@ -23,13 +23,18 @@ class LocationSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasAddress = address != null && address!.isNotEmpty;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "일정 장소",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textMain(context),
+          ),
         ),
 
         const SizedBox(height: 10),
@@ -41,31 +46,35 @@ class LocationSection extends StatelessWidget {
                 controller: addressController,
                 readOnly: true,
                 maxLines: 1,
+                style: TextStyle(color: AppColors.textMain(context)),
                 decoration: InputDecoration(
                   hintText: "주소를 입력해주세요",
                   hintStyle: TextStyle(
-                    color: AppColors.commonGrey,
+                    color: AppColors.textSub(context),
                     fontWeight: FontWeight.w600,
                   ),
                   suffixIcon: hasAddress
                       ? IconButton(
-                          icon: const Icon(Icons.cancel, color: Colors.grey),
+                          icon: Icon(
+                            Icons.cancel,
+                            color: AppColors.iconSub(context),
+                          ),
                           onPressed: onClear,
                         )
                       : null,
                   filled: true,
-                  fillColor: AppColors.card(context),
+                  fillColor: AppColors.surface(context),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(
-                      color: AppColors.cardBorder(context),
+                      color: isDark ? AppColors.dBorder : AppColors.lBorder,
                       width: 2,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(
-                      color: AppColors.cardBorder(context),
+                      color: AppColors.primary(context),
                       width: 2,
                     ),
                   ),
@@ -84,10 +93,10 @@ class LocationSection extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(14.0),
                 decoration: BoxDecoration(
-                  color: AppColors.commonBlue,
+                  color: AppColors.primary(context),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(Icons.location_pin, color: AppColors.commonWhite),
+                child: Icon(Icons.location_pin, color: AppColors.pureWhite),
               ),
             ),
           ],

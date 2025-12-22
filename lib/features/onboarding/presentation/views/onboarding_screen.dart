@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,7 +51,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Column(
           children: [
@@ -60,9 +61,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 alignment: Alignment.topRight,
                 child: TextButton(
                   onPressed: _goToLogin,
-                  child: const Text(
+                  child: Text(
                     '건너뛰기',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.textSub(context),
+                    ),
                   ),
                 ),
               ),
@@ -90,8 +94,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: ElevatedButton(
                   onPressed: _goToNextPage,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3F76EE),
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.primaryBlue,
+                    foregroundColor: AppColors.textMain(context),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -99,9 +103,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   child: Text(
                     _currentPage == onboardingPages.length - 1 ? '시작하기' : '다음',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                 ),

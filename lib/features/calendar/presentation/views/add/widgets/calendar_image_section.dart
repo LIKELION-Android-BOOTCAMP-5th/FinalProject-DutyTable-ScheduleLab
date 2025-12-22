@@ -9,14 +9,16 @@ class CalendarImageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final viewModel = context.watch<CalendarAddViewModel>();
+
     return Column(
       children: [
         /// 캘린더 이미지 제목
         Text(
           "캘린더 사진",
           style: TextStyle(
-            color: AppColors.text(context),
+            color: AppColors.textMain(context),
             fontSize: 12,
             fontWeight: FontWeight.w800,
           ),
@@ -35,20 +37,20 @@ class CalendarImageSection extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: AppColors.cardBorder(context),
+                color: isDarkMode ? AppColors.dBorder : AppColors.lBorder,
                 width: 2,
               ),
-              color: AppColors.card(context),
+              color: AppColors.surface(context),
             ),
             child: viewModel.imageFile != null
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(22),
                     child: Image.file(viewModel.imageFile!, fit: BoxFit.cover),
                   )
-                : const Center(
+                : Center(
                     child: Icon(
                       Icons.camera_alt_outlined,
-                      color: AppColors.commonGrey,
+                      color: AppColors.textSub(context),
                       size: 36,
                     ),
                   ),
@@ -61,7 +63,7 @@ class CalendarImageSection extends StatelessWidget {
         Text(
           "사진을 입력해주세요",
           style: TextStyle(
-            color: AppColors.commonGreyShade400,
+            color: AppColors.textSub(context),
             fontSize: 10,
             fontWeight: FontWeight.w600,
           ),

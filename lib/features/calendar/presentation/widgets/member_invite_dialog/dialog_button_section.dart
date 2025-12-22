@@ -18,7 +18,7 @@ class DialogButtonSection extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
         decoration: BoxDecoration(
-          color: AppColors.commonBlue,
+          color: AppColors.primaryBlue,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -27,7 +27,7 @@ class DialogButtonSection extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: AppColors.commonWhite,
+            color: AppColors.pureWhite,
           ),
         ),
       ),

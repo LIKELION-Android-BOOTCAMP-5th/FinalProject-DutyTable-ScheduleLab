@@ -74,21 +74,39 @@ class _OptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
-        color: AppColors.card(context),
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.commonGrey),
+        border: Border.all(
+          color: isDark ? AppColors.dBorder : AppColors.lBorder,
+          width: 2,
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Checkbox(
+            activeColor: AppColors.primary(context),
+            checkColor: AppColors.pureWhite,
+            side: BorderSide(
+              color: isDark ? AppColors.textSub(context) : AppColors.lBorder,
+              width: 2,
+            ),
             value: isCheck,
             onChanged: (value) => onChanged(value ?? false),
           ),
-          Text(label),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textSub(context),
+            ),
+          ),
         ],
       ),
     );

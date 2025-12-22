@@ -10,6 +10,8 @@ class RepeatSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleDetailViewModel>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? AppColors.dBorder : AppColors.lBorder;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -26,18 +28,20 @@ class RepeatSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Checkbox(
-                        activeColor: AppColors.commonBlue,
+                        activeColor: AppColors.primary(context),
+                        checkColor: AppColors.pureWhite,
                         value: viewModel.isRepeat,
                         onChanged: (_) => viewModel.isRepeat,
                       ),
 
                       const SizedBox(width: 10),
 
-                      const Text(
+                      Text(
                         "일정 반복",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
+                          color: AppColors.textMain(context),
                         ),
                       ),
                     ],
@@ -61,39 +65,42 @@ class RepeatSection extends StatelessWidget {
                               enabled: viewModel.isRepeat, // 활성/비활성
                               textAlign: TextAlign.center,
                               initialValue: viewModel.repeatNum.toString(),
+                              style: TextStyle(
+                                color: AppColors.textMain(context),
+                              ),
                               keyboardType: TextInputType.number,
                               onChanged: (_) => viewModel.repeatNum,
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: AppColors.card(context),
+                                fillColor: AppColors.surface(context),
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: AppColors.commonGrey,
+                                    color: borderColor,
                                     width: 2,
                                   ),
                                 ),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: AppColors.commonGrey,
+                                    color: borderColor,
                                     width: 2,
                                   ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: AppColors.commonGrey,
+                                    color: borderColor,
                                     width: 2,
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: AppColors.commonGrey,
+                                    color: borderColor,
                                     width: 2,
                                   ),
                                 ),
@@ -107,11 +114,15 @@ class RepeatSection extends StatelessWidget {
                           Expanded(
                             flex: 2,
                             child: DropdownButtonFormField<String>(
+                              dropdownColor: AppColors.surface(context),
                               value: viewModel.repeatOption,
                               onChanged: (_) => viewModel.repeatOption,
+                              style: TextStyle(
+                                color: AppColors.textMain(context),
+                              ),
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: AppColors.card(context),
+                                fillColor: AppColors.surface(context),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 12,
@@ -119,28 +130,28 @@ class RepeatSection extends StatelessWidget {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: AppColors.commonGrey,
+                                    color: borderColor,
                                     width: 2,
                                   ),
                                 ),
                                 disabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: AppColors.commonGrey,
+                                    color: borderColor,
                                     width: 2,
                                   ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: AppColors.commonGrey,
+                                    color: borderColor,
                                     width: 2,
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: BorderSide(
-                                    color: AppColors.commonGrey,
+                                    color: borderColor,
                                     width: 2,
                                   ),
                                 ),
@@ -186,14 +197,16 @@ class RepeatSection extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.only(right: 12.0),
                           decoration: BoxDecoration(
-                            color: AppColors.card(context),
+                            color: AppColors.surface(context),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.commonGrey),
+                            border: Border.all(color: borderColor),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Checkbox(
+                                activeColor: AppColors.primary(context),
+                                checkColor: AppColors.pureWhite,
                                 value: viewModel.weekendException,
                                 onChanged: (_) => viewModel.weekendException,
                               ),
@@ -210,14 +223,16 @@ class RepeatSection extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.only(right: 12.0),
                           decoration: BoxDecoration(
-                            color: AppColors.card(context),
+                            color: AppColors.surface(context),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.commonGrey),
+                            border: Border.all(color: borderColor),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Checkbox(
+                                activeColor: AppColors.primary(context),
+                                checkColor: AppColors.pureWhite,
                                 value: viewModel.holidayException,
                                 onChanged: (_) => viewModel.holidayException,
                               ),

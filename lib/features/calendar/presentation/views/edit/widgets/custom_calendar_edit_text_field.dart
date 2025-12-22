@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomCalendarEditTextField extends StatelessWidget {
@@ -14,6 +15,8 @@ class CustomCalendarEditTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -24,10 +27,27 @@ class CustomCalendarEditTextField extends StatelessWidget {
           maxLines: null, // 높이 제한 없음
           controller: controller,
           keyboardType: TextInputType.multiline,
+          style: TextStyle(color: AppColors.textMain(context)),
           decoration: InputDecoration(
-            border: OutlineInputBorder(
+            filled: true,
+            fillColor: AppColors.surface(context),
+            enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Color(0x61000000)),
+              borderSide: BorderSide(
+                color: isDarkMode ? AppColors.dBorder : AppColors.lBorder,
+                width: 1.5,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(
+                color: AppColors.primaryBlue,
+                width: 2,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
             ),
           ),
         ),

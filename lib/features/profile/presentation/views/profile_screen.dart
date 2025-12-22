@@ -1,3 +1,5 @@
+import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/providers/theme_provider.dart';
 import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
 import 'package:dutytable/features/profile/presentation/viewmodels/profile_viewmodel.dart';
 import 'package:dutytable/features/profile/presentation/widgets/custom_dialog.dart';
@@ -15,7 +17,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => ProfileViewmodel(),
-      child: _ProfileScreen(),
+      child: const _ProfileScreen(),
     );
   }
 }
@@ -25,353 +27,373 @@ class _ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 테마 변경 실시간 감지를 위해 watch 사용
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Consumer<ProfileViewmodel>(
       builder: (context, viewModel, child) {
         return Scaffold(
+          // 배경색 대응
+          backgroundColor: AppColors.background(context),
           appBar: LogoActionsAppBar(
-            leftActions: const Text(
+            leftActions: Text(
               "프로필",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: AppColors.textMain(context),
+              ),
             ),
             rightActions: GestureDetector(
               onTap: () {
-                //로그아웃 다이얼로그
                 showDialog(
                   context: context,
                   builder: (context) => CustomDialog(
                     context,
                     height: 240.0,
-                    iconBackgroundColor: Color(0xFFDBE9FE),
+                    iconBackgroundColor: const Color(0xFFDBE9FE),
                     icon: Icons.logout_outlined,
-                    iconColor: Color(0xFF3C82F6),
+                    iconColor: AppColors.primaryBlue,
                     title: "로그아웃",
                     message: "정말 로그아웃 하시겠습니까?",
                     allow: "로그아웃",
-                    onChangeSelected: () => {
-                      viewModel.logout(),
-                      context.pop(),
-                      context.go('/login'),
+                    onChangeSelected: () {
+                      viewModel.logout();
+                      context.pop();
+                      context.go('/login');
                     },
                     onClosed: () => context.pop(),
                   ),
                 );
               },
-              child: Icon(Icons.logout, color: Color(0xFF545D6A)),
+              child: Icon(Icons.logout, color: AppColors.iconSub(context)),
             ),
           ),
-          body: Container(
-            color: Colors.white,
-            child: SafeArea(
-              child: ListView(
-                children: [
-                  Column(
-                    children: [
-                      const SizedBox(height: 10),
+          body: SafeArea(
+            child: ListView(
+              children: [
+                Column(
+                  children: [
+                    const SizedBox(height: 10),
 
-                      //프로필쪽
-                      Row(
-                        children: [
-                          Padding(padding: EdgeInsets.only(left: 10)),
-                          Stack(
-                            children: [
-                              SizedBox(
-                                width: 60,
-                                height: 60,
-                                child:
-                                    // image가 없거나 비어있을때
-                                    (viewModel.image == null ||
-                                        viewModel.image!.isEmpty)
-                                    ? Icon(Icons.account_circle, size: 60)
-                                    : ClipRRect(
-                                        borderRadius:
-                                            BorderRadiusGeometry.circular(100),
-                                        child: Image.network(
-                                          '${viewModel.image!}',
-                                          width: double.infinity,
-                                          height: 350,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                              ),
-                              // 프로필 수정 버튼 누를 시
-                              (viewModel.is_edit)
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 30.0,
-                                        top: 30,
-                                      ),
-                                      // 카메라 아이콘 추가
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          await viewModel.getImage(
-                                            ImageSource.gallery,
-                                          );
-                                          await viewModel.upload();
-                                        },
-
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 20.0,
-                                            top: 20,
-                                          ),
-                                          child: Icon(
-                                            Icons.camera_alt_outlined,
-                                          ),
-                                        ),
-                                      ),
+                    // 프로필 섹션
+                    Row(
+                      children: [
+                        const Padding(padding: EdgeInsets.only(left: 10)),
+                        Stack(
+                          children: [
+                            SizedBox(
+                              width: 60,
+                              height: 60,
+                              child:
+                                  (viewModel.image == null ||
+                                      viewModel.image!.isEmpty)
+                                  ? Icon(
+                                      Icons.account_circle,
+                                      size: 60,
+                                      color: AppColors.iconSub(context),
                                     )
-                                  : Container(),
-                            ],
-                          ),
-                          Padding(padding: EdgeInsets.only(left: 10)),
-                          (viewModel.is_edit)
-                              ? Expanded(
-                                  // 닉네임 텍스트 필드
-                                  child: TextField(
-                                    controller: viewModel.nicknameController,
-                                    decoration: InputDecoration(
-                                      hintText: "닉네임을 입력해주세요",
-                                      border: OutlineInputBorder(),
-                                      hintStyle: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: Image.network(
+                                        viewModel.image!,
+                                        width: double.infinity,
+                                        height: 350,
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
-                                  ),
-                                )
-                              : Text(
-                                  "${viewModel.nickname}",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
+                            ),
+                            if (viewModel.is_edit)
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    await viewModel.getImage(
+                                      ImageSource.gallery,
+                                    );
+                                    await viewModel.upload();
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: AppColors.primary(context),
+                                    child: const Icon(
+                                      Icons.camera_alt_outlined,
+                                      size: 14,
+                                      color: AppColors.pureWhite,
+                                    ),
                                   ),
                                 ),
-                          (viewModel.is_edit)
-                              // 중복체크 버튼 추가
-                              ? GestureDetector(
-                                  onTap: () {
-                                    viewModel.nicknameOverlapping();
-                                  },
-                                  child: Text("   중복체크  "),
-                                )
-                              : Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              viewModel.nicknameButtonFunc();
-                            },
-                            child: Text(
-                              viewModel.nicknameButtonText(),
+                              ),
+                          ],
+                        ),
+                        const Padding(padding: EdgeInsets.only(left: 10)),
+                        if (viewModel.is_edit)
+                          Expanded(
+                            child: TextField(
+                              controller: viewModel.nicknameController,
                               style: TextStyle(
-                                color: Color(0xFF3C82F6),
-                                fontWeight: FontWeight.bold,
+                                color: AppColors.textMain(context),
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "닉네임을 입력해주세요",
+                                hintStyle: TextStyle(
+                                  color: AppColors.textSub(context),
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppColors.lBorder,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-
-                          Padding(padding: EdgeInsets.only(right: 10)),
-                        ],
-                      ),
-                      Padding(padding: EdgeInsets.all(10)),
-
-                      //내 계정
-                      Row(
-                        children: [
-                          Padding(padding: EdgeInsets.only(left: 20)),
-                          Expanded(
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Color(0xFFF9FAFB),
-                                  ),
-                                  child: SizedBox(height: 50),
-                                ),
-                                Column(
-                                  children: [
-                                    Padding(padding: EdgeInsets.all(7)),
-                                    Text(
-                                      "   내 계정 : ${viewModel.email}",
-
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                          )
+                        else
+                          Text(
+                            viewModel.nickname,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textMain(context),
                             ),
                           ),
-                          Padding(padding: EdgeInsets.only(left: 20)),
-                        ],
-                      ),
-                      //구글 캘린더 동기화
-                      Padding(padding: EdgeInsets.all(7)),
-                      CustomTab(
-                        icon: Icons.settings_outlined,
-                        buttonText: "  구글 캘린더 동기화",
-                        padding: 7.0,
-                        addWidget: GestureDetector(
-                          onTap: () {
-                            viewModel.googleSync();
-                            viewModel.updateGoogleSync(viewModel.user!.id);
-                          },
+                        if (viewModel.is_edit)
+                          TextButton(
+                            onPressed: () => viewModel.nicknameOverlapping(),
+                            child: const Text("중복체크"),
+                          )
+                        else
+                          const Spacer(),
+                        GestureDetector(
+                          onTap: () => viewModel.nicknameButtonFunc(),
                           child: Text(
-                            (viewModel.is_sync) ? "연결해제    " : "   연결    ",
-                            style: TextStyle(
-                              color: Color(0xFF3C82F6),
-                              fontSize: 12,
+                            viewModel.nicknameButtonText(),
+                            style: const TextStyle(
+                              color: AppColors.primaryBlue,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
+                        const Padding(padding: EdgeInsets.only(right: 10)),
+                      ],
+                    ),
+                    const Padding(padding: EdgeInsets.all(10)),
+
+                    // 내 계정 섹션
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.surface(context), // 배경색 대응
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Text(
+                          "   내 계정 : ${viewModel.email}",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSub(context),
+                          ),
+                        ),
                       ),
-                      Padding(padding: EdgeInsets.all(5)),
-                      //테마
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                    ),
+
+                    const Padding(padding: EdgeInsets.all(7)),
+
+                    // 구글 캘린더 동기화
+                    CustomTab(
+                      icon: Icons.settings_outlined,
+                      buttonText: "  구글 캘린더 동기화",
+                      padding: 7.0,
+                      addWidget: GestureDetector(
+                        onTap: () {
+                          viewModel.googleSync();
+                          viewModel.updateGoogleSync(viewModel.user!.id);
+                        },
+                        child: Text(
+                          (viewModel.is_sync) ? "연결해제    " : "   연결    ",
+                          style: const TextStyle(
+                            color: AppColors.primaryBlue,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Padding(padding: EdgeInsets.all(5)),
+
+                    // 테마 설정 (ExpansionTile) - 리플 효과 삭제
+                    Theme(
+                      data: Theme.of(
+                        context,
+                      ).copyWith(splashFactory: NoSplash.splashFactory),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
                         child: ExpansionTile(
+                          iconColor: AppColors.textMain(context),
+                          collapsedIconColor: AppColors.iconSub(context),
                           title: Row(
                             children: [
-                              Icon(Icons.nightlight_outlined),
+                              Icon(
+                                Icons.nightlight_outlined,
+                                color: AppColors.textMain(context),
+                              ),
                               Text(
                                 "  테마",
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
+                                  color: AppColors.textMain(context),
                                 ),
                               ),
                             ],
                           ),
+                          collapsedShape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color: isDarkMode
+                                  ? AppColors.dBorder
+                                  : AppColors.lBorder,
+                            ),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
                           shape: RoundedRectangleBorder(
                             side: BorderSide(
-                              color: Color(0xFFE5E7EB),
+                              color: AppColors.primary(context),
                               width: 2.0,
                             ),
                             borderRadius: BorderRadius.circular(10.0),
                           ),
-                          collapsedShape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              color: Color(0xFFE5E7EB),
-                              width: 1.0,
-                            ),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          children: viewModel.themeList.map((option) {
+                          children: themeProvider.themeList.map((option) {
                             return RadioListTile<String>(
                               title: Text(
                                 option,
-                                style: TextStyle(fontSize: 12),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textMain(context),
+                                ),
                               ),
                               value: option,
-                              groupValue: viewModel.selectedOption,
-                              onChanged: (String? value) {
-                                viewModel.updateThmem(value);
-                                viewModel.saveTheme();
+                              groupValue: themeProvider.selectedOption,
+                              activeColor: AppColors.primaryBlue,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  themeProvider.updateTheme(value);
+                                }
                               },
                             );
                           }).toList(),
                         ),
                       ),
+                    ),
 
-                      Padding(padding: EdgeInsets.all(5)),
-                      //알림
-                      CustomTab(
-                        icon: Icons.notifications_active_outlined,
-                        buttonText: "  알림",
-                        padding: 0.0,
-                        addWidget: Transform.scale(
-                          scale: 0.7,
-                          child: Switch(
-                            value: viewModel.is_active_notification,
-                            onChanged: (value) {
-                              viewModel.activeNotification();
-                              viewModel.updateNotification(viewModel.user!.id);
-                            },
-                            activeThumbColor: Colors.white,
-                            activeTrackColor: Color(0xFF3C82F6),
+                    const Padding(padding: EdgeInsets.all(5)),
+
+                    // 알림 설정
+                    CustomTab(
+                      icon: Icons.notifications_active_outlined,
+                      buttonText: "  알림",
+                      padding: 0.0,
+                      addWidget: Transform.scale(
+                        scale: 0.7,
+                        child: Switch(
+                          value: viewModel.is_active_notification,
+                          onChanged: (value) {
+                            viewModel.activeNotification();
+                            viewModel.updateNotification(viewModel.user!.id);
+                          },
+                          activeThumbColor: AppColors.pureWhite,
+                          activeTrackColor: AppColors.primaryBlue,
+                        ),
+                      ),
+                    ),
+                    const Padding(padding: EdgeInsets.all(5)),
+
+                    // 앱 소개 다시보기
+                    GestureDetector(
+                      onTap: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.setBool("isOnboardingDone", false);
+                        viewModel.logout();
+                        if (context.mounted) context.push("/login");
+                      },
+                      child: CustomTab(
+                        icon: Icons.lightbulb_outline_rounded,
+                        buttonText: "  앱 소개 다시보기",
+                        padding: 7.0,
+                        addWidget: Padding(
+                          padding: const EdgeInsets.only(right: 15.0),
+                          child: Icon(
+                            Icons.keyboard_arrow_right,
+                            size: 20,
+                            color: AppColors.textSub(context),
                           ),
                         ),
                       ),
-                      Padding(padding: EdgeInsets.all(5)),
-                      //온보딩 다시보기
-                      GestureDetector(
-                        onTap: () async {
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setBool("isOnboardingDone", false);
-                          viewModel.logout();
-                          context.push("/login");
-                        },
-                        child: CustomTab(
-                          icon: Icons.lightbulb_outline_rounded,
-                          buttonText: "  앱 소개 다시보기",
-                          padding: 7.0,
-                          addWidget: Padding(
-                            padding: const EdgeInsets.only(right: 15.0),
-                            child: Icon(
-                              Icons.keyboard_arrow_right,
-                              size: 20,
-                              color: Color(0xFF9CA3AF),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(padding: EdgeInsets.all(5)),
+                    ),
+                    const Padding(padding: EdgeInsets.all(5)),
 
-                      //회원탈퇴
-                      GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => CustomDialog(
-                              context,
-                              height: 280.0,
-                              iconBackgroundColor: Color(0xFFFBE7F3),
-                              icon: Icons.warning,
-                              iconColor: Color(0xFFFFC943),
-                              title: "회원탈퇴",
-                              message: "정말 회원탈퇴 하시겠습니까?",
-                              allow: "회원탈퇴",
-                              announcement: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.yellow),
-                                  color: Color(0xFFFEFCE8),
+                    // 회원탈퇴
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => CustomDialog(
+                            context,
+                            height: 280.0,
+                            iconBackgroundColor: isDarkMode
+                                ? const Color(0xFF451225)
+                                : const Color(0xFFFBE7F3),
+                            icon: Icons.warning,
+                            iconColor: AppColors.danger(context),
+                            title: "회원탈퇴",
+                            message: "정말 회원탈퇴 하시겠습니까?",
+                            allow: "회원탈퇴",
+                            announcement: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: AppColors.warningBannerBorder(context),
                                 ),
-                                child: SizedBox(
-                                  width: 250,
-                                  height: 50,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Text(
-                                      "탈퇴 시 모든 데이터가 삭제되며 \n복구할 수 없습니다",
-                                      style: TextStyle(fontSize: 10),
-                                      textAlign: TextAlign.center,
+                                color: AppColors.warningBanner(context),
+                              ),
+                              child: SizedBox(
+                                width: 250,
+                                height: 50,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Text(
+                                    "탈퇴 시 모든 데이터가 삭제되며 \n복구할 수 없습니다",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppColors.textMain(context),
                                     ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
-                              onChangeSelected: () => {
-                                viewModel.deleteUser(),
-                                context.pop(),
-                                context.go('/login'),
-                              },
-                              onClosed: () => context.pop(),
                             ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "회원탈퇴",
-                            style: TextStyle(color: Colors.red),
+                            onChangeSelected: () {
+                              viewModel.deleteUser();
+                              context.pop();
+                              context.go('/login');
+                            },
+                            onClosed: () => context.pop(),
                           ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "회원탈퇴",
+                          style: TextStyle(color: AppColors.danger(context)),
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         );

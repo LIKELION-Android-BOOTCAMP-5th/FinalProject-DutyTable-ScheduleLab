@@ -29,6 +29,7 @@ class _SignupScreenUI extends StatelessWidget {
   // 프로필 이미지 선택 위젯을 빌드하는 함수
   Widget _buildImagePicker(BuildContext context, SignupViewModel viewModel) {
     ImageProvider? imageProvider;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // 회원가입 화면에서는 기존 이미지 URL이 없으므로 FileImage만 처리
     if (viewModel.selectedImage != null) {
@@ -45,7 +46,7 @@ class _SignupScreenUI extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.boxShadow(context),
+                color: isDark ? AppColors.dBorder : AppColors.lBorder,
                 blurRadius: 15,
                 spreadRadius: 2,
                 offset: const Offset(0, 5),
@@ -54,10 +55,10 @@ class _SignupScreenUI extends StatelessWidget {
           ),
           child: CircleAvatar(
             radius: 50,
-            backgroundColor: AppColors.card(context),
+            backgroundColor: AppColors.surface(context),
             backgroundImage: imageProvider,
             child: imageProvider == null
-                ? Icon(Icons.photo, size: 40, color: AppColors.subText(context))
+                ? Icon(Icons.photo, size: 40, color: AppColors.iconSub(context))
                 : null,
           ),
         ),
@@ -69,13 +70,20 @@ class _SignupScreenUI extends StatelessWidget {
             height: 36,
             width: 36,
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: AppColors.background(context),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.black12, width: 2),
+              border: Border.all(
+                color: isDark ? AppColors.dBorder : AppColors.lBorder,
+                width: 2,
+              ),
             ),
             child: IconButton(
               padding: EdgeInsets.zero,
-              icon: Icon(Icons.camera_alt, color: Colors.black45, size: 20),
+              icon: Icon(
+                Icons.camera_alt,
+                color: AppColors.iconSub(context),
+                size: 20,
+              ),
               onPressed: () => viewModel.pickImage(),
             ),
           ),
@@ -87,20 +95,7 @@ class _SignupScreenUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 테마 및 색상 설정
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final Color scaffoldBgColor = isDarkMode
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
-    final Color cardBgColor = isDarkMode
-        ? AppColors.cardBackgroundDark
-        : AppColors.cardBackgroundLight;
-    final Color inputFieldColor = isDarkMode
-        ? Color.lerp(cardBgColor, Colors.white, 0.07)!
-        : Color.lerp(cardBgColor, Colors.black, 0.05)!;
-    final Color textColor = isDarkMode
-        ? AppColors.textDark
-        : AppColors.textLight;
-    final Color subTextColor = isDarkMode ? Colors.white70 : Colors.grey;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // 화면의 다른 곳을 탭하면 키보드를 숨기기 위한 GestureDetector
     return GestureDetector(
@@ -113,12 +108,15 @@ class _SignupScreenUI extends StatelessWidget {
               viewmodel.isFormComplete && !viewmodel.isLoading;
 
           return Scaffold(
-            backgroundColor: scaffoldBgColor,
+            backgroundColor: AppColors.background(context),
             appBar: AppBar(
-              backgroundColor: scaffoldBgColor,
+              backgroundColor: Colors.transparent,
               elevation: 0,
               leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: textColor),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: AppColors.textMain(context),
+                ),
                 // 뒤로가기 버튼 클릭 시 로그인 화면으로 이동
                 onPressed: () => context.go('/login'),
               ),
@@ -141,7 +139,7 @@ class _SignupScreenUI extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: textColor,
+                      color: AppColors.textMain(context),
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -150,13 +148,11 @@ class _SignupScreenUI extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: cardBgColor,
+                      color: AppColors.surface(context),
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: isDarkMode
-                              ? Colors.black.withOpacity(0.5)
-                              : AppColors.cardShadowLight.withOpacity(0.4),
+                          color: isDark ? AppColors.dBorder : AppColors.lBorder,
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -172,11 +168,13 @@ class _SignupScreenUI extends StatelessWidget {
                             Expanded(
                               child: TextField(
                                 controller: viewmodel.nicknameController,
-                                style: TextStyle(color: textColor),
+                                style: TextStyle(
+                                  color: AppColors.textMain(context),
+                                ),
                                 decoration: InputDecoration(
                                   hintText: '닉네임을 입력하세요',
                                   hintStyle: TextStyle(
-                                    color: textColor.withOpacity(0.6),
+                                    color: AppColors.textSub(context),
                                   ),
                                   isDense: true,
                                   contentPadding: const EdgeInsets.symmetric(
@@ -184,7 +182,7 @@ class _SignupScreenUI extends StatelessWidget {
                                     horizontal: 15,
                                   ),
                                   filled: true,
-                                  fillColor: inputFieldColor,
+                                  fillColor: AppColors.background(context),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                     borderSide: BorderSide.none,
@@ -209,18 +207,18 @@ class _SignupScreenUI extends StatelessWidget {
                                     color:
                                         viewmodel.isNicknameValid &&
                                             !viewmodel.isLoading
-                                        ? AppColors.actionPositiveLight
-                                        : Colors.grey,
+                                        ? AppColors.primaryBlue
+                                        : AppColors.iconSub(context),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child:
                                       viewmodel.isLoading &&
                                           !viewmodel.isNicknameChecked
-                                      ? const SizedBox(
+                                      ? SizedBox(
                                           width: 14,
                                           height: 14,
                                           child: CircularProgressIndicator(
-                                            color: Colors.white,
+                                            color: AppColors.primary(context),
                                             strokeWidth: 2,
                                           ),
                                         )
@@ -228,7 +226,7 @@ class _SignupScreenUI extends StatelessWidget {
                                           '중복 체크',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.white,
+                                            color: AppColors.pureWhite,
                                           ),
                                         ),
                                 ),
@@ -245,8 +243,8 @@ class _SignupScreenUI extends StatelessWidget {
                               viewmodel.nicknameMessage!,
                               style: TextStyle(
                                 color: viewmodel.isNicknameMessageError
-                                    ? Colors.red
-                                    : Colors.green,
+                                    ? AppColors.pureDanger
+                                    : AppColors.pureSuccess,
                                 fontSize: 12,
                               ),
                             ),
@@ -263,15 +261,18 @@ class _SignupScreenUI extends StatelessWidget {
                                       !viewmodel.hasViewedTerms
                                   ? null // 로딩 중이거나 약관을 안 봤으면 비활성화
                                   : viewmodel.toggleTermsAgreement,
-                              activeColor: AppColors.actionPositiveLight,
-                              checkColor: Colors.white,
+                              activeColor: AppColors.primaryBlue,
+                              side: BorderSide(
+                                color: AppColors.iconSub(context),
+                              ),
+                              checkColor: AppColors.pureWhite,
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 '약관동의',
                                 style: TextStyle(
-                                  color: subTextColor,
+                                  color: AppColors.textMain(context),
                                   fontSize: 14,
                                 ),
                               ),
@@ -298,7 +299,7 @@ class _SignupScreenUI extends StatelessWidget {
                                 '전체보기',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.blue,
+                                  color: AppColors.primaryBlue,
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
@@ -323,16 +324,16 @@ class _SignupScreenUI extends StatelessWidget {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: isButtonEnabled
-                                ? AppColors.actionPositiveLight
-                                : Colors.grey,
+                                ? AppColors.primaryBlue
+                                : AppColors.textSub(context),
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: viewmodel.isLoading
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: AppColors.primary(context),
                                     strokeWidth: 2,
                                   ),
                                 )
@@ -340,7 +341,7 @@ class _SignupScreenUI extends StatelessWidget {
                                   '완료',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white,
+                                    color: AppColors.pureWhite,
                                   ),
                                 ),
                         ),

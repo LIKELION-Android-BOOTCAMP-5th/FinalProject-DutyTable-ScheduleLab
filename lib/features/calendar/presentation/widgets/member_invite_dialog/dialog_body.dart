@@ -28,16 +28,17 @@ class DialogBody extends StatelessWidget {
             await viewModel.addInvitedUserByNickname(_controller.text);
             if (viewModel.inviteError == null) {
               _controller.clear();
+              FocusScope.of(context).unfocus();
             }
           },
           child: Container(
             height: 54,
             width: 54,
             decoration: BoxDecoration(
-              color: AppColors.commonBlue,
+              color: AppColors.primaryBlue,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.add, color: AppColors.commonWhite),
+            child: Icon(Icons.add, color: AppColors.iconSub(context)),
           ),
         ),
       ],

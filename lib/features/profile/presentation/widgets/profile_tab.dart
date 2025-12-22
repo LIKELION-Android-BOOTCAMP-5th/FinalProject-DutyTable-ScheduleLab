@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 // ///프로필스크린에 있는 각 설정 항목
@@ -24,6 +25,8 @@ class CustomTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Row(
       children: [
         Padding(padding: EdgeInsets.only(left: 20)),
@@ -35,7 +38,9 @@ class CustomTab extends StatelessWidget {
                 height: 50,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Color(0xFFE5E7EB)),
+                  border: Border.all(
+                    color: isDarkMode ? AppColors.dBorder : AppColors.lBorder,
+                  ),
                 ),
                 child: SizedBox(height: 50),
               ),
@@ -45,12 +50,13 @@ class CustomTab extends StatelessWidget {
                   Row(
                     children: [
                       Padding(padding: EdgeInsets.all(7)),
-                      Icon(icon, size: 25),
+                      Icon(icon, size: 25, color: AppColors.textMain(context)),
                       Text(
                         buttonText,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.textMain(context),
                         ),
                       ),
                       Spacer(),

@@ -24,6 +24,7 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     final currentIndex = _calculateIndex(context);
     final location = GoRouterState.of(context).uri.toString();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return PopScope(
       canPop: false, // 시스템 뒤로가기 기본 동작을 막음
@@ -48,7 +49,7 @@ class _AppShellState extends State<AppShell> {
             SnackBar(
               content: const Text(
                 '한 번 더 누르면 종료됩니다.',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.pureWhite),
               ),
               duration: const Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
@@ -73,7 +74,10 @@ class _AppShellState extends State<AppShell> {
           bottomNavigationBar: Container(
             decoration: BoxDecoration(
               border: Border(
-                top: BorderSide(color: AppColors.commonGrey, width: 1),
+                top: BorderSide(
+                  color: isDark ? AppColors.dBorder : AppColors.lBorder,
+                  width: 1,
+                ),
               ),
             ),
             child: BottomNavigationBar(
@@ -97,7 +101,7 @@ class _AppShellState extends State<AppShell> {
                     break;
                 }
               },
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              backgroundColor: AppColors.background(context),
               type: BottomNavigationBarType.fixed,
               showSelectedLabels: true,
               showUnselectedLabels: true,
@@ -105,54 +109,60 @@ class _AppShellState extends State<AppShell> {
               unselectedLabelStyle: const TextStyle(
                 fontWeight: FontWeight.w600,
               ),
-              selectedItemColor: AppColors.commonBlue,
-              unselectedItemColor: AppColors.commonGrey,
+              selectedItemColor: AppColors.primary(context),
+              unselectedItemColor: AppColors.textSub(context),
               items: [
                 BottomNavigationBarItem(
                   icon: _buildSharedCalendarIcon(
+                    context,
                     active: false,
-                    icon: _buildSharedCalendarInnerIcon(active: false),
+                    icon: _buildSharedCalendarInnerIcon(context, active: false),
                   ),
                   activeIcon: _buildSharedCalendarIcon(
+                    context,
                     active: true,
-                    icon: _buildSharedCalendarInnerIcon(active: true),
+                    icon: _buildSharedCalendarInnerIcon(context, active: true),
                   ),
                   label: "공유 캘린더",
                 ),
                 BottomNavigationBarItem(
                   icon: _buildSharedCalendarIcon(
+                    context,
                     active: false,
                     icon: const Icon(
                       Icons.calendar_month,
                       size: 22,
-                      color: AppColors.commonWhite,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                   activeIcon: _buildSharedCalendarIcon(
+                    context,
                     active: true,
                     icon: const Icon(
                       Icons.calendar_month,
                       size: 22,
-                      color: AppColors.commonWhite,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                   label: "내 캘린더",
                 ),
                 BottomNavigationBarItem(
                   icon: _buildSharedCalendarIcon(
+                    context,
                     active: false,
                     icon: const Icon(
                       Icons.person_outline,
                       size: 22,
-                      color: AppColors.commonWhite,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                   activeIcon: _buildSharedCalendarIcon(
+                    context,
                     active: true,
                     icon: const Icon(
                       Icons.person,
                       size: 22,
-                      color: AppColors.commonWhite,
+                      color: AppColors.pureWhite,
                     ),
                   ),
                   label: "프로필",
@@ -175,10 +185,13 @@ class _AppShellState extends State<AppShell> {
 }
 
 // 아이콘 빌더 함수들 (기존과 동일)
-Widget _buildSharedCalendarInnerIcon({required bool active}) {
+Widget _buildSharedCalendarInnerIcon(
+  BuildContext context, {
+  required bool active,
+}) {
   final Color bgColor = active
-      ? AppColors.commonBlue
-      : AppColors.commonGreyShade400;
+      ? AppColors.primary(context)
+      : AppColors.textSub(context);
   return Container(
     width: 48,
     height: 48,
@@ -189,11 +202,7 @@ Widget _buildSharedCalendarInnerIcon({required bool active}) {
     child: Stack(
       alignment: Alignment.center,
       children: [
-        const Icon(
-          Icons.calendar_month,
-          size: 22,
-          color: AppColors.commonWhite,
-        ),
+        const Icon(Icons.calendar_month, size: 22, color: AppColors.pureWhite),
         Positioned(
           right: 0,
           bottom: 0,
@@ -201,7 +210,7 @@ Widget _buildSharedCalendarInnerIcon({required bool active}) {
             width: 16,
             height: 16,
             decoration: const BoxDecoration(
-              color: AppColors.commonWhite,
+              color: AppColors.pureWhite,
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.group, size: 10, color: bgColor),
@@ -212,10 +221,14 @@ Widget _buildSharedCalendarInnerIcon({required bool active}) {
   );
 }
 
-Widget _buildSharedCalendarIcon({required bool active, required Widget icon}) {
+Widget _buildSharedCalendarIcon(
+  BuildContext context, {
+  required bool active,
+  required Widget icon,
+}) {
   final Color bgColor = active
-      ? AppColors.commonBlue
-      : AppColors.commonGreyShade400;
+      ? AppColors.primary(context)
+      : AppColors.textSub(context);
   return Padding(
     padding: const EdgeInsets.all(4.0),
     child: Container(

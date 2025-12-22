@@ -33,11 +33,12 @@ class MemberInviteDialog extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
+              backgroundColor: AppColors.surface(context),
               child: Container(
                 width: size.width * 0.85,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.background(context),
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Column(

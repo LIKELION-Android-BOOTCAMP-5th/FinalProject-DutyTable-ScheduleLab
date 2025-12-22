@@ -36,19 +36,12 @@ class ProfileViewmodel extends ChangeNotifier {
   /// 알림 활성화
   bool is_active_notification = true;
 
-  /// 테마 드롭다운 리스트
-  List<String> themeList = ["라이트모드", "다크모드", "시스템모드"];
-
-  /// 사용자가 테마 선택
-  String selectedOption = "라이트모드";
-
   /// 닉네임 중복 여부
   bool is_overlapping = true;
 
   // 시작할때 닉네임,이메일,프로필 이미지 호출
   void _init() {
     fetchUser();
-    loadTheme(); // 로컬저장한 테마 불러오기
     nicknameCancel();
   }
 
@@ -74,17 +67,6 @@ class ProfileViewmodel extends ChangeNotifier {
   //알림 토글
   void activeNotification() {
     is_active_notification = !is_active_notification;
-    notifyListeners();
-  }
-
-  // 사용자가 테마 선택하면 업데이트
-  Future<dynamic> updateThmem(value) async {
-    selectedOption = value;
-    // if (selectedOption == "라이트모드") {
-    //   AppTheme.lightTheme;
-    // } else {
-    //   AppTheme.darkTheme;
-    // }
     notifyListeners();
   }
 
@@ -221,18 +203,6 @@ class ProfileViewmodel extends ChangeNotifier {
     final googleSignIn = GoogleSignIn.instance;
     await googleSignIn.disconnect();
     await googleSignIn.signOut();
-  }
-
-  //테마 로컬 저장하기
-  Future<void> saveTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(user!.id, selectedOption);
-  }
-
-  //테마 로컬 가져오기
-  Future<void> loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    selectedOption = prefs.getString(user!.id) ?? "라이트모드";
   }
 
   // 회원탈퇴

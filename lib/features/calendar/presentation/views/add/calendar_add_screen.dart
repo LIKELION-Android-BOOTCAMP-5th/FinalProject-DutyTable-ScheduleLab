@@ -30,11 +30,12 @@ class _CalendarAddScreen extends StatelessWidget {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        backgroundColor: AppColors.background(context),
         appBar: BackActionsAppBar(
           title: Text(
             "새 캘린더",
             style: TextStyle(
-              color: AppColors.text(context),
+              color: AppColors.textMain(context),
               fontSize: 20,
               fontWeight: FontWeight.w800,
             ),

@@ -28,11 +28,17 @@ class CalendarSettingBody extends StatelessWidget {
             CustomCalendarImageBox(imageUrl: viewModel.calendar.imageURL),
             const SizedBox(height: 40),
             CustomCalendarSettingContentBox(
-              title: const Text(
+              title: Text(
                 "캘린더 이름",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textMain(context),
+                ),
               ),
-              child: Text(viewModel.calendar.title),
+              child: Text(
+                viewModel.calendar.title,
+                style: TextStyle(color: AppColors.textMain(context)),
+              ),
             ),
 
             const SizedBox(height: 40),
@@ -42,11 +48,17 @@ class CalendarSettingBody extends StatelessWidget {
             const SizedBox(height: 40),
 
             CustomCalendarSettingContentBox(
-              title: const Text(
+              title: Text(
                 "캘린더 설명",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textMain(context),
+                ),
               ),
-              child: Text(viewModel.calendar.description ?? ""),
+              child: Text(
+                viewModel.calendar.description ?? "",
+                style: TextStyle(color: AppColors.textMain(context)),
+              ),
             ),
           ],
         ),
@@ -68,7 +80,13 @@ class _CalendarMemberList extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("캘린더 멤버", style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              "캘린더 멤버",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textMain(context),
+              ),
+            ),
             const SizedBox(height: 8),
 
             ListView.separated(
@@ -121,7 +139,10 @@ class _OwnerMemberTile extends StatelessWidget {
                 imageUrl: profileUrl,
               ),
               const SizedBox(width: 4),
-              Text(nickname),
+              Text(
+                nickname,
+                style: TextStyle(color: AppColors.textMain(context)),
+              ),
             ],
           ),
           const Text("👑", style: TextStyle(fontSize: 24)),
@@ -155,7 +176,10 @@ class _SharedMemberTile extends StatelessWidget {
                 imageUrl: member.profileUrl,
               ),
               const SizedBox(width: 4),
-              Text(member.nickname),
+              Text(
+                member.nickname,
+                style: TextStyle(color: AppColors.textMain(context)),
+              ),
             ],
           ),
           calendarType == "personal"
@@ -186,7 +210,7 @@ class _KickButton extends StatelessWidget {
         CustomConfirmationDialog.show(
           context,
           content: "추방하시겠습니까?",
-          confirmColor: AppColors.commonRed,
+          confirmColor: AppColors.danger(context),
           onConfirm: () async {
             await viewModel.exileMember(userId);
             viewModel.fetchCalendar();
@@ -196,26 +220,11 @@ class _KickButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.commonRed),
+          border: Border.all(color: AppColors.danger(context)),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Text("추방", style: TextStyle(color: AppColors.commonRed)),
+        child: Text("추방", style: TextStyle(color: AppColors.danger(context))),
       ),
     );
   }
 }
-
-// Widget calendarImage(String? url) {
-//   if (url == null || url.isEmpty) {
-//     return Image.asset("assets/images/calendar_logo.png", fit: BoxFit.cover);
-//   }
-//   if (url.startsWith("http")) {
-//     return Image.network(
-//       url,
-//       fit: BoxFit.cover,
-//       errorBuilder: (_, __, ___) =>
-//           Image.asset("assets/images/calendar_logo.png"),
-//     );
-//   }
-//   return Image.asset(url, fit: BoxFit.cover);
-// }

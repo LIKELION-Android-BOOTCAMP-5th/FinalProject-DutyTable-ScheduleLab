@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingIndicator extends StatelessWidget {
@@ -23,8 +24,8 @@ class OnboardingIndicator extends StatelessWidget {
           height: 8,
           decoration: BoxDecoration(
             color: currentIndex == index
-                ? const Color(0xFF3F76EE)
-                : Colors.grey,
+                ? AppColors.primaryBlue
+                : AppColors.textSub(context),
             borderRadius: BorderRadius.circular(20),
           ),
         ),

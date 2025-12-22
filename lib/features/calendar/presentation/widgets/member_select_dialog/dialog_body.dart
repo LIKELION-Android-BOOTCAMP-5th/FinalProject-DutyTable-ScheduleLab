@@ -33,10 +33,10 @@ class DialogBody extends StatelessWidget {
             height: 54,
             width: 54,
             decoration: BoxDecoration(
-              color: AppColors.commonBlue,
+              color: AppColors.pureWhite,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.add, color: AppColors.commonWhite),
+            child: Icon(Icons.add, color: AppColors.iconSub(context)),
           ),
         ),
       ],

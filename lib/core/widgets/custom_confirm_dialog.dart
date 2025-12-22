@@ -7,7 +7,7 @@ class CustomConfirmationDialog extends StatelessWidget {
   /// 내용
   final String content;
 
-  final Color contentColor;
+  final Color? contentColor;
 
   /// 확인 버튼 색상
   final Color confirmColor;
@@ -21,7 +21,7 @@ class CustomConfirmationDialog extends StatelessWidget {
   const CustomConfirmationDialog({
     super.key,
     required this.content,
-    required this.contentColor,
+    this.contentColor,
     required this.confirmColor,
     required this.onConfirm,
     this.onCancel,
@@ -33,7 +33,7 @@ class CustomConfirmationDialog extends StatelessWidget {
       backgroundColor: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.pureWhite,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
@@ -46,7 +46,7 @@ class CustomConfirmationDialog extends StatelessWidget {
                 content,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: contentColor,
+                  color: contentColor ?? AppColors.textMain(context),
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
@@ -65,15 +65,18 @@ class CustomConfirmationDialog extends StatelessWidget {
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          border: Border.all(
+                            color: AppColors.textSub(context),
+                            width: 1,
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
                             "취소",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: AppColors.textSub(context),
                             ),
                           ),
                         ),
@@ -102,7 +105,7 @@ class CustomConfirmationDialog extends StatelessWidget {
                             "확인",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.pureWhite,
                             ),
                           ),
                         ),
@@ -121,7 +124,7 @@ class CustomConfirmationDialog extends StatelessWidget {
   static Future<void> show(
     BuildContext context, {
     required String content,
-    Color contentColor = AppColors.commonBlack54,
+    Color? contentColor,
     required Color confirmColor,
     required VoidCallback onConfirm,
     VoidCallback? onCancel,

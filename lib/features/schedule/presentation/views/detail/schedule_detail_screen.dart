@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
@@ -35,15 +36,34 @@ class _ScheduleDetailScreen extends StatelessWidget {
     final viewModel = context.watch<ScheduleDetailViewModel>();
 
     if (viewModel.state == DetailViewState.loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        backgroundColor: AppColors.background(context),
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary(context)),
+        ),
+      );
     }
 
     if (viewModel.state == DetailViewState.error || !viewModel.hasData) {
-      return const Scaffold(body: Center(child: Text('일정을 불러오지 못했습니다')));
+      return Scaffold(
+        backgroundColor: AppColors.background(context),
+        body: Center(
+          child: Text(
+            '일정을 불러오지 못했습니다',
+            style: TextStyle(color: AppColors.textMain(context)),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
-      appBar: BackActionsAppBar(title: Text(viewModel.title)),
+      backgroundColor: AppColors.background(context),
+      appBar: BackActionsAppBar(
+        title: Text(
+          viewModel.title,
+          style: TextStyle(color: AppColors.textMain(context)),
+        ),
+      ),
       body: const ScheduleDetailBody(),
       bottomNavigationBar: const ScheduleDetailButtonSection(),
     );

@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 /// 다이얼로그
@@ -54,7 +55,7 @@ class CustomDialog extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
+              color: AppColors.pureWhite,
             ),
             width: 300,
             height: height,
@@ -124,7 +125,10 @@ class CustomDialog extends StatelessWidget {
                           padding: const EdgeInsets.all(13.0),
                           child: Text(
                             allow,
-                            style: TextStyle(color: Colors.white, fontSize: 12),
+                            style: TextStyle(
+                              color: AppColors.pureWhite,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ),

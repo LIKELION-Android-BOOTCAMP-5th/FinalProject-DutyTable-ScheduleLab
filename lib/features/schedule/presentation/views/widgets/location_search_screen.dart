@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/schedule/data/models/location_search_result_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/location_search_view_model.dart';
 import 'package:dutytable/main.dart';
@@ -53,9 +54,11 @@ class _LocationSearchDialog extends StatelessWidget {
           ),
 
           if (viewModel.isLoading)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: AppColors.primary(context),
+              ),
             ),
 
           if (!viewModel.isLoading && viewModel.results.isNotEmpty)

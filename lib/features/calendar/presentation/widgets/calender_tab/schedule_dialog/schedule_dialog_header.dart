@@ -29,7 +29,7 @@ class ScheduleDialogHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.text(context),
+                  color: AppColors.textMain(context),
                 ),
               ),
               const SizedBox(width: 6),
@@ -38,7 +38,7 @@ class ScheduleDialogHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.text(context),
+                  color: AppColors.textMain(context),
                 ),
               ),
             ],
@@ -54,14 +54,14 @@ class ScheduleDialogHeader extends StatelessWidget {
                     onTap: () {
                       viewModel.cancelDeleteMode();
                     },
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.only(right: 12),
                       child: Text(
                         "취소",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: Colors.grey,
+                          color: AppColors.textSub(context),
                         ),
                       ),
                     ),
@@ -78,19 +78,32 @@ class ScheduleDialogHeader extends StatelessWidget {
                     // 삭제 전 확인 다이얼로그
                     final confirmed = await showDialog<bool>(
                       context: context,
-                      builder: (_) => AlertDialog(
-                        title: const Text("일정 삭제"),
-                        content: const Text("선택한 일정을 삭제하시겠습니까?"),
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: AppColors.surface(ctx),
+                        title: Text(
+                          "일정 삭제",
+                          style: TextStyle(color: AppColors.textMain(ctx)),
+                        ),
+                        content: Text(
+                          "선택한 일정을 삭제하시겠습니까?",
+                          style: TextStyle(color: AppColors.textSub(ctx)),
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () => context.pop(false),
-                            child: const Text("취소"),
+                            child: Text(
+                              "취소",
+                              style: TextStyle(color: AppColors.textSub(ctx)),
+                            ),
                           ),
                           TextButton(
                             onPressed: () => context.pop(true),
                             child: const Text(
                               "삭제",
-                              style: TextStyle(color: Colors.red),
+                              style: TextStyle(
+                                color: AppColors.pureDanger,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -112,8 +125,10 @@ class ScheduleDialogHeader extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: viewModel.deleteMode
-                          ? AppColors.commonRed
-                          : AppColors.commonBlue,
+                          ? (viewModel.selectedIds.isEmpty
+                                ? AppColors.textSub(context)
+                                : AppColors.pureDanger)
+                          : AppColors.primaryBlue,
                     ),
                   ),
                 ),
