@@ -113,7 +113,6 @@ class CalendarCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              // 1. 카드 제목도 길어질 수 있으므로 Expanded로 감쌉니다.
               Expanded(
                 child: Text(
                   title,
@@ -122,7 +121,7 @@ class CalendarCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: AppColors.textMain(context),
                   ),
-                  maxLines: 1, // 한 줄로 제한
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
