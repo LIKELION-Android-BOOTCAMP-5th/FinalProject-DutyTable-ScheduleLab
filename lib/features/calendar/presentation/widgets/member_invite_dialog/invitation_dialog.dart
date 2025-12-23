@@ -58,7 +58,7 @@ class _InvitationDialogState extends State<InvitationDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
                   : Text(
                 "그룹 캘린더 초대가 도착했습니다.",
                 textAlign: TextAlign.center,

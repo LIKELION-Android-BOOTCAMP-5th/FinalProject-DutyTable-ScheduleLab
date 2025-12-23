@@ -111,7 +111,7 @@ class CustomConfirmationDialog extends StatelessWidget {
                         child: Center(
                           child: Text(
                             confirmText ?? "확인",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.pureWhite,
                             ),
