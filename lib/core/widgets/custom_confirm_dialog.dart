@@ -38,10 +38,10 @@ class CustomConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.background(context),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.pureWhite,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
@@ -130,16 +130,16 @@ class CustomConfirmationDialog extends StatelessWidget {
   }
 
   static Future<void> show(
-      BuildContext context, {
-        required String content,
-        Color? contentColor,
-        required Color confirmColor,
-        required VoidCallback onConfirm,
-        VoidCallback? onCancel,
-        bool barrierDismissible = false,
-        String? confirmText,
-        String? cancelText,
-      }) {
+    BuildContext context, {
+    required String content,
+    Color? contentColor,
+    required Color confirmColor,
+    required VoidCallback onConfirm,
+    VoidCallback? onCancel,
+    bool barrierDismissible = false,
+    String? confirmText,
+    String? cancelText,
+  }) {
     return showDialog(
       context: context,
       barrierDismissible: barrierDismissible,

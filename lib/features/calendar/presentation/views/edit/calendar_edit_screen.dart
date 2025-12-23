@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_edit_view_model.dart';
@@ -38,6 +39,7 @@ class _CalendarEditScreen extends StatelessWidget {
             FocusScope.of(context).unfocus();
           },
           child: Scaffold(
+            backgroundColor: AppColors.background(context),
             appBar: BackActionsAppBar(
               title: Text(
                 "캘린더 수정",

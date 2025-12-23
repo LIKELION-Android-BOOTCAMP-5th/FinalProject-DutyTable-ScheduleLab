@@ -35,13 +35,13 @@ class CustomCalendarEditTextField extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
                 color: isDarkMode ? AppColors.dBorder : AppColors.lBorder,
-                width: 1.5,
+                width: 2,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                color: AppColors.primaryBlue,
+              borderSide: BorderSide(
+                color: AppColors.primary(context),
                 width: 2,
               ),
             ),
