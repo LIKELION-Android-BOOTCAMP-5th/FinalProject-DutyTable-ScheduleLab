@@ -3,7 +3,7 @@ import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 
-enum DetailViewState { idle, loading, success, error }
+enum DetailViewState { idle, loading, success, error, deleted }
 
 class ScheduleDetailViewModel extends ChangeNotifier {
   DetailViewState _state = DetailViewState.loading;
@@ -43,6 +43,7 @@ class ScheduleDetailViewModel extends ChangeNotifier {
   int get repeatNum => _schedule?.repeatNum ?? 1;
   bool get weekendException => _schedule?.weekendException ?? false;
   bool get holidayException => _schedule?.holidayException ?? false;
+  int get repeatCount => _schedule?.repeatCount ?? 1;
 
   String? get address => _schedule?.address;
   String? get latitude => _schedule?.latitude;
@@ -50,28 +51,47 @@ class ScheduleDetailViewModel extends ChangeNotifier {
 
   String get memo => _schedule?.memo ?? '';
 
-  /// ===== Fetch 최신 데이터 =====
   Future<void> fetchUpdatedSchedule() async {
     _state = DetailViewState.loading;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(milliseconds: 300));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       _schedule = await ScheduleDataSource.instance.fetchScheduleById(
         _scheduleId,
       );
 
       _state = DetailViewState.success;
-      notifyListeners();
     } catch (e) {
-      _state = DetailViewState.error;
-      debugPrint('❌ fetchUpdatedSchedule error: $e');
+      _schedule = null;
+      _state = DetailViewState.deleted;
+    } finally {
+      notifyListeners();
     }
   }
 
-  /// ===== Delete =====
   Future<void> deleteSchedule() async {
     await ScheduleDataSource.instance.deleteSchedules(_scheduleId);
+    _state = DetailViewState.deleted;
+    notifyListeners();
+  }
+
+  Future<void> deleteRepeatGroup() async {
+    final groupId = _schedule?.repeatGroupId;
+    if (groupId == null) return;
+
+    try {
+      await ScheduleDataSource.instance.deleteSchedulesByGroupId(groupId);
+
+      _schedule = null;
+      _state = DetailViewState.deleted;
+
+      notifyListeners();
+    } catch (e) {
+      _state = DetailViewState.error;
+      debugPrint('❌ 그룹 삭제 에러: $e');
+      notifyListeners();
+    }
   }
 }

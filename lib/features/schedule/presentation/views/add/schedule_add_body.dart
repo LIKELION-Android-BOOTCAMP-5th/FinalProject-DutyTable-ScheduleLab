@@ -117,10 +117,12 @@ class ScheduleAddBody extends StatelessWidget {
                   isRepeat: viewModel.isRepeat,
                   weekendException: viewModel.weekendException,
                   holidayException: viewModel.holidayException,
+                  repeatCount: viewModel.repeatCount,
                   onWeekendException: (value) =>
                       viewModel.weekendException = value,
                   onHolidayException: (value) =>
                       viewModel.holidayException = value,
+                  onRepeatCount: (value) => viewModel.repeatCount = value,
                 ),
 
                 const SizedBox(height: 24),

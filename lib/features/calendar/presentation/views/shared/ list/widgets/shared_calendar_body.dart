@@ -19,7 +19,10 @@ class SharedCalendarBody extends StatelessWidget {
     switch (state) {
       case ViewState.loading:
         return Center(
-          child: CircularProgressIndicator(color: AppColors.primary(context)),
+          child: CircularProgressIndicator(
+            color: AppColors.primary(context),
+            strokeWidth: 2,
+          ),
         );
 
       case ViewState.error:

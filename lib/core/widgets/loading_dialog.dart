@@ -9,7 +9,7 @@ void showFullScreenLoading(BuildContext context) {
       return Center(
         child: CircularProgressIndicator(
           color: AppColors.primary(context),
-          strokeWidth: 4,
+          strokeWidth: 2,
           strokeCap: StrokeCap.round,
         ),
       );

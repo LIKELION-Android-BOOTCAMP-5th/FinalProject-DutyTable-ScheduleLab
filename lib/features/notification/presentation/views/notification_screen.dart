@@ -150,8 +150,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
             }
           } catch (e) {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('알림 삭제 중 오류가 발생했습니다: $e')));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('알림 삭제 중 오류가 발생했습니다: $e')));
             }
           }
         },
@@ -296,7 +297,10 @@ class NotificationBody extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isLoading) {
       return Center(
-        child: CircularProgressIndicator(color: AppColors.primary(context)),
+        child: CircularProgressIndicator(
+          color: AppColors.primary(context),
+          strokeWidth: 2,
+        ),
       );
     }
     if (notifications.isEmpty) {

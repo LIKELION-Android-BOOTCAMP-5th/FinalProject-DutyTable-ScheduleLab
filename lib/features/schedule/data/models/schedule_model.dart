@@ -1,6 +1,7 @@
 class ScheduleModel {
   final int id;
   final int calendarId;
+  final String? repeatGroupId; // ✅ 추가: 반복 일정을 묶어주는 고유 ID
 
   final String title;
   final String? emotionTag;
@@ -8,30 +9,27 @@ class ScheduleModel {
 
   final bool isDone;
 
-  /// ISO String (timestamptz)
   final DateTime startedAt;
   final DateTime endedAt;
 
-  /// 반복
   final bool isRepeat;
   final int? repeatNum;
-  final String? repeatOption; // daily, weekly, monthly, yearly
+  final String? repeatOption;
   final bool? weekendException;
   final bool? holidayException;
+  final int? repeatCount;
 
-  /// 위치
   final String? address;
   final String? longitude;
   final String? latitude;
 
-  /// 메모
   final String? memo;
-
   final DateTime createdAt;
 
   const ScheduleModel({
     required this.id,
     required this.calendarId,
+    this.repeatGroupId, // ✅ 추가
     required this.title,
     required this.colorValue,
     required this.isDone,
@@ -44,6 +42,7 @@ class ScheduleModel {
     this.repeatOption,
     this.weekendException,
     this.holidayException,
+    this.repeatCount,
     this.address,
     this.longitude,
     this.latitude,
@@ -54,6 +53,7 @@ class ScheduleModel {
     return ScheduleModel(
       id: json['id'] as int,
       calendarId: json['calendar_id'] as int,
+      repeatGroupId: json['repeat_group_id'] as String?, // ✅ 추가
       title: json['title'] as String,
       emotionTag: json['emotion_tag'] as String?,
       colorValue: json['color_value'] as String,
@@ -65,6 +65,8 @@ class ScheduleModel {
       repeatOption: json['repeat_option'] as String?,
       weekendException: json['weekend_exception'] as bool?,
       holidayException: json['holiday_exception'] as bool?,
+      // ✅ 수정: int?로 처리하거나 null일 경우 1로 기본값 설정 (에러 방지)
+      repeatCount: json['repeat_count'] as int?,
       address: json['address'] as String?,
       longitude: json['longitude'] as String?,
       latitude: json['latitude'] as String?,
@@ -77,6 +79,7 @@ class ScheduleModel {
     return {
       'id': id,
       'calendar_id': calendarId,
+      'repeat_group_id': repeatGroupId, // ✅ 추가
       'title': title,
       'emotion_tag': emotionTag,
       'color_value': colorValue,
@@ -88,6 +91,7 @@ class ScheduleModel {
       'repeat_option': repeatOption,
       'weekend_exception': weekendException,
       'holiday_exception': holidayException,
+      'repeat_count': repeatCount,
       'address': address,
       'longitude': longitude,
       'latitude': latitude,
@@ -105,11 +109,14 @@ class ScheduleModel {
     int? repeatNum,
     bool? weekendException,
     bool? holidayException,
+    int? repeatCount,
     String? memo,
+    String? repeatGroupId, // ✅ 추가
   }) {
     return ScheduleModel(
       id: id,
       calendarId: calendarId,
+      repeatGroupId: repeatGroupId ?? this.repeatGroupId, // ✅ 추가
       title: title ?? this.title,
       colorValue: colorValue ?? this.colorValue,
       emotionTag: emotionTag,
@@ -121,6 +128,7 @@ class ScheduleModel {
       repeatOption: repeatOption ?? this.repeatOption,
       weekendException: weekendException ?? this.weekendException,
       holidayException: holidayException ?? this.holidayException,
+      repeatCount: repeatCount ?? this.repeatCount,
       address: address,
       longitude: longitude,
       latitude: latitude,

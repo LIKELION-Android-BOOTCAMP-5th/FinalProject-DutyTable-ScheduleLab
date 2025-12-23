@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +41,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
   int _repeatNum = 1;
   bool _weekendException = false;
   bool _holidayException = false;
+  int _repeatCount = 1;
 
   /// 주소
   String? _address;
@@ -65,6 +68,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
   int get repeatNum => _repeatNum;
   bool get weekendException => _weekendException;
   bool get holidayException => _holidayException;
+  int get repeatCount => _repeatCount;
 
   String? get address => _address;
   String? get longitude => _longitude;
@@ -138,6 +142,11 @@ class ScheduleAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  set repeatCount(int value) {
+    _repeatCount = value;
+    notifyListeners();
+  }
+
   ScheduleAddViewModel(DateTime? date) {
     if (date != null) {
       _startDate = date;
@@ -198,43 +207,122 @@ class ScheduleAddViewModel extends ChangeNotifier {
     _state = ViewState.loading;
     notifyListeners();
 
-    DateTime startedAt() => DateTime(
-      _startDate.year,
-      _startDate.month,
-      _startDate.day,
-      _startTime.hour,
-      _startTime.minute,
-    );
-
-    DateTime endedAt() => DateTime(
-      _endDate.year,
-      _endDate.month,
-      _endDate.day,
-      _endTime.hour,
-      _endTime.minute,
-    );
-
     try {
-      final payload = {
-        'calendar_id': calendarId,
-        'title': _title.trim(),
-        'emotion_tag': _emotionTag,
-        'color_value': _colorValue,
-        'is_done': _isDone,
-        'started_at': startedAt().toUtc().toIso8601String(),
-        'ended_at': endedAt().toUtc().toIso8601String(),
-        'is_repeat': _isRepeat,
-        'repeat_option': _isRepeat ? _repeatOption : null,
-        'repeat_num': _isRepeat ? _repeatNum : null,
-        'weekend_exception': _isRepeat ? weekendException : false,
-        'holiday_exception': _isRepeat ? holidayException : false,
-        'address': _address,
-        'latitude': _latitude,
-        'longitude': _longitude,
-        'memo': _memo.trim().isEmpty ? null : _memo.trim(),
-      };
+      List<DateTime> holidays = [];
+      if (_isRepeat && _holidayException) {
+        holidays = await ScheduleDataSource.instance.fetchHolidays();
+      }
 
-      await ScheduleDataSource.instance.addSchedule(payload);
+      final String? groupId = _isRepeat
+          ? "group_${DateTime.now().millisecondsSinceEpoch}_$calendarId"
+          : null;
+
+      List<Map<String, dynamic>> payloads = [];
+      int createdCount = 0;
+
+      final scheduleDuration =
+          DateTime(
+            _endDate.year,
+            _endDate.month,
+            _endDate.day,
+            _endTime.hour,
+            _endTime.minute,
+          ).difference(
+            DateTime(
+              _startDate.year,
+              _startDate.month,
+              _startDate.day,
+              _startTime.hour,
+              _startTime.minute,
+            ),
+          );
+
+      DateTime currentStartDate = _startDate;
+      int targetCount = _isRepeat ? _repeatCount : 1;
+
+      int attempts = 0;
+
+      while (createdCount < targetCount && attempts < 1000) {
+        attempts++;
+
+        bool isWeekend =
+            currentStartDate.weekday == DateTime.saturday ||
+            currentStartDate.weekday == DateTime.sunday;
+
+        bool isHoliday = holidays.any(
+          (h) =>
+              h.year == currentStartDate.year &&
+              h.month == currentStartDate.month &&
+              h.day == currentStartDate.day,
+        );
+
+        bool shouldSkip =
+            _isRepeat &&
+            ((_weekendException && isWeekend) ||
+                (_holidayException && isHoliday));
+
+        if (!shouldSkip) {
+          DateTime startDateTime = DateTime(
+            currentStartDate.year,
+            currentStartDate.month,
+            currentStartDate.day,
+            _startTime.hour,
+            _startTime.minute,
+          );
+
+          DateTime endDateTime = startDateTime.add(scheduleDuration);
+
+          payloads.add({
+            'calendar_id': calendarId,
+            'repeat_group_id': groupId,
+            'title': _title.trim(),
+            'emotion_tag': _emotionTag,
+            'color_value': _colorValue,
+            'is_done': _isDone,
+            'started_at': startDateTime.toUtc().toIso8601String(),
+            'ended_at': endDateTime.toUtc().toIso8601String(),
+            'is_repeat': _isRepeat,
+            'repeat_option': _isRepeat ? _repeatOption : null,
+            'repeat_num': _isRepeat ? _repeatNum : null,
+            'weekend_exception': _isRepeat ? _weekendException : false,
+            'holiday_exception': _isRepeat ? _holidayException : false,
+            'repeat_count': _isRepeat ? _repeatCount : null,
+            'address': _address,
+            'latitude': _latitude,
+            'longitude': _longitude,
+            'memo': _memo.trim().isEmpty ? null : _memo.trim(),
+          });
+          createdCount++;
+        }
+
+        if (!_isRepeat) break;
+
+        if (_repeatOption == "daily") {
+          currentStartDate = currentStartDate.add(Duration(days: _repeatNum));
+        } else if (_repeatOption == "weekly") {
+          currentStartDate = currentStartDate.add(
+            Duration(days: _repeatNum * 7),
+          );
+        } else if (_repeatOption == "monthly") {
+          currentStartDate = DateTime(
+            currentStartDate.year,
+            currentStartDate.month + _repeatNum,
+            currentStartDate.day,
+          );
+        } else if (_repeatOption == "yearly") {
+          currentStartDate = DateTime(
+            currentStartDate.year + _repeatNum,
+            currentStartDate.month,
+            currentStartDate.day,
+          );
+        }
+      }
+
+      log(payloads.toString(), name: 'SCHEDULE_PAYLOAD');
+
+      if (payloads.isNotEmpty) {
+        await ScheduleDataSource.instance.addSchedule(payloads);
+      }
 
       _state = ViewState.success;
     } catch (e) {

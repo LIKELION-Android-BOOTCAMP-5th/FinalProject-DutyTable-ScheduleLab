@@ -118,6 +118,8 @@ class ScheduleDetailEditBody extends StatelessWidget {
                     viewModel.setWeekendException(value),
                 onHolidayException: (value) =>
                     viewModel.setHolidayException(value),
+                repeatCount: viewModel.repeatCount,
+                onRepeatCount: (value) => viewModel.setRepeatCount(value),
               ),
 
               const SizedBox(height: 24),

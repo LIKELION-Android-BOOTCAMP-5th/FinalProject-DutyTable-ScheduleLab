@@ -69,8 +69,10 @@ class DefaultFirebaseOptions {
     messagingSenderId: '174693600398',
     projectId: 'dutytable-479405',
     storageBucket: 'dutytable-479405.firebasestorage.app',
-    androidClientId: '174693600398-9kgf5tj9vidoc9f6791v8n1n4rl5llb8.apps.googleusercontent.com',
-    iosClientId: '174693600398-kt7o6r2jne782tkfbna9g5sl9b72vdjm.apps.googleusercontent.com',
+    androidClientId:
+        '174693600398-9kgf5tj9vidoc9f6791v8n1n4rl5llb8.apps.googleusercontent.com',
+    iosClientId:
+        '174693600398-kt7o6r2jne782tkfbna9g5sl9b72vdjm.apps.googleusercontent.com',
     iosBundleId: 'com.schedulelab.dutytable',
   );
 }
