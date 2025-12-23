@@ -47,6 +47,7 @@ class _ProfileScreen extends StatelessWidget {
             ),
             rightActions: GestureDetector(
               onTap: () {
+                //로그아웃 다이얼로그
                 showDialog(
                   context: context,
                   builder: (context) => CustomDialog(
@@ -208,9 +209,8 @@ class _ProfileScreen extends StatelessWidget {
                       buttonText: "  구글 캘린더 동기화",
                       padding: 7.0,
                       addWidget: GestureDetector(
-                        onTap: () {
-                          viewModel.googleSync();
-                          viewModel.updateGoogleSync(viewModel.user!.id);
+                        onTap: () async {
+                          await viewModel.googleSync();
                         },
                         child: Text(
                           (viewModel.is_sync) ? "연결해제    " : "   연결    ",
