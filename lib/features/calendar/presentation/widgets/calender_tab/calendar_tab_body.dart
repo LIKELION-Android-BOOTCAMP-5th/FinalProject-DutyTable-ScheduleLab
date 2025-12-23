@@ -23,6 +23,7 @@ class CalendarTabBody extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: AppColors.background(context),
+          resizeToAvoidBottomInset: false,
           body: Column(
             children: [
               if (viewModel.calendar!.type != "personal") ...[

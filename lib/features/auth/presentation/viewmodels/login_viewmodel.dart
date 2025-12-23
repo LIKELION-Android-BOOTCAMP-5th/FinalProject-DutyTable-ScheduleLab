@@ -148,8 +148,6 @@ class LoginViewModel extends ChangeNotifier {
         idToken: idToken,
         nonce: rawNonce,
       );
-      print("response.user ${response.user}");
-      print("response.session ${response.session}");
       if (credential.givenName != null || credential.familyName != null) {
         final nameParts = <String>[];
         if (credential.givenName != null) nameParts.add(credential.givenName!);
@@ -169,8 +167,6 @@ class LoginViewModel extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('auto_login', isAutoLogin);
       // 로그인 후 프로필 확인 및 화면 이동 로직 처리
-      print("response.user ${response.user}");
-      print("response.session ${response.session}");
       await _handlePostSignIn(context);
     } catch (e) {
       // TODO: 나중에 스낵바 제거

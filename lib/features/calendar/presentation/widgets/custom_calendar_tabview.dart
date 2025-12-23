@@ -46,6 +46,7 @@ class _CustomCalendarTabViewState extends State<CustomCalendarTabView> {
   void _onTabSelected(int index) {
     setState(() {
       _selectedIndex = index;
+      FocusScope.of(context).unfocus();
     });
 
     _pageController.jumpToPage(index);

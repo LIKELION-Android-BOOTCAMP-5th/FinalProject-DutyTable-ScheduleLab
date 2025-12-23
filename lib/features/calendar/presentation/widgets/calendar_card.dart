@@ -113,17 +113,19 @@ class CalendarCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textMain(context),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textMain(context),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-
               const SizedBox(width: 8),
-
               _buildMemberChip(context),
             ],
           ),
@@ -139,12 +141,16 @@ class CalendarCard extends StatelessWidget {
                   color: AppColors.textSub(context),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(right: 10)),
-              Text(
-                "${viewModel.nextScheduleTitle[calendarId ?? " "]}",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSub(context),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "${viewModel.nextScheduleTitle[calendarId ?? " "]}",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSub(context),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
