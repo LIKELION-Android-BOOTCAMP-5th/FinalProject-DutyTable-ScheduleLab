@@ -34,7 +34,10 @@ class _PersonalCalendarScreen extends StatelessWidget {
       case ViewState.loading:
         // 데이터 로드 중일 때 로딩 인디케이터 표시
         bodyContent = Center(
-          child: CircularProgressIndicator(color: AppColors.primary(context)),
+          child: CircularProgressIndicator(
+            color: AppColors.primary(context),
+            strokeWidth: 2,
+          ),
         );
         break;
 

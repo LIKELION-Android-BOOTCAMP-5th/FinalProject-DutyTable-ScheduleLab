@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class InvitationDialog extends StatefulWidget {
-  const InvitationDialog({
-    super.key,
-    required this.notification,
-  });
+  const InvitationDialog({super.key, required this.notification});
 
   final InviteNotificationModel notification;
 
@@ -32,9 +29,9 @@ class _InvitationDialogState extends State<InvitationDialog> {
       // 에러 처리
       if (mounted) {
         context.pop(false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('초대 수락 중 오류가 발생했습니다: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('초대 수락 중 오류가 발생했습니다: $e')));
       }
     }
   }
@@ -58,16 +55,21 @@ class _InvitationDialogState extends State<InvitationDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _isLoading
-                  ? Center(child: CircularProgressIndicator(color: AppColors.primary(context)))
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary(context),
+                        strokeWidth: 2,
+                      ),
+                    )
                   : Text(
-                "그룹 캘린더 초대가 도착했습니다.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.textMain(context),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
+                      "그룹 캘린더 초대가 도착했습니다.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textMain(context),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
               const SizedBox(height: 24),
               Row(
                 children: [

@@ -39,7 +39,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_sign_in: ^7.2.0
   sign_in_with_apple: ^7.0.1
-  table_calendar: ^3.2.0
   syncfusion_flutter_calendar: ^31.2.18
   syncfusion_flutter_core: ^31.2.18
   flutter_naver_map: ^1.4.2

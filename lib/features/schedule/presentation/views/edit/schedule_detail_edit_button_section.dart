@@ -30,7 +30,11 @@ class ScheduleDetailEditButtonSection extends StatelessWidget {
               label: "수정",
               buttonColor: AppColors.primary(context),
               onTap: () async {
-                await viewModel.updateSchedule();
+                if (viewModel.repeatGroupId != null) {
+                  await viewModel.updateAllSchedulesInGroup();
+                } else {
+                  await viewModel.updateSingleSchedule();
+                }
 
                 if (!context.mounted) return;
 

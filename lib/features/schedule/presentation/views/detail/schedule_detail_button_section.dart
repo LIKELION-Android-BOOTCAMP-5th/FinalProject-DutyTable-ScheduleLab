@@ -43,6 +43,11 @@ class ScheduleDetailButtonSection extends StatelessWidget {
 
                   if (result == true) {
                     await viewModel.fetchUpdatedSchedule();
+
+                    if (!context.mounted) return;
+                    if (viewModel.state == DetailViewState.deleted) {
+                      context.pop(true);
+                    }
                   }
                 },
               ),
@@ -122,10 +127,15 @@ Future<void> _showDeleteDialog(
   BuildContext context,
   ScheduleDetailViewModel viewModel,
 ) {
+  final bgColor = AppColors.background(context);
+  final mainTextColor = AppColors.textMain(context);
+  final subTextColor = AppColors.textSub(context);
+  final dangerColor = AppColors.danger(context);
+
   return showDialog(
     context: context,
     builder: (_) => Dialog(
-      backgroundColor: AppColors.background(context),
+      backgroundColor: bgColor,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
@@ -137,7 +147,7 @@ Future<void> _showDeleteDialog(
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textMain(context),
+                color: mainTextColor,
               ),
             ),
             const SizedBox(height: 14),
@@ -147,7 +157,7 @@ Future<void> _showDeleteDialog(
                 Expanded(
                   child: _DialogButton(
                     label: "취소",
-                    buttonColor: AppColors.textSub(context),
+                    buttonColor: subTextColor,
                     textColor: AppColors.pureWhite,
                     onTap: () => context.pop(),
                   ),
@@ -159,15 +169,16 @@ Future<void> _showDeleteDialog(
                 Expanded(
                   child: _DialogButton(
                     label: "확인",
-                    buttonColor: AppColors.danger(context),
+                    buttonColor: dangerColor,
                     textColor: AppColors.pureWhite,
                     onTap: () async {
                       await viewModel.deleteSchedule();
 
                       if (!context.mounted) return;
 
-                      context.pop();
-                      context.pop(true);
+                      if (context.canPop()) {
+                        context.pop();
+                      }
                     },
                   ),
                 ),

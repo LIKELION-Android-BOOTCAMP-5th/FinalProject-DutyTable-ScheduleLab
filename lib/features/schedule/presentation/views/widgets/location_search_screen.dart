@@ -58,6 +58,7 @@ class _LocationSearchDialog extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: CircularProgressIndicator(
                 color: AppColors.primary(context),
+                strokeWidth: 2,
               ),
             ),
 

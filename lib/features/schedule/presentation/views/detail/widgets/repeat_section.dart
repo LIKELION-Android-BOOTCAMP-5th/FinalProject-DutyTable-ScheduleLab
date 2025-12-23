@@ -190,6 +190,70 @@ class RepeatSection extends StatelessWidget {
                 children: [
                   const SizedBox(height: 10),
 
+                  /// 반복 횟수
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          "반복 횟수",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textMain(context),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      Expanded(
+                        child: TextFormField(
+                          textAlign: TextAlign.center,
+                          initialValue: viewModel.repeatCount.toString(),
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(color: AppColors.textMain(context)),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: AppColors.surface(context),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? AppColors.dBorder
+                                    : AppColors.lBorder,
+                                width: 2,
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: isDark
+                                    ? AppColors.dBorder
+                                    : AppColors.lBorder,
+                                width: 2,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: AppColors.primary(context),
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
                   Row(
                     children: [
                       /// 주말 제외

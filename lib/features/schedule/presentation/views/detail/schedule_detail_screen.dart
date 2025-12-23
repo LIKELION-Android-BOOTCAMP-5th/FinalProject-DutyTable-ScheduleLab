@@ -5,6 +5,7 @@ import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_det
 import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_button_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_body.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class ScheduleDetailScreen extends StatelessWidget {
@@ -35,11 +36,27 @@ class _ScheduleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleDetailViewModel>();
 
+    if (viewModel.state == DetailViewState.deleted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted && context.canPop()) {
+          context.pop(true);
+        }
+      });
+
+      return Scaffold(
+        backgroundColor: AppColors.background(context),
+        body: const SizedBox.shrink(),
+      );
+    }
+
     if (viewModel.state == DetailViewState.loading) {
       return Scaffold(
         backgroundColor: AppColors.background(context),
         body: Center(
-          child: CircularProgressIndicator(color: AppColors.primary(context)),
+          child: CircularProgressIndicator(
+            color: AppColors.primary(context),
+            strokeWidth: 2,
+          ),
         ),
       );
     }
