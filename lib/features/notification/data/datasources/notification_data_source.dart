@@ -8,7 +8,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/invite_notification_model.dart';
 import '../models/reminder_notification_model.dart';
 
-
 class NotificationDataSource {
   static final NotificationDataSource _shared = NotificationDataSource();
   static NotificationDataSource get shared => _shared;
@@ -18,9 +17,9 @@ class NotificationDataSource {
 
   // 새로운 알림을 전달하기 위한 StreamController
   final _inviteNotificationController =
-  StreamController<InviteNotificationModel>.broadcast();
+      StreamController<InviteNotificationModel>.broadcast();
   final _reminderNotificationController =
-  StreamController<ReminderNotificationModel>.broadcast();
+      StreamController<ReminderNotificationModel>.broadcast();
 
   // UI 컴포넌트가 리스닝할 공개 스트림
   Stream<InviteNotificationModel> get newInviteNotifications =>
@@ -56,8 +55,10 @@ class NotificationDataSource {
       final inviteFuture = getInviteNotifications();
       final reminderFuture = getReminderNotifications();
       final results = await Future.wait([inviteFuture, reminderFuture]);
-      final hasUnread = [...results[0], ...results[1]]
-          .any((n) => (n as dynamic).isRead == false);
+      final hasUnread = [
+        ...results[0],
+        ...results[1],
+      ].any((n) => (n as dynamic).isRead == false);
       notificationState.setHasNewNotifications(hasUnread);
     } catch (e) {
       debugPrint("Failed to check initial notification status: $e");
@@ -108,11 +109,13 @@ class NotificationDataSource {
 
   /// 특정 알림을 읽음으로 표시
   Future<void> markAsRead(int notificationId, String type) async {
-    final tableName =
-    type == 'invite' ? 'invite_notifications' : 'reminder_notifications';
+    final tableName = type == 'invite'
+        ? 'invite_notifications'
+        : 'reminder_notifications';
     await supabase
         .from(tableName)
-        .update({'is_read': true}).eq('id', notificationId);
+        .update({'is_read': true})
+        .eq('id', notificationId);
   }
 
   /// 초대 수락
@@ -137,10 +140,10 @@ class NotificationDataSource {
     }
 
     // invite_notifications 테이블에서 is_accepted를 true로 업데이트하고 읽음 처리
-    await supabase.from('invite_notifications').update({
-      'is_accepted': true,
-      'is_read': true,
-    }).eq('id', notification.id);
+    await supabase
+        .from('invite_notifications')
+        .update({'is_accepted': true, 'is_read': true})
+        .eq('id', notification.id);
   }
 
   /// Realtime 알림 리스너 시작
@@ -158,47 +161,45 @@ class NotificationDataSource {
     _inviteNotificationChannel = supabase
         .channel('invite-notifications-channel')
         .onPostgresChanges(
-      event: PostgresChangeEvent.insert,
-      schema: 'public',
-      table: 'invite_notifications',
-      filter: PostgresChangeFilter(
-        type: PostgresChangeFilterType.eq,
-        column: 'user_id',
-        value: userId,
-      ),
-      callback: (payload) {
-        debugPrint('초대 알림 변경 수신: ${payload.toString()}');
-        final newRecord = payload.newRecord;
-        final notification = InviteNotificationModel.fromJson(newRecord);
-        _inviteNotificationController.sink.add(notification);
-        debugPrint('새로운 초대 알림: ${notification.message}');
-      },
-    ).subscribe();
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'invite_notifications',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            debugPrint('초대 알림 변경 수신: ${payload.toString()}');
+            final newRecord = payload.newRecord;
+            final notification = InviteNotificationModel.fromJson(newRecord);
+            _inviteNotificationController.sink.add(notification);
+            debugPrint('새로운 초대 알림: ${notification.message}');
+          },
+        )
+        .subscribe();
 
     // 리마인더 알림 채널 생성 및 구독
     _reminderNotificationChannel = supabase
         .channel('reminder-notifications-channel')
         .onPostgresChanges(
-      event: PostgresChangeEvent.insert,
-      schema: 'public',
-      table: 'reminder_notifications',
-      filter: PostgresChangeFilter(
-        type: PostgresChangeFilterType.eq,
-        column: 'user_id',
-        value: userId,
-      ),
-      callback: (payload) {
-        debugPrint('리마인더 알림 변경 수신: ${payload.toString()}');
-        final newRecord = payload.newRecord;
-        final notification = ReminderNotificationModel.fromJson(newRecord);
-        _reminderNotificationController.sink.add(notification);
-        debugPrint(
-          '새로운 리마인더 알림: ${notification.firstMessage}',
-        );
-      },
-    ).subscribe();
-
-    debugPrint('실시간 리스너 시작 (사용자: $userId)');
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'reminder_notifications',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId,
+          ),
+          callback: (payload) {
+            debugPrint('리마인더 알림 변경 수신: ${payload.toString()}');
+            final newRecord = payload.newRecord;
+            final notification = ReminderNotificationModel.fromJson(newRecord);
+            _reminderNotificationController.sink.add(notification);
+            debugPrint('새로운 리마인더 알림: ${notification.firstMessage}');
+          },
+        )
+        .subscribe();
   }
 
   /// Realtime 알림 리스너 중지
@@ -212,7 +213,6 @@ class NotificationDataSource {
       await supabase.removeChannel(_reminderNotificationChannel!);
       _reminderNotificationChannel = null;
     }
-    debugPrint('실시간 리스너 중지됨.');
   }
 
   // SupabaseManager가 더 이상 필요 없을 때 StreamController 닫기 (메모리 누수 방지)

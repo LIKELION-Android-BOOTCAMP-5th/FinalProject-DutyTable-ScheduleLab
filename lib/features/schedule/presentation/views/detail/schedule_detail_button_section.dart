@@ -58,7 +58,7 @@ class ScheduleDetailButtonSection extends StatelessWidget {
               icon: Icons.share,
               label: "공유",
               buttonColor: AppColors.primary(context),
-              onTap: () => print("공유"),
+              onTap: () => viewModel.shareSchedule(),
             ),
 
             if (isAdmin) ...[

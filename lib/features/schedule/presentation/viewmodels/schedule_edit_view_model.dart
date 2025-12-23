@@ -32,7 +32,6 @@ class ScheduleEditViewModel extends ChangeNotifier {
   String? _longitude;
   String _memo = "";
 
-  /// ===== getter =====
   int get scheduleId => _scheduleFromEdit.id;
   String? get repeatGroupId => _scheduleFromEdit.repeatGroupId;
   String get title => _title;
@@ -160,19 +159,14 @@ class ScheduleEditViewModel extends ChangeNotifier {
       };
 
       if (isAll && repeatGroupId != null) {
-        // ✅ 1. 기존 반복 그룹 일정 전체 삭제
         await ScheduleDataSource.instance.deleteSchedulesByGroupId(
           repeatGroupId!,
         );
 
-        // ✅ 2. 새로운 조건으로 일정 리스트 재생성
-        // (ID는 삭제되었으므로 기존 repeatGroupId를 재사용하거나 새로 생성하여 전달)
         final newSchedules = await _generateNewSchedules(repeatGroupId!);
 
-        // ✅ 3. 재생성된 일정들을 INSERT
         await ScheduleDataSource.instance.addSchedule(newSchedules);
       } else {
-        // 단건 수정 로직
         final singlePayload = {
           ...commonPayload,
           'started_at': startedAt.toUtc().toIso8601String(),
@@ -203,7 +197,6 @@ class ScheduleEditViewModel extends ChangeNotifier {
   ) async {
     List<Map<String, dynamic>> payloads = [];
 
-    // 공휴일 정보 가져오기 (예외 처리를 위해)
     List<DateTime> holidays = [];
     if (_holidayException) {
       holidays = await ScheduleDataSource.instance.fetchHolidays();
@@ -225,15 +218,15 @@ class ScheduleEditViewModel extends ChangeNotifier {
     );
 
     int createdCount = 0;
-    int safetyLoop = 0; // 무한 루프 방지
+    int safetyLoop = 0;
 
     while (createdCount < _repeatCount && safetyLoop < 1000) {
       safetyLoop++;
 
-      // 주말 및 공휴일 예외 체크
       bool isWeekend =
           currentStart.weekday == DateTime.saturday ||
           currentStart.weekday == DateTime.sunday;
+
       bool isHoliday = holidays.any(
         (h) =>
             h.year == currentStart.year &&
@@ -243,15 +236,13 @@ class ScheduleEditViewModel extends ChangeNotifier {
 
       if ((_weekendException && isWeekend) ||
           (_holidayException && isHoliday)) {
-        // 다음 날짜로 이동
         currentStart = _getNextDate(currentStart);
         currentEnd = _getNextDate(currentEnd);
         continue;
       }
 
-      // Payload 작성
       payloads.add({
-        'calendar_id': _scheduleFromEdit.calendarId, // 기존 캘린더 ID 유지
+        'calendar_id': _scheduleFromEdit.calendarId,
         'title': _title.trim(),
         'emotion_tag': _emotionTag,
         'color_value': _colorValue,
@@ -268,7 +259,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
         'latitude': _latitude,
         'longitude': _longitude,
         'memo': _memo.trim().isEmpty ? null : _memo.trim(),
-        'is_done': false, // 재생성 시 기본 미완료 처리 (기획에 따라 변경 가능)
+        'is_done': false,
       });
 
       createdCount++;
@@ -299,7 +290,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
     }
   }
 
-  // 주소 관련 로직
+  /// 주소 관련 로직
   Future<void> updateLocationAction(String newAddress) async {
     try {
       final response = await supabase.functions.invoke(

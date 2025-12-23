@@ -350,16 +350,6 @@ class ProfileViewmodel extends ChangeNotifier {
         return;
       }
 
-      // 일정 출력
-      print("=== 구글 캘린더 일정 ===");
-      for (var item in events.items!) {
-        print("제목: ${item.summary}");
-        print("시작: ${item.start?.dateTime ?? item.start?.date}");
-        print("종료: ${item.end?.dateTime ?? item.end?.date}");
-        print("메모: ${item.description}");
-        print("---");
-      }
-
       Fluttertoast.showToast(msg: "${events.items!.length}개의 일정을 가져왔습니다.");
       await _addEventsToScheduleTable(events.items!);
     } catch (e) {
