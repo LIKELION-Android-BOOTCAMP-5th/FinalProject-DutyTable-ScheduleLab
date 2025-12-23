@@ -18,6 +18,12 @@ class CustomConfirmationDialog extends StatelessWidget {
   /// 취소 버튼 클릭 시 실행
   final VoidCallback? onCancel;
 
+  /// 확인 버튼 텍스트
+  final String? confirmText;
+
+  /// 취소 버튼 텍스트
+  final String? cancelText;
+
   const CustomConfirmationDialog({
     super.key,
     required this.content,
@@ -25,6 +31,8 @@ class CustomConfirmationDialog extends StatelessWidget {
     required this.confirmColor,
     required this.onConfirm,
     this.onCancel,
+    this.confirmText,
+    this.cancelText,
   });
 
   @override
@@ -73,7 +81,7 @@ class CustomConfirmationDialog extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            "취소",
+                            cancelText ?? "취소",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.textSub(context),
@@ -100,9 +108,9 @@ class CustomConfirmationDialog extends StatelessWidget {
                           color: confirmColor,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            "확인",
+                            confirmText ?? "확인",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: AppColors.pureWhite,
@@ -122,14 +130,16 @@ class CustomConfirmationDialog extends StatelessWidget {
   }
 
   static Future<void> show(
-    BuildContext context, {
-    required String content,
-    Color? contentColor,
-    required Color confirmColor,
-    required VoidCallback onConfirm,
-    VoidCallback? onCancel,
-    bool barrierDismissible = false,
-  }) {
+      BuildContext context, {
+        required String content,
+        Color? contentColor,
+        required Color confirmColor,
+        required VoidCallback onConfirm,
+        VoidCallback? onCancel,
+        bool barrierDismissible = false,
+        String? confirmText,
+        String? cancelText,
+      }) {
     return showDialog(
       context: context,
       barrierDismissible: barrierDismissible,
@@ -139,6 +149,8 @@ class CustomConfirmationDialog extends StatelessWidget {
         confirmColor: confirmColor,
         onConfirm: onConfirm,
         onCancel: onCancel,
+        confirmText: confirmText,
+        cancelText: cancelText,
       ),
     );
   }
