@@ -164,8 +164,6 @@ class ScheduleDataSource {
       );
 
       // 로그 확인: 수정된 데이터 리스트가 비어있다면 필터(id)가 잘못된 것입니다.
-      print("✅ 수정된 데이터 수: ${(response.data as List).length}");
-      print("✅ 수정된 데이터 상세: ${response.data}");
     } catch (e) {
       throw Exception("그룹 일괄 수정 에러: $e");
     }

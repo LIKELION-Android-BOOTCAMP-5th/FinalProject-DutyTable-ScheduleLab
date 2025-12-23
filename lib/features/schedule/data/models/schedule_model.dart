@@ -1,7 +1,7 @@
 class ScheduleModel {
   final int id;
   final int calendarId;
-  final String? repeatGroupId; // ✅ 추가: 반복 일정을 묶어주는 고유 ID
+  final String? repeatGroupId;
 
   final String title;
   final String? emotionTag;
@@ -29,7 +29,7 @@ class ScheduleModel {
   const ScheduleModel({
     required this.id,
     required this.calendarId,
-    this.repeatGroupId, // ✅ 추가
+    this.repeatGroupId,
     required this.title,
     required this.colorValue,
     required this.isDone,
@@ -53,7 +53,7 @@ class ScheduleModel {
     return ScheduleModel(
       id: json['id'] as int,
       calendarId: json['calendar_id'] as int,
-      repeatGroupId: json['repeat_group_id'] as String?, // ✅ 추가
+      repeatGroupId: json['repeat_group_id'] as String?,
       title: json['title'] as String,
       emotionTag: json['emotion_tag'] as String?,
       colorValue: json['color_value'] as String,
@@ -65,7 +65,6 @@ class ScheduleModel {
       repeatOption: json['repeat_option'] as String?,
       weekendException: json['weekend_exception'] as bool?,
       holidayException: json['holiday_exception'] as bool?,
-      // ✅ 수정: int?로 처리하거나 null일 경우 1로 기본값 설정 (에러 방지)
       repeatCount: json['repeat_count'] as int?,
       address: json['address'] as String?,
       longitude: json['longitude'] as String?,
@@ -79,7 +78,7 @@ class ScheduleModel {
     return {
       'id': id,
       'calendar_id': calendarId,
-      'repeat_group_id': repeatGroupId, // ✅ 추가
+      'repeat_group_id': repeatGroupId,
       'title': title,
       'emotion_tag': emotionTag,
       'color_value': colorValue,
@@ -111,12 +110,12 @@ class ScheduleModel {
     bool? holidayException,
     int? repeatCount,
     String? memo,
-    String? repeatGroupId, // ✅ 추가
+    String? repeatGroupId,
   }) {
     return ScheduleModel(
       id: id,
       calendarId: calendarId,
-      repeatGroupId: repeatGroupId ?? this.repeatGroupId, // ✅ 추가
+      repeatGroupId: repeatGroupId ?? this.repeatGroupId,
       title: title ?? this.title,
       colorValue: colorValue ?? this.colorValue,
       emotionTag: emotionTag,

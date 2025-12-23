@@ -105,7 +105,6 @@ class ChatViewModel extends ChangeNotifier {
             );
 
             chatMessages.add(newChatMessage);
-            print("Change received: ${payload.toString()}");
             notifyListeners();
 
             WidgetsBinding.instance.addPostFrameCallback((_) {

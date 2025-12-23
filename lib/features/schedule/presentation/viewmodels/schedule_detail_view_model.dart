@@ -1,7 +1,8 @@
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 enum DetailViewState { idle, loading, success, error, deleted }
 
@@ -19,7 +20,6 @@ class ScheduleDetailViewModel extends ChangeNotifier {
     fetchUpdatedSchedule();
   }
 
-  /// ===== Getter =====
   DetailViewState get state => _state;
 
   bool get isAdmin => _isAdmin;
@@ -92,6 +92,35 @@ class ScheduleDetailViewModel extends ChangeNotifier {
       _state = DetailViewState.error;
       debugPrint('❌ 그룹 삭제 에러: $e');
       notifyListeners();
+    }
+  }
+
+  Future<void> shareSchedule() async {
+    if (_schedule == null) return;
+
+    final dateFormat = DateFormat('yyyy년 MM월 dd일 HH:mm');
+
+    String content = "📅 [일정 공유: $title]\n\n";
+
+    if (startedAt != null && endedAt != null) {
+      content +=
+          "⏰ 시간: ${dateFormat.format(startedAt!)} ~ ${dateFormat.format(endedAt!)}\n";
+    }
+
+    if (address != null && address!.isNotEmpty) {
+      content += "📍 장소: $address\n";
+    }
+
+    if (memo.isNotEmpty) {
+      content += "📝 메모: $memo\n";
+    }
+
+    content += "\nFrom. DutyTable";
+
+    try {
+      await Share.share(content, subject: title);
+    } catch (e) {
+      debugPrint('❌ 공유하기 에러: $e');
     }
   }
 }
