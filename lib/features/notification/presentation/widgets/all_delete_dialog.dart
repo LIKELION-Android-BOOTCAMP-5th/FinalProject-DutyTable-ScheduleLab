@@ -65,8 +65,7 @@ class AllDeleteDialog extends StatelessWidget {
 
                   Expanded(
                     child: GestureDetector(
-                      /// TODO: 알림 전체(초대 및 리마인더) 삭제 API 연동 필요
-                      onTap: () {},
+                      onTap: () => context.pop(true),
                       child: Container(
                         decoration: BoxDecoration(
                           color: AppColors.danger(context),

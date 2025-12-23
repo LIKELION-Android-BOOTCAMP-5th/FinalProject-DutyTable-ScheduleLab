@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
+import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/invitation_dialog.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
@@ -125,30 +126,36 @@ class _NotificationScreenState extends State<NotificationScreen> {
   /// 사용자에게 삭제 확인 다이얼로그를 보여주고, 확인 시 모든 알림을 삭제
   void _handleDeleteAll() {
     showDialog<bool>(
-      barrierDismissible: false, // 다이얼로그 외부 터치 시 닫히지 않음
+      barrierDismissible: false,
       context: context,
-      builder: (_) => AllDeleteDialog(), // 삭제 확인 다이얼로그 위젯
+      builder: (_) => AllDeleteDialog(),
     ).then((confirmed) async {
-      // 사용자가 '확인'을 눌렀을 경우
-      if (confirmed == true) {
-        try {
-          await NotificationDataSource.shared
-              .deleteAllNotifications(); // Supabase에서 모든 알림 삭제
-          if (mounted) {
-            setState(() {
-              _notifications.clear(); // 로컬 알림 목록 비우기
-            });
-            _recheckUnreadNotificationsStatus(); // 모든 알림 삭제 후 읽지 않은 알림 상태 재확인
+      if (confirmed != true) return;
+
+      if (!mounted) return;
+      await CustomConfirmationDialog.show(
+        context,
+        content: "정말 삭제하시겠습니까? \n 삭제된 알림은 \n 복구할 수 없습니다.",
+        confirmColor: AppColors.danger(context),
+        confirmText: "삭제",
+        cancelText: "취소",
+        onConfirm: () async {
+          try {
+            await NotificationDataSource.shared.deleteAllNotifications();
+            if (mounted) {
+              setState(() {
+                _notifications.clear();
+              });
+              _recheckUnreadNotificationsStatus();
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('알림 삭제 중 오류가 발생했습니다: $e')));
+            }
           }
-        } catch (e) {
-          // 삭제 중 에러 발생 시 스낵바 표시
-          if (mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('알림 삭제 중 오류가 발생했습니다: $e')));
-          }
-        }
-      }
+        },
+      );
     });
   }
 
