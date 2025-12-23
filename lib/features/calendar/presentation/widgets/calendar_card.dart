@@ -113,17 +113,20 @@ class CalendarCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textMain(context),
+              // 1. 카드 제목도 길어질 수 있으므로 Expanded로 감쌉니다.
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textMain(context),
+                  ),
+                  maxLines: 1, // 한 줄로 제한
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-
               const SizedBox(width: 8),
-
               _buildMemberChip(context),
             ],
           ),
@@ -139,12 +142,16 @@ class CalendarCard extends StatelessWidget {
                   color: AppColors.textSub(context),
                 ),
               ),
-              Padding(padding: EdgeInsets.only(right: 10)),
-              Text(
-                "${viewModel.nextScheduleTitle[calendarId ?? " "]}",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSub(context),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "${viewModel.nextScheduleTitle[calendarId ?? " "]}",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSub(context),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
