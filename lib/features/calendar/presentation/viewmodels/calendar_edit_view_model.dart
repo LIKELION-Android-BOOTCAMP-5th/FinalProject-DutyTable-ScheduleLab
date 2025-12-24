@@ -93,7 +93,7 @@ class CalendarEditViewModel extends ChangeNotifier {
     final bool result = await CalendarDataSource.instance.updateCalendarInfo(
       _titleController.text,
       _descController.text,
-      imageUrl,
+      imageUrl ?? calendar.imageURL,
       _calendar.id,
     );
     return result;
