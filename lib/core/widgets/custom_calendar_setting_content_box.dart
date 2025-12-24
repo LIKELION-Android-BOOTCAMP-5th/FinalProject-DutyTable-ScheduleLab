@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomCalendarSettingContentBox extends StatelessWidget {
@@ -16,6 +17,8 @@ class CustomCalendarSettingContentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     // 반환할 위젯 리스트
     List<Widget> childrenList = [];
 
@@ -35,8 +38,11 @@ class CustomCalendarSettingContentBox extends StatelessWidget {
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0x61000000)),
-            color: const Color(0x10000000),
+            border: Border.all(
+              color: isDark ? AppColors.dBorder : AppColors.lBorder,
+              width: 2,
+            ),
+            color: AppColors.surface(context),
           ),
           child: child,
         ),

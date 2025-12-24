@@ -34,7 +34,6 @@ class _ProfileScreen extends StatelessWidget {
     return Consumer<ProfileViewmodel>(
       builder: (context, viewModel, child) {
         return Scaffold(
-          // 배경색 대응
           backgroundColor: AppColors.background(context),
           appBar: LogoActionsAppBar(
             leftActions: Text(
