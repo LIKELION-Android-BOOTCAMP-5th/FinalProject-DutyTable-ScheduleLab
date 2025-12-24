@@ -138,7 +138,7 @@ class CalendarEditViewModel extends ChangeNotifier {
     final file = _newImage!;
     final extension = file.path.split('.').last;
     final filePath =
-        'calendar-images/${user.id}/${DateTime.now().millisecondsSinceEpoch}.$extension';
+        'calendar-images/${_calendar.id}/${DateTime.now().millisecondsSinceEpoch}.$extension';
 
     await supabase.storage
         .from('calendar-images')
