@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
 
   const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('fcm_token')
+      .select('fcm_token, allowed_notification')
       .eq('id', targetUserId)
       .single()
 
@@ -105,6 +105,14 @@ Deno.serve(async (req) => {
         headers: { 'Content-Type': 'application/json' },
     })
   }
+
+if (!userData.allowed_notification) {
+  console.log(`User ${targetUserId} has notifications disabled. Skipping.`);
+  return new Response(JSON.stringify({ message: 'Notification is disabled by user.' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+  })
+}
 
   const fcmToken = userData.fcm_token as string
 
