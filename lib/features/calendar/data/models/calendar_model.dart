@@ -54,4 +54,44 @@ class CalendarModel {
       ownerProfileUrl: ownerProfileUrl,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'user_id': user_id,
+      'ownerNickname': ownerNickname,
+      'title': title,
+      'description': description,
+      'imageURL': imageURL,
+      'calendarMemberModel': calendarMemberModel
+          ?.map((e) => e.toJson())
+          .toList(),
+      'ownerProfileUrl': ownerProfileUrl,
+    };
+  }
+
+  CalendarModel copyWith({
+    int? id,
+    String? type,
+    String? user_id,
+    String? ownerNickname,
+    String? ownerProfileUrl,
+    String? title,
+    String? description,
+    String? imageURL,
+    List<CalendarMemberModel>? calendarMemberModel,
+  }) {
+    return CalendarModel(
+      id: id ?? this.id,
+      type: type ?? this.type,
+      user_id: user_id ?? this.user_id,
+      ownerNickname: ownerNickname ?? this.ownerNickname,
+      ownerProfileUrl: ownerProfileUrl ?? this.ownerProfileUrl,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      imageURL: imageURL,
+      calendarMemberModel: calendarMemberModel ?? this.calendarMemberModel,
+    );
+  }
 }

@@ -31,4 +31,33 @@ class CalendarMemberModel {
       profileUrl: profileUrl,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'calendar_id': calendar_id,
+      'user_id': user_id,
+      'is_admin': is_admin,
+      'last_read_at': last_read_at,
+      'nickname': nickname,
+      'profileUrl': profileUrl,
+    };
+  }
+
+  CalendarMemberModel copyWith({
+    int? calendar_id,
+    String? user_id,
+    bool? is_admin,
+    DateTime? last_read_at,
+    String? nickname,
+    String? profileUrl,
+  }) {
+    return CalendarMemberModel(
+      calendar_id: calendar_id ?? this.calendar_id,
+      user_id: user_id ?? this.user_id,
+      is_admin: is_admin ?? this.is_admin,
+      last_read_at: last_read_at ?? this.last_read_at,
+      nickname: nickname ?? this.nickname,
+      profileUrl: profileUrl,
+    );
+  }
 }

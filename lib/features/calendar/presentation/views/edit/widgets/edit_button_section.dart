@@ -11,10 +11,22 @@ class EditButtonSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isContentChange =
-        viewModel.titleController.text != viewModel.calendar.title ||
-        viewModel.descController.text != viewModel.calendar.description ||
-        viewModel.image?.path != viewModel.calendar.imageURL;
+    // 1. 텍스트 변경 여부
+    final bool isTitleChanged =
+        viewModel.titleController.text != viewModel.initialCalendar.title;
+    final bool isDescChanged =
+        viewModel.descController.text !=
+        (viewModel.initialCalendar.description ?? "");
+
+    // 2. 이미지 변경 여부 (핵심)
+    final bool isImageChanged =
+        viewModel.newImage != null || // 1) 새로운 파일을 선택했거나
+        viewModel.calendar.imageURL !=
+            viewModel.initialCalendar.imageURL; // 2) 기존 이미지를 삭제했거나(null이 됨)
+
+    // 3. 최종 변경 여부
+    final bool isContentChange =
+        isTitleChanged || isDescChanged || isImageChanged;
 
     return SafeArea(
       child: Padding(
