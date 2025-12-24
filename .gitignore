@@ -46,3 +46,4 @@ app.*.map.json
 /android/app/release
 
 supabase/functions/service-account.json
+/android/key.properties
