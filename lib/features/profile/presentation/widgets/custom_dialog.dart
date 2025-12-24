@@ -50,12 +50,13 @@ class CustomDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Colors.transparent,
       child: Stack(
         children: [
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: AppColors.pureWhite,
+              color: AppColors.surface(context),
             ),
             width: 300,
             height: height,

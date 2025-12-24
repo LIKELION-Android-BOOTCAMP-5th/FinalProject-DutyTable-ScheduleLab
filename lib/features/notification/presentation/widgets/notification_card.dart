@@ -83,7 +83,8 @@ class NotificationCard extends StatelessWidget {
                           isAccepted == true ? " (수락됨)" : " (대기중)",
                           style: TextStyle(
                             fontSize: 12.0,
-                            color: AppColors.textSub(context),
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.dTextSub,
                           ),
                         ),
                     ],
