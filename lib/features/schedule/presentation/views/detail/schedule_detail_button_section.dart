@@ -127,7 +127,7 @@ Future<void> _showDeleteDialog(
   BuildContext context,
   ScheduleDetailViewModel viewModel,
 ) {
-  final bgColor = AppColors.background(context);
+  final bgColor = AppColors.surface(context);
   final mainTextColor = AppColors.textMain(context);
   final subTextColor = AppColors.textSub(context);
   final dangerColor = AppColors.danger(context);

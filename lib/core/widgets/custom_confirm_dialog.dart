@@ -38,7 +38,7 @@ class CustomConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppColors.background(context),
+      backgroundColor: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface(context),

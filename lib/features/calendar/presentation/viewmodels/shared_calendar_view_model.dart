@@ -47,9 +47,6 @@ class SharedCalendarViewModel extends ChangeNotifier {
 
   bool deleteMode = false;
 
-  //TODO: 민석님 확인 해주세요
-  bool isAdmin = false;
-
   /// 선택된 카드 id들
   final Set<String> selectedIds = {};
 
@@ -216,12 +213,6 @@ class SharedCalendarViewModel extends ChangeNotifier {
     } else {
       selectedIds.add(id);
     }
-    notifyListeners();
-  }
-
-  //TODO: 민석님 확인 해주세요
-  void setAdmin(bool value) {
-    isAdmin = value;
     notifyListeners();
   }
 

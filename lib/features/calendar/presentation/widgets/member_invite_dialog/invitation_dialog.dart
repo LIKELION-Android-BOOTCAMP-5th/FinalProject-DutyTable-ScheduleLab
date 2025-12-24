@@ -46,7 +46,7 @@ class _InvitationDialogState extends State<InvitationDialog> {
       backgroundColor: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.pureWhite,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
@@ -67,7 +67,7 @@ class _InvitationDialogState extends State<InvitationDialog> {
                       style: TextStyle(
                         color: AppColors.textMain(context),
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 18,
                       ),
                     ),
               const SizedBox(height: 24),

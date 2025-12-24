@@ -27,6 +27,7 @@ class _LocationSearchDialog extends StatelessWidget {
     final viewModel = context.watch<LocationSearchViewModel>();
 
     return Dialog(
+      backgroundColor: AppColors.surface(context),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Column(
