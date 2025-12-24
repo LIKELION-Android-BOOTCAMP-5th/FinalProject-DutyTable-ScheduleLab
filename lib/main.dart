@@ -1,4 +1,5 @@
 import 'package:dutytable/core/providers/theme_provider.dart';
+import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -120,6 +121,8 @@ Future<void> main() async {
         providers: [
           ChangeNotifierProvider(create: (_) => ThemeProvider()),
           ChangeNotifierProvider(create: (context) => NotificationState()),
+          ChangeNotifierProvider(
+              create: (context) => SharedCalendarViewModel()),
         ],
         child: const MyApp(),
       ),

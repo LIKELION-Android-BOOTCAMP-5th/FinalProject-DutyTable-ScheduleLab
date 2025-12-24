@@ -106,10 +106,6 @@ GoRouter createRouter(BuildContext context) {
         builder: (context, state, child) {
           return MultiProvider(
             providers: [
-              // 공유 캘린더 리스트 새로고침용 뷰모델
-              ChangeNotifierProvider(
-                create: (context) => SharedCalendarViewModel(),
-              ),
               // 개인 캘린더 새로고침용 뷰모델
               ChangeNotifierProvider(
                 create: (context) => PersonalCalendarViewModel(),
