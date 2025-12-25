@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dutytable/extensions.dart';
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
@@ -210,7 +211,9 @@ class ScheduleAddViewModel extends ChangeNotifier {
     try {
       List<DateTime> holidays = [];
       if (_isRepeat && _holidayException) {
-        holidays = await ScheduleDataSource.instance.fetchHolidays();
+        holidays = await ScheduleDataSource.instance.fetchHolidays(
+          targetYear: _startDate.year,
+        );
       }
 
       final String? groupId = _isRepeat
@@ -219,111 +222,82 @@ class ScheduleAddViewModel extends ChangeNotifier {
 
       List<Map<String, dynamic>> payloads = [];
       int createdCount = 0;
+      int targetCount = _isRepeat ? (_repeatCount ?? 1) : 1;
 
-      final scheduleDuration =
-          DateTime(
-            _endDate.year,
-            _endDate.month,
-            _endDate.day,
-            _endTime.hour,
-            _endTime.minute,
-          ).difference(
-            DateTime(
-              _startDate.year,
-              _startDate.month,
-              _startDate.day,
-              _startTime.hour,
-              _startTime.minute,
-            ),
-          );
+      final scheduleDuration = DateTime(
+        2000,
+        1,
+        1,
+        _endTime.hour,
+        _endTime.minute,
+      ).difference(DateTime(2000, 1, 1, _startTime.hour, _startTime.minute));
 
-      DateTime currentStartDate = _startDate;
-      int targetCount = _isRepeat ? _repeatCount : 1;
-
+      DateTime currentStartDate = DateTime(
+        _startDate.year,
+        _startDate.month,
+        _startDate.day,
+      );
       int attempts = 0;
 
-      while (createdCount < targetCount && attempts < 1000) {
+      while (createdCount < targetCount && attempts < 3000) {
         attempts++;
 
-        bool isWeekend =
-            currentStartDate.weekday == DateTime.saturday ||
-            currentStartDate.weekday == DateTime.sunday;
+        if (currentStartDate.checkIsException(
+          holidays: holidays,
+          weekendException: _weekendException,
+          holidayException: _holidayException,
+        )) {
+          currentStartDate = currentStartDate.add(const Duration(days: 1));
+          continue;
+        }
 
-        bool isHoliday = holidays.any(
-          (h) =>
-              h.year == currentStartDate.year &&
-              h.month == currentStartDate.month &&
-              h.day == currentStartDate.day,
+        DateTime startDateTime = DateTime(
+          currentStartDate.year,
+          currentStartDate.month,
+          currentStartDate.day,
+          _startTime.hour,
+          _startTime.minute,
         );
 
-        bool shouldSkip =
-            _isRepeat &&
-            ((_weekendException && isWeekend) ||
-                (_holidayException && isHoliday));
+        payloads.add({
+          'calendar_id': calendarId,
+          'repeat_group_id': groupId,
+          'title': _title.trim(),
+          'emotion_tag': _emotionTag,
+          'color_value': _colorValue,
+          'is_done': _isDone,
+          'started_at': startDateTime.toUtc().toIso8601String(),
+          'ended_at': startDateTime
+              .add(scheduleDuration)
+              .toUtc()
+              .toIso8601String(),
+          'is_repeat': _isRepeat,
+          'repeat_option': _isRepeat ? _repeatOption : null,
+          'repeat_num': _isRepeat ? _repeatNum : null,
+          'weekend_exception': _isRepeat ? _weekendException : false,
+          'holiday_exception': _isRepeat ? _holidayException : false,
+          'repeat_count': _isRepeat ? _repeatCount : null,
+          'address': _address,
+          'latitude': _latitude,
+          'longitude': _longitude,
+          'memo': _memo.trim().isEmpty ? null : _memo.trim(),
+        });
 
-        if (!shouldSkip) {
-          DateTime startDateTime = DateTime(
-            currentStartDate.year,
-            currentStartDate.month,
-            currentStartDate.day,
-            _startTime.hour,
-            _startTime.minute,
-          );
-
-          DateTime endDateTime = startDateTime.add(scheduleDuration);
-
-          payloads.add({
-            'calendar_id': calendarId,
-            'repeat_group_id': groupId,
-            'title': _title.trim(),
-            'emotion_tag': _emotionTag,
-            'color_value': _colorValue,
-            'is_done': _isDone,
-            'started_at': startDateTime.toUtc().toIso8601String(),
-            'ended_at': endDateTime.toUtc().toIso8601String(),
-            'is_repeat': _isRepeat,
-            'repeat_option': _isRepeat ? _repeatOption : null,
-            'repeat_num': _isRepeat ? _repeatNum : null,
-            'weekend_exception': _isRepeat ? _weekendException : false,
-            'holiday_exception': _isRepeat ? _holidayException : false,
-            'repeat_count': _isRepeat ? _repeatCount : null,
-            'address': _address,
-            'latitude': _latitude,
-            'longitude': _longitude,
-            'memo': _memo.trim().isEmpty ? null : _memo.trim(),
-          });
-          createdCount++;
-        }
-
+        createdCount++;
         if (!_isRepeat) break;
 
-        if (_repeatOption == "daily") {
-          currentStartDate = currentStartDate.add(Duration(days: _repeatNum));
-        } else if (_repeatOption == "weekly") {
-          currentStartDate = currentStartDate.add(
-            Duration(days: _repeatNum * 7),
-          );
-        } else if (_repeatOption == "monthly") {
-          currentStartDate = DateTime(
-            currentStartDate.year,
-            currentStartDate.month + _repeatNum,
-            currentStartDate.day,
-          );
-        } else if (_repeatOption == "yearly") {
-          currentStartDate = DateTime(
-            currentStartDate.year + _repeatNum,
-            currentStartDate.month,
-            currentStartDate.day,
-          );
-        }
+        currentStartDate = currentStartDate.jumpToNextWorkingDay(
+          repeatOption: _repeatOption,
+          repeatNum: _repeatNum,
+          holidays: holidays,
+          weekendException: _weekendException,
+          holidayException: _holidayException,
+        );
       }
-
-      log(payloads.toString(), name: 'SCHEDULE_PAYLOAD');
 
       if (payloads.isNotEmpty) {
         await ScheduleDataSource.instance.addSchedule(payloads);
       }
-
       _state = ViewState.success;
     } catch (e) {
       _state = ViewState.error;
