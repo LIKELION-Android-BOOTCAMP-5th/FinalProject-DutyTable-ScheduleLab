@@ -158,3 +158,68 @@ extension ChattingDateTime on String {
     return '$amPm $hour12시 $minute분';
   }
 }
+
+/// 반복 일정 계산 관련 확장
+extension ScheduleRepeatExtension on DateTime {
+  /// 현재 날짜가 예외(주말/공휴일)인지 체크합니다.
+  bool checkIsException({
+    required List<DateTime> holidays,
+    required bool weekendException,
+    required bool holidayException,
+  }) {
+    bool isWeekend = weekday == DateTime.saturday || weekday == DateTime.sunday;
+    bool isHoliday = holidays.any(
+      (h) => h.year == year && h.month == month && h.day == day,
+    );
+
+    return (weekendException && isWeekend) || (holidayException && isHoliday);
+  }
+
+  /// 다음 반복 날짜를 계산하여 반환합니다.
+  DateTime jumpToNextWorkingDay({
+    required String repeatOption,
+    required int repeatNum,
+    required List<DateTime> holidays,
+    required bool weekendException,
+    required bool holidayException,
+  }) {
+    DateTime nextDate = this;
+
+    if (repeatOption == 'daily') {
+      // 일 단위: 순수 영업일 수만큼 카운트하며 전진
+      int targetJump = repeatNum;
+      while (targetJump > 0) {
+        nextDate = nextDate.add(const Duration(days: 1));
+        // 자기 자신의 checkIsException을 활용
+        if (!nextDate.checkIsException(
+          holidays: holidays,
+          weekendException: weekendException,
+          holidayException: holidayException,
+        )) {
+          targetJump--;
+        }
+      }
+    } else if (repeatOption == 'weekly') {
+      // 주 단위: 단순 7일 점프 (요일 유지)
+      nextDate = nextDate.add(Duration(days: repeatNum * 7));
+    } else if (repeatOption == 'monthly') {
+      // 월 단위: 한 달 뒤 점프
+      nextDate = DateTime(
+        nextDate.year,
+        nextDate.month + repeatNum,
+        nextDate.day,
+      );
+    } else if (repeatOption == 'yearly') {
+      // 년 단위: 일 년 뒤 점프
+      nextDate = DateTime(
+        nextDate.year + repeatNum,
+        nextDate.month,
+        nextDate.day,
+      );
+    } else {
+      nextDate = nextDate.add(Duration(days: repeatNum));
+    }
+
+    return nextDate;
+  }
+}

@@ -11,7 +11,8 @@ class ScheduleDataSource {
 
   final Dio _dio = DioClient.shared.dio;
 
-  Future<List<DateTime>> fetchHolidays() async {
+  /// google calendar API 공휴일
+  Future<List<DateTime>> fetchHolidays({required int targetYear}) async {
     const String googleApiKey = "AIzaSyChi09zyRm-cUUvRYsggxCUE6hxkzRf9is";
     const String calendarId =
         "ko.south_korea#holiday@group.v.calendar.google.com";
@@ -21,8 +22,8 @@ class ScheduleDataSource {
       "/calendar/v3/calendars/$calendarId/events",
       {
         'key': googleApiKey,
-        'timeMin': "${DateTime.now().year}-01-01T00:00:00Z",
-        'timeMax': "${DateTime.now().year}-12-31T23:59:59Z",
+        'timeMin': "$targetYear-01-01T00:00:00Z",
+        'timeMax': "${targetYear + 1}-12-31T23:59:59Z",
         'singleEvents': 'true',
       },
     );
@@ -38,10 +39,8 @@ class ScheduleDataSource {
         }).toList();
 
         holidays.sort();
-
         return holidays;
       }
-
       return [];
     } on DioException catch (e) {
       print("❌ 구글 API 상세 에러: ${e.response?.data}");

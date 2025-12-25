@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:dutytable/extensions.dart';
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:dutytable/main.dart';
@@ -191,7 +192,6 @@ class ScheduleEditViewModel extends ChangeNotifier {
     }
   }
 
-  /// ✅ 새로운 반복 일정 리스트를 생성하는 로직
   Future<List<Map<String, dynamic>>> _generateNewSchedules(
     String groupId,
   ) async {
@@ -199,55 +199,59 @@ class ScheduleEditViewModel extends ChangeNotifier {
 
     List<DateTime> holidays = [];
     if (_holidayException) {
-      holidays = await ScheduleDataSource.instance.fetchHolidays();
+      holidays = await ScheduleDataSource.instance.fetchHolidays(
+        targetYear: _startDate.year,
+      );
     }
+
+    print(holidays);
+
+    final scheduleDuration = DateTime(
+      2000,
+      1,
+      1,
+      _endTime.hour,
+      _endTime.minute,
+    ).difference(DateTime(2000, 1, 1, _startTime.hour, _startTime.minute));
 
     DateTime currentStart = DateTime(
       _startDate.year,
       _startDate.month,
       _startDate.day,
-      _startTime.hour,
-      _startTime.minute,
     );
-    DateTime currentEnd = DateTime(
-      _endDate.year,
-      _endDate.month,
-      _endDate.day,
-      _endTime.hour,
-      _endTime.minute,
-    );
-
     int createdCount = 0;
     int safetyLoop = 0;
 
-    while (createdCount < _repeatCount && safetyLoop < 1000) {
+    while (createdCount < _repeatCount && safetyLoop < 3000) {
       safetyLoop++;
 
-      bool isWeekend =
-          currentStart.weekday == DateTime.saturday ||
-          currentStart.weekday == DateTime.sunday;
-
-      bool isHoliday = holidays.any(
-        (h) =>
-            h.year == currentStart.year &&
-            h.month == currentStart.month &&
-            h.day == currentStart.day,
-      );
-
-      if ((_weekendException && isWeekend) ||
-          (_holidayException && isHoliday)) {
-        currentStart = _getNextDate(currentStart);
-        currentEnd = _getNextDate(currentEnd);
+      if (currentStart.checkIsException(
+        holidays: holidays,
+        weekendException: _weekendException,
+        holidayException: _holidayException,
+      )) {
+        currentStart = currentStart.add(const Duration(days: 1));
         continue;
       }
+
+      DateTime startDateTime = DateTime(
+        currentStart.year,
+        currentStart.month,
+        currentStart.day,
+        _startTime.hour,
+        _startTime.minute,
+      );
 
       payloads.add({
         'calendar_id': _scheduleFromEdit.calendarId,
         'title': _title.trim(),
         'emotion_tag': _emotionTag,
         'color_value': _colorValue,
-        'started_at': currentStart.toUtc().toIso8601String(),
-        'ended_at': currentEnd.toUtc().toIso8601String(),
+        'started_at': startDateTime.toUtc().toIso8601String(),
+        'ended_at': startDateTime
+            .add(scheduleDuration)
+            .toUtc()
+            .toIso8601String(),
         'is_repeat': true,
         'repeat_option': _repeatOption,
         'repeat_num': _repeatNum,
@@ -263,31 +267,17 @@ class ScheduleEditViewModel extends ChangeNotifier {
       });
 
       createdCount++;
-      currentStart = _getNextDate(currentStart);
-      currentEnd = _getNextDate(currentEnd);
+
+      currentStart = currentStart.jumpToNextWorkingDay(
+        repeatOption: _repeatOption,
+        repeatNum: _repeatNum,
+        holidays: holidays,
+        weekendException: _weekendException,
+        holidayException: _holidayException,
+      );
     }
 
     return payloads;
-  }
-
-  /// 주기 옵션에 따라 다음 날짜를 계산하는 헬퍼 함수
-  DateTime _getNextDate(DateTime date) {
-    switch (_repeatOption) {
-      case 'daily':
-        return date.add(Duration(days: _repeatNum));
-      case 'weekly':
-        return date.add(Duration(days: 7 * _repeatNum));
-      case 'monthly':
-        return DateTime(
-          date.year,
-          date.month + _repeatNum,
-          date.day,
-          date.hour,
-          date.minute,
-        );
-      default:
-        return date.add(Duration(days: _repeatNum));
-    }
   }
 
   /// 주소 관련 로직

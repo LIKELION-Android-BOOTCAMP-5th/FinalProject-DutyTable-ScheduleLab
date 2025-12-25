@@ -157,9 +157,9 @@ class MyApp extends StatelessWidget {
 
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(1.0), // 🔒 폰트 크기 고정
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(1.0)),
           child: child!,
         );
       },
