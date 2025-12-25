@@ -122,7 +122,8 @@ Future<void> main() async {
           ChangeNotifierProvider(create: (_) => ThemeProvider()),
           ChangeNotifierProvider(create: (context) => NotificationState()),
           ChangeNotifierProvider(
-              create: (context) => SharedCalendarViewModel()),
+            create: (context) => SharedCalendarViewModel(),
+          ),
         ],
         child: const MyApp(),
       ),
@@ -153,6 +154,15 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routerConfig: createRouter(context),
       title: "DutyTable",
+
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(1.0), // 🔒 폰트 크기 고정
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }
