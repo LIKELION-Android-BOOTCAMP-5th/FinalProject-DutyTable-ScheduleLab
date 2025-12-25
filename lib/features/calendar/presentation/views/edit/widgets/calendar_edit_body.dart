@@ -29,11 +29,11 @@ class CalendarEditBody extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  viewModel.getImage();
+                  viewModel.pickImage(context);
                 },
                 child: CustomCalendarImageBox(
-                  imageUrl: viewModel.image != null
-                      ? viewModel.image!.path
+                  imageUrl: viewModel.newImage != null
+                      ? viewModel.newImage!.path
                       : viewModel.calendar.imageURL,
                 ),
               ),
