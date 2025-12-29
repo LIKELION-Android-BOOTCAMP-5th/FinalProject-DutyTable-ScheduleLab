@@ -15,7 +15,7 @@ class CalendarDataSource {
 
   /// CREATE
   /// 캘린더 추가
-  Future<void> addSharedCalendar({
+  Future<int> addSharedCalendar({
     required String title,
     String? imageURL,
     String? description,
@@ -47,6 +47,8 @@ class CalendarDataSource {
 
       await _dio.post('/rest/v1/invite_notifications', data: members);
     }
+
+    return calendarId;
   }
 
   /// 멤버 초대
@@ -62,18 +64,23 @@ class CalendarDataSource {
 
   /// UPDATE
   /// 캘린더 수정
-  Future<bool> updateCalendarInfo(
-    String title,
-    String description,
+  Future<bool> updateCalendarInfo({
+    String? title,
+    String? description,
     String? imageURL,
-    int calendarId,
-  ) async {
+    required int calendarId,
+  }) async {
     try {
-      final Map<String, dynamic> data = {
-        'title': title,
-        'description': description,
-        'imageURL': imageURL,
-      };
+      // 1. 전송할 데이터 맵을 빈 상태로 시작
+      final Map<String, dynamic> data = {};
+
+      // 2. 전달된 값이 있을 때만(Null이 아닐 때만) 맵에 추가
+      if (title != null) data['title'] = title;
+      if (description != null) data['description'] = description;
+      if (imageURL != null) data['imageURL'] = imageURL;
+
+      // 3. 값이 없다면 호출 X
+      if (data.isEmpty) return true;
 
       final response = await _dio.patch(
         '/rest/v1/calendars',
@@ -82,11 +89,7 @@ class CalendarDataSource {
         data: data,
       );
 
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      return response.statusCode == 200 || response.statusCode == 204;
     } on DioException catch (e) {
       return false;
     }

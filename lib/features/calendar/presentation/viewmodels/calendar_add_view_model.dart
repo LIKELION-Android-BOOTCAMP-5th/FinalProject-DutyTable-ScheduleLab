@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:dutytable/core/services/supabase_storage_service.dart';
 import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../main.dart';
 import '../../data/datasources/user_data_source.dart';
@@ -70,29 +70,6 @@ class CalendarAddViewModel extends ChangeNotifier {
     }
   }
 
-  /// 선택한 이미지 supabase storage 에 저장
-  Future<String?> _uploadCalendarImage() async {
-    if (_imageFile == null) return null;
-
-    final user = supabase.auth.currentUser;
-    if (user == null) throw Exception('User not authenticated');
-
-    final file = _imageFile!;
-    final extension = file.path.split('.').last;
-    final filePath =
-        'calendar-images/${user.id}/${DateTime.now().millisecondsSinceEpoch}.$extension';
-
-    await supabase.storage
-        .from('calendar-images')
-        .upload(
-          filePath,
-          file,
-          fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
-        );
-
-    return supabase.storage.from('calendar-images').getPublicUrl(filePath);
-  }
-
   /// 멤버 추가
   Future<void> addInvitedUserByNickname(String nickname) async {
     final value = nickname.trim();
@@ -137,13 +114,23 @@ class CalendarAddViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final imageUrl = await _uploadCalendarImage();
-
-      await CalendarDataSource.instance.addSharedCalendar(
+      // 1. 이미지 없이 캘린더 생성 후 캘린더 id 받아오기
+      final calendarId = await CalendarDataSource.instance.addSharedCalendar(
         title: _title,
-        imageURL: imageUrl,
         description: _description,
         invitedUserIds: _invitedUsers.keys.toList(),
+      );
+
+      // 2. 받아온 캘린더 id로 storage에 이미지 저장
+      final imageUrl = await SupabaseStorageService().uploadCalendarImage(
+        _imageFile,
+        calendarId,
+      );
+
+      // 3. storage에 저장한 이미지 캘린더에 업데이트
+      await CalendarDataSource.instance.updateCalendarInfo(
+        imageURL: imageUrl,
+        calendarId: calendarId,
       );
     } finally {
       _isLoading = false;
