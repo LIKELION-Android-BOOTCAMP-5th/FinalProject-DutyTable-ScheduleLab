@@ -122,6 +122,9 @@ class CalendarEditViewModel extends ChangeNotifier {
 
   /// 이미지 지우기
   Future<void> _deleteImage() async {
+    await SupabaseStorageService().deleteCalendarImage(
+      _calendar.imageURL ?? "",
+    );
     _newImage = null;
     _calendar = _calendar.copyWith(imageURL: null);
     notifyListeners();
