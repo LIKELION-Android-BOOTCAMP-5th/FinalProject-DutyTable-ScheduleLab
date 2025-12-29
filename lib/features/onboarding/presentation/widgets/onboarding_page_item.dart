@@ -1,10 +1,10 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import 'onboarding_data.dart';
+import '../../data/models/onboarding_model.dart';
 
 class OnboardingPageItem extends StatelessWidget {
-  final OnboardingData data;
+  final OnboardingModel data;
 
   const OnboardingPageItem({super.key, required this.data});
 
