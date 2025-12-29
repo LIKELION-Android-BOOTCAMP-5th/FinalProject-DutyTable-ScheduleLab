@@ -1,3 +1,4 @@
+import 'package:dutytable/core/di/injection.dart';
 import 'package:dutytable/core/providers/theme_provider.dart';
 import 'package:dutytable/core/services/notification_service.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
@@ -10,7 +11,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as timezone;
-
 import 'core/router/app_router.dart';
 import 'features/notification/presentation/viewmodels/notification_state.dart';
 import 'firebase_options.dart';
@@ -19,13 +19,16 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await NotificationService().initialize();
   await Supabase.initialize(
     url: dotenv.get("SUPABASE_URL"),
     anonKey: dotenv.get("SUPABASE_ANON_KEY"),
   );
 
+  await configureDependencies();
+
+  await NotificationService().initialize();
   await FlutterNaverMap().init(
     clientId: 'e98nekb2dd',
     onAuthFailed: (ex) {

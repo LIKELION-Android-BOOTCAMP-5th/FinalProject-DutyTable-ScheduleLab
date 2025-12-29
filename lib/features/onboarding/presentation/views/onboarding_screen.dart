@@ -1,3 +1,5 @@
+import 'package:dutytable/core/di/injection.dart';
+import 'package:dutytable/features/onboarding/presentation/args/onboarding_args.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,9 +17,11 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => OnboardingViewModel(
-        totalPages: onboardingPages.length,
-        onFinished: onFinished,
+      create: (_) => getIt<OnboardingViewModel>(
+        param1: OnboardingArgs(
+          totalPages: onboardingPages.length,
+          onFinished: onFinished,
+        ),
       ),
       child: const _OnboardingView(),
     );

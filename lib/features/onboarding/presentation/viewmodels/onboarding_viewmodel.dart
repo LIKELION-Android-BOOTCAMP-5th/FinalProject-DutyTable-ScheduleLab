@@ -1,14 +1,20 @@
+import 'package:dutytable/features/onboarding/data/datasources/onboarding_local_data_source.dart';
+import 'package:dutytable/features/onboarding/presentation/args/onboarding_args.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class OnboardingViewModel extends ChangeNotifier {
+  final OnboardingLocalDataSource localDataSource;
+  final OnboardingArgs args;
+
   final PageController pageController = PageController();
   int currentPage = 0;
 
-  final int totalPages;
-  final VoidCallback onFinished;
+  int get totalPages => args.totalPages;
+  VoidCallback get onFinished => args.onFinished;
 
-  OnboardingViewModel({required this.totalPages, required this.onFinished});
+  OnboardingViewModel(this.localDataSource, @factoryParam this.args);
 
   void onPageChanged(int page) {
     currentPage = page;
@@ -31,8 +37,7 @@ class OnboardingViewModel extends ChangeNotifier {
   }
 
   Future<void> _finishOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool("isOnboardingDone", true);
+    await localDataSource.setOnboardingDone();
     onFinished();
   }
 
