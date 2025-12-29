@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dutytable/core/services/supabase_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -139,37 +140,6 @@ class SignupViewModel with ChangeNotifier {
     }
   }
 
-  // 프로필 이미지를 Supabase Storage에 업로드하는 내부 함수
-  Future<String> _uploadProfileImage() async {
-    if (_selectedImage == null) {
-      throw Exception('Image not selected');
-    }
-
-    final currentUser = supabase.auth.currentUser;
-    if (currentUser == null) {
-      throw Exception('User not authenticated');
-    }
-
-    final imageFile = _selectedImage!;
-    final fileExtension = imageFile.path.split('.').last;
-    final filePath = '${currentUser.id}/profile.$fileExtension';
-
-    // 파일 업로드 (upsert: true - 덮어쓰기 허용)
-    await supabase.storage
-        .from('profile-images')
-        .upload(
-          filePath,
-          imageFile,
-          fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
-        );
-
-    // 업로드된 이미지의 public URL 반환
-    final imageUrl = supabase.storage
-        .from('profile-images')
-        .getPublicUrl(filePath);
-    return imageUrl;
-  }
-
   // 회원가입 완료 및 프로필 정보 업데이트
   Future<void> completeSignup(BuildContext context) async {
     if (!isFormComplete) return;
@@ -185,7 +155,9 @@ class SignupViewModel with ChangeNotifier {
       // 프로필 이미지가 있으면 업로드하고 URL 가져오기
       String? imageUrl;
       if (_selectedImage != null) {
-        imageUrl = await _uploadProfileImage();
+        imageUrl = await SupabaseStorageService().uploadProfileImage(
+          _selectedImage!,
+        );
       }
 
       // 'users' 테이블에 저장할 프로필 정보

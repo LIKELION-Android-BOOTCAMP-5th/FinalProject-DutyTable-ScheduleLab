@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dutytable/core/services/supabase_storage_service.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -140,27 +141,23 @@ class ProfileViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 이미지 수파베이스 스토리지에 업로드 하기
-  Future<String?> uploadStorage() async {
-    // 선택한 사진이 없을때
-    if (_image == null) {
-      return null;
+  Future<void> upload() async {
+    if (_image == null) return;
+
+    try {
+      final fileToUpload = File(_image!.path);
+
+      final publicUrl = await SupabaseStorageService().uploadProfileImage(
+        fileToUpload,
+      );
+
+      if (publicUrl != null) {
+        await updateImage(user!.id, publicUrl);
+        notifyListeners();
+      }
+    } catch (e) {
+      print('업로드 및 업데이트 실패: $e');
     }
-    final file = File(_image!.path); // 스토리지에 올릴 이미지 로컬 경로
-    final timestamp = DateTime.now().millisecondsSinceEpoch; // 타임스탬프
-
-    await supabase.storage
-        .from('profile-images')
-        .upload('${user!.id}/profile_$timestamp.jpg', file); //사용자 폴더에 이미지 넣기
-    final filePath =
-        "${user!.id}/profile_$timestamp.jpg"; //파일 경로 : 유저아이디/프로필_타임스탬프.jpg
-
-    // 테이블에 업데이트 할 public url 만들기
-    final publicUrl = supabase.storage
-        .from('profile-images')
-        .getPublicUrl('${filePath}');
-    notifyListeners();
-    return publicUrl;
   }
 
   // 수파베이스에 저장
@@ -170,13 +167,6 @@ class ProfileViewmodel extends ChangeNotifier {
         .update({'profileurl': publicUrl}) // 사진 경로 업데이트
         .eq('id', userId);
     this.image = publicUrl;
-    notifyListeners();
-  }
-
-  // 스토리지올리기 + 테이블 업데이트
-  Future<void> upload() async {
-    final publicUrl = await uploadStorage();
-    await updateImage(user!.id, publicUrl);
     notifyListeners();
   }
 

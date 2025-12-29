@@ -4,9 +4,8 @@ import 'package:dutytable/features/calendar/data/datasources/calendar_data_sourc
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../main.dart';
+import '../../../../core/services/supabase_storage_service.dart';
 
 class CalendarEditViewModel extends ChangeNotifier {
   /// 캘린더 제목 컨트롤러(private)
@@ -128,44 +127,24 @@ class CalendarEditViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 선택한 이미지 supabase storage 에 저장
-  Future<String?> _uploadCalendarImage() async {
-    if (_newImage == null) return null;
-
-    final user = supabase.auth.currentUser;
-    if (user == null) throw Exception('User not authenticated');
-
-    final file = _newImage!;
-    final extension = file.path.split('.').last;
-    final filePath =
-        'calendar-images/${_calendar.id}/${DateTime.now().millisecondsSinceEpoch}.$extension';
-
-    await supabase.storage
-        .from('calendar-images')
-        .upload(
-          filePath,
-          file,
-          fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
-        );
-
-    return supabase.storage.from('calendar-images').getPublicUrl(filePath);
-  }
-
   /// 캘린더 정보 업데이트
   Future<bool> updateCalendarInfo() async {
     String? finalImageUrl;
 
     if (_newImage != null) {
-      finalImageUrl = await _uploadCalendarImage();
+      finalImageUrl = await SupabaseStorageService().uploadCalendarImage(
+        _newImage,
+        calendar.id,
+      );
     } else {
       finalImageUrl = _calendar.imageURL;
     }
 
     final bool result = await CalendarDataSource.instance.updateCalendarInfo(
-      _titleController.text,
-      _descController.text,
-      finalImageUrl,
-      _calendar.id,
+      title: _titleController.text,
+      description: _descController.text,
+      imageURL: finalImageUrl,
+      calendarId: _calendar.id,
     );
 
     return result;
