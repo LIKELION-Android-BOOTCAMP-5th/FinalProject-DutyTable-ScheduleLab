@@ -200,9 +200,9 @@ class _SharedMemberTile extends StatelessWidget {
           ),
           isPersonalCalendar
               ? const SizedBox.shrink()
-              : member.is_admin
+              : member.isAdmin
               ? const Text("👑", style: TextStyle(fontSize: 24))
-              : _RoleButton(member.user_id),
+              : _RoleButton(member.userId),
         ],
       ),
     );

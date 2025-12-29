@@ -117,7 +117,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
       final user = await UserDataSource.shared.findUserByNickname(value);
       final memberIds =
           _calendar!.calendarMemberModel?.map((e) {
-            return e.user_id;
+            return e.userId;
           }).toList() ??
           [];
       if (user == null) {

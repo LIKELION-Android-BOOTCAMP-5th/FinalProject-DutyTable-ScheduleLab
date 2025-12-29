@@ -41,7 +41,7 @@ class _SharedCalendarScreen extends StatelessWidget {
             actions: [
               Row(
                 children: [
-                  viewModel.calendar!.user_id == viewModel.currentUserId
+                  viewModel.calendar!.userId == viewModel.currentUserId
                       ?
                         // 커스텀 캘린더 앱바 아이콘 사용
                         CustomAppBarIcon(

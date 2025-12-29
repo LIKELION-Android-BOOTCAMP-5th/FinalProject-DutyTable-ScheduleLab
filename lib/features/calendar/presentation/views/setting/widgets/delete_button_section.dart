@@ -12,7 +12,7 @@ class DeleteButtonSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<CalendarSettingViewModel>();
-    final isAdmin = viewModel.calendar.user_id == viewModel.currentUser!.id;
+    final isAdmin = viewModel.calendar.userId == viewModel.currentUser!.id;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(8),

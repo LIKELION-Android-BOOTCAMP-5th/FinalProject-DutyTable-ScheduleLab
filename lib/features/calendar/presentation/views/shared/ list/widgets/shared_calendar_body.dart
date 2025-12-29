@@ -67,7 +67,7 @@ class _CalendarListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     // 필요한 값만 선택적으로 구독 (성능 최적화)
     final isAdmin = context.select<SharedCalendarViewModel, bool>(
-      (vm) => calendar.user_id == vm.currentUserId,
+      (vm) => calendar.userId == vm.currentUserId,
     );
     final isSelected = context.select<SharedCalendarViewModel, bool>(
       (vm) => vm.isSelected(calendar.id.toString()),

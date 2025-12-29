@@ -126,7 +126,7 @@ class _ListTab extends StatelessWidget {
                           ],
                         ),
                         // TODO: 방장만 표시
-                        viewModel.calendar?.user_id == viewModel.currentUserId
+                        viewModel.calendar?.userId == viewModel.currentUserId
                             ? viewModel.deleteMode
                                   ? Row(
                                       children: [
@@ -249,7 +249,7 @@ class _ListTab extends StatelessWidget {
                             return;
                           }
                           final isAdmin =
-                              viewModel.calendar?.user_id ==
+                              viewModel.calendar?.userId ==
                               viewModel.currentUserId;
 
                           final bool? isDeleted = await context.push<bool>(
@@ -272,7 +272,7 @@ class _ListTab extends StatelessWidget {
             ],
           ),
           floatingActionButton:
-              viewModel.calendar!.user_id == viewModel.currentUserId
+              viewModel.calendar!.userId == viewModel.currentUserId
               ? CustomFloatingActionButton(calendarId: viewModel.calendar!.id)
               : null,
         );

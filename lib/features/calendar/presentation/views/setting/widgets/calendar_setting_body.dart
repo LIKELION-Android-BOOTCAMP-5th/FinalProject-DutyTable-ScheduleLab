@@ -184,10 +184,10 @@ class _SharedMemberTile extends StatelessWidget {
           ),
           calendarType == "personal"
               ? const SizedBox.shrink()
-              : member.is_admin
+              : member.isAdmin
               ? const Text("👑", style: TextStyle(fontSize: 24))
-              : calendar.user_id == currentUser!.id
-              ? _KickButton(member.user_id)
+              : calendar.userId == currentUser!.id
+              ? _KickButton(member.userId)
               : SizedBox.shrink(),
         ],
       ),
