@@ -13,10 +13,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/services/supabase_manager.dart';
 import '../../../../core/widgets/loading_dialog.dart';
 import '../../../../main.dart';
-import '../../../../supabase_manager.dart';
-import '../../../../supabase_user_model.dart';
+import '../../data/models/supabase_user_model.dart';
 
 // LoginScreen의 비즈니스 로직을 관리하는 ViewModel
 class LoginViewModel extends ChangeNotifier {
@@ -230,7 +230,6 @@ class LoginViewModel extends ChangeNotifier {
         // 데이터 가져오기
         try {
           final calendars = await SupabaseManager.shared.getCalendars();
-          final tasks = await SupabaseManager.shared.getTasks();
         } catch (e) {}
 
         // 알림 리스너 및 상태 설정

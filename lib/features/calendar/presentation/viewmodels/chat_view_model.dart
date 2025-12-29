@@ -2,8 +2,8 @@ import 'package:dutytable/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/services/supabase_manager.dart';
 import '../../../../main.dart';
-import '../../../../supabase_manager.dart';
 
 enum ViewState { loading, success, error }
 

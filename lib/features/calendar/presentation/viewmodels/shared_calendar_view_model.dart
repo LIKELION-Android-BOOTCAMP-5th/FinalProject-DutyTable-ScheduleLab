@@ -1,6 +1,6 @@
+import 'package:dutytable/core/services/supabase_manager.dart';
 import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
-import 'package:dutytable/supabase_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
