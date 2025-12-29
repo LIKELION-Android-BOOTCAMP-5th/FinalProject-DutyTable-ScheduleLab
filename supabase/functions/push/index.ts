@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
           scheduleTitle = scheduleData.title;
       }
 
-  notificationBody = `${record.first_message}${scheduleTitle}`;
+  notificationBody = `${record.first_message}`;
 
 
   } else {
@@ -121,7 +121,7 @@ if (!userData.allowed_notification) {
     privateKey: serviceAccount.private_key,
   })
 
-  const res = await fetch(
+const res = await fetch(
     `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`,
     {
       method: 'POST',
@@ -136,13 +136,13 @@ if (!userData.allowed_notification) {
             title: notificationTitle,
             body: notificationBody,
           },
-        },
-      android: {
-        priority: 'HIGH',
-        notification: {
-          channel_id: 'fcm_head_up_channel_id'
+          android: {
+            priority: 'HIGH',
+            notification: {
+              channel_id: 'fcm_head_up_channel_id'
+            }
+          }
         }
-      }
       }),
     }
   )
