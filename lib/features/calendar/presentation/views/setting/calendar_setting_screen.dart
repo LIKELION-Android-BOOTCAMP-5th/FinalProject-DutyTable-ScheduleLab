@@ -45,9 +45,9 @@ class _CalendarSettingScreen extends StatelessWidget {
             : null,
       ),
       body: const CalendarSettingBody(),
-      bottomNavigationBar: viewModel.calendar.type == "personal"
-          ? null
-          : const DeleteButtonSection(),
+      bottomNavigationBar: viewModel.calendar.type == "group"
+          ? const DeleteButtonSection()
+          : null,
     );
   }
 }

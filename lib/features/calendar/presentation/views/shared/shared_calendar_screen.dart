@@ -13,7 +13,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class SharedCalendarScreen extends StatelessWidget {
-  // 3단계 : 데이터 받기
   final CalendarModel calendar;
 
   const SharedCalendarScreen({super.key, required this.calendar});
@@ -42,9 +41,7 @@ class _SharedCalendarScreen extends StatelessWidget {
               Row(
                 children: [
                   viewModel.calendar!.userId == viewModel.currentUserId
-                      ?
-                        // 커스텀 캘린더 앱바 아이콘 사용
-                        CustomAppBarIcon(
+                      ? CustomAppBarIcon(
                           icon: Icons.person_add_alt,
                           onTap: () {
                             showDialog(
@@ -56,12 +53,10 @@ class _SharedCalendarScreen extends StatelessWidget {
                           },
                         )
                       : SizedBox.shrink(),
-                  // 커스텀 캘린더 앱바 아이콘 사용
                   CustomAppBarIcon(
                     icon: Icons.notifications_none,
                     onTap: () => context.push("/notification"),
                   ),
-                  // 커스텀 캘린더 앱바 아이콘 사용
                   CustomAppBarIcon(
                     icon: Icons.menu,
                     onTap: () async {
@@ -87,9 +82,9 @@ class _SharedCalendarScreen extends StatelessWidget {
               // 각 탭에 들어갈 위젯 리스트
               tabViewWidgetList: [
                 // 캘린더 탭
-                CalendarTab(calendar: viewModel.calendar), // 6단계 : 데이터 전달
+                CalendarTab(calendar: viewModel.calendar),
                 // 리스트 탭
-                ListTab(calendar: viewModel.calendar), // 6단계 : 데이터 전달
+                ListTab(calendar: viewModel.calendar),
                 // 채팅 탭
                 ChatTab(calendar: viewModel.calendar),
               ],
