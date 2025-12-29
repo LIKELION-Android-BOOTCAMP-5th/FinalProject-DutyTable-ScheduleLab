@@ -36,6 +36,7 @@ class _ScheduleDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleDetailViewModel>();
 
+    /// 일정 디테일 - 삭제된 상태
     if (viewModel.state == DetailViewState.deleted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted && context.canPop()) {
@@ -49,6 +50,7 @@ class _ScheduleDetailScreen extends StatelessWidget {
       );
     }
 
+    /// 일정 디테일 - 로딩중인 상태
     if (viewModel.state == DetailViewState.loading) {
       return Scaffold(
         backgroundColor: AppColors.background(context),
@@ -61,6 +63,7 @@ class _ScheduleDetailScreen extends StatelessWidget {
       );
     }
 
+    /// 일정 디테일 - 에러인 상태
     if (viewModel.state == DetailViewState.error || !viewModel.hasData) {
       return Scaffold(
         backgroundColor: AppColors.background(context),
@@ -73,6 +76,7 @@ class _ScheduleDetailScreen extends StatelessWidget {
       );
     }
 
+    /// 일정 디테일 - 성공인 상태
     return Scaffold(
       backgroundColor: AppColors.background(context),
       appBar: BackActionsAppBar(

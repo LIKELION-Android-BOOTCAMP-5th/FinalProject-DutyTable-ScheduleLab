@@ -46,12 +46,15 @@ class SharedCalendarBody extends StatelessWidget {
           );
         }
 
-        return ListView.separated(
-          itemCount: calendars.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (_, index) {
-            return _CalendarListItem(calendar: calendars[index]);
-          },
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          child: ListView.separated(
+            itemCount: calendars.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (_, index) {
+              return _CalendarListItem(calendar: calendars[index]);
+            },
+          ),
         );
     }
   }
@@ -65,15 +68,19 @@ class _CalendarListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 필요한 값만 선택적으로 구독 (성능 최적화)
+    /// 방장인지 여부
     final isAdmin = context.select<SharedCalendarViewModel, bool>(
       (vm) => calendar.userId == vm.currentUserId,
     );
-    final isSelected = context.select<SharedCalendarViewModel, bool>(
-      (vm) => vm.isSelected(calendar.id.toString()),
-    );
+
+    /// 캘린더 삭제 모드
     final deleteMode = context.select<SharedCalendarViewModel, bool>(
       (vm) => vm.deleteMode,
+    );
+
+    /// 캘린더 삭제 모드 true 일때 - 캘린더 선택 여부
+    final isSelected = context.select<SharedCalendarViewModel, bool>(
+      (vm) => vm.isSelected(calendar.id.toString()),
     );
 
     return GestureDetector(

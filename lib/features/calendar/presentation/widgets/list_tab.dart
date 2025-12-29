@@ -1,11 +1,11 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/widgets/custom_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/custom_confirm_dialog.dart';
-import '../../../../core/widgets/custom_floatingactionbutton.dart';
 import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
 import '../../data/models/calendar_model.dart';
 

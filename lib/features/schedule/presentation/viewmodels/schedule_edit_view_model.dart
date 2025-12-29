@@ -225,6 +225,8 @@ class ScheduleEditViewModel extends ChangeNotifier {
     while (createdCount < _repeatCount && safetyLoop < 3000) {
       safetyLoop++;
 
+      print(currentStart.weekday);
+
       if (currentStart.checkIsException(
         holidays: holidays,
         weekendException: _weekendException,

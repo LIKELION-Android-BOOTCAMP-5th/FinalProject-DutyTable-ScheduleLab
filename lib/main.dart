@@ -76,8 +76,11 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       themeMode: themeProvider.themeMode,
-      theme: ThemeData(brightness: Brightness.light),
-      darkTheme: ThemeData(brightness: Brightness.dark),
+      theme: ThemeData(brightness: Brightness.light, fontFamily: 'Pretendard'),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        fontFamily: 'Pretendard',
+      ),
       debugShowCheckedModeBanner: false,
       routerConfig: createRouter(context),
       title: "DutyTable",
