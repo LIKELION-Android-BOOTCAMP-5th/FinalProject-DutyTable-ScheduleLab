@@ -6,14 +6,9 @@ class OnboardingViewModel extends ChangeNotifier {
   int currentPage = 0;
 
   final int totalPages;
-
   final VoidCallback onFinished;
 
   OnboardingViewModel({required this.totalPages, required this.onFinished});
-
-  void disposeController() {
-    pageController.dispose();
-  }
 
   void onPageChanged(int page) {
     currentPage = page;
@@ -22,7 +17,7 @@ class OnboardingViewModel extends ChangeNotifier {
 
   Future<void> goToNextPage() async {
     if (currentPage < totalPages - 1) {
-      pageController.nextPage(
+      await pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
@@ -39,5 +34,11 @@ class OnboardingViewModel extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool("isOnboardingDone", true);
     onFinished();
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
   }
 }
