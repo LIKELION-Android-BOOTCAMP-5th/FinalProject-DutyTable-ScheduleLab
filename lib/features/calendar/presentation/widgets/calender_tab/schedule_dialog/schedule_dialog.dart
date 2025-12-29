@@ -54,7 +54,7 @@ class ScheduleDialog extends StatelessWidget {
                           return;
                         }
                         final isAdmin =
-                            viewModel.calendar?.user_id ==
+                            viewModel.calendar?.userId ==
                             viewModel.currentUserId;
 
                         context.pop();

@@ -40,7 +40,7 @@ class _CalendarSettingScreen extends StatelessWidget {
             color: AppColors.textMain(context),
           ),
         ),
-        actions: viewModel.calendar.user_id == viewModel.currentUser!.id
+        actions: viewModel.calendar.userId == viewModel.currentUser!.id
             ? [_EditButton()]
             : null,
       ),

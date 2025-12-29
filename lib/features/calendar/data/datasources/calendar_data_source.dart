@@ -221,8 +221,8 @@ class CalendarDataSource {
 
     // 방장을 제일 위로 정렬
     members.sort((a, b) {
-      if (a.is_admin == b.is_admin) return 0;
-      return a.is_admin ? -1 : 1;
+      if (a.isAdmin == b.isAdmin) return 0;
+      return a.isAdmin ? -1 : 1;
     });
 
     return members;

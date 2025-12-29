@@ -3,7 +3,7 @@ import 'calendar_member_model.dart';
 class CalendarModel {
   final int id;
   final String type;
-  final String user_id;
+  final String userId;
   final String ownerNickname;
   final String? ownerProfileUrl;
   final String title;
@@ -14,7 +14,7 @@ class CalendarModel {
   CalendarModel({
     required this.id,
     required this.type,
-    required this.user_id,
+    required this.userId,
     required this.ownerNickname,
     required this.title,
     this.description,
@@ -45,7 +45,7 @@ class CalendarModel {
     return CalendarModel(
       id: json["id"] as int,
       type: json["type"] as String,
-      user_id: json["user_id"] as String,
+      userId: json["user_id"] as String,
       ownerNickname: ownerNickname,
       title: json["title"] as String,
       description: json["description"] as String?,
@@ -59,7 +59,7 @@ class CalendarModel {
     return {
       'id': id,
       'type': type,
-      'user_id': user_id,
+      'user_id': userId,
       'ownerNickname': ownerNickname,
       'title': title,
       'description': description,
@@ -85,7 +85,7 @@ class CalendarModel {
     return CalendarModel(
       id: id ?? this.id,
       type: type ?? this.type,
-      user_id: user_id ?? this.user_id,
+      userId: user_id ?? this.userId,
       ownerNickname: ownerNickname ?? this.ownerNickname,
       ownerProfileUrl: ownerProfileUrl ?? this.ownerProfileUrl,
       title: title ?? this.title,

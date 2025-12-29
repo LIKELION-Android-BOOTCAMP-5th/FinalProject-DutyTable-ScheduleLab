@@ -1,16 +1,16 @@
 class CalendarMemberModel {
-  final int calendar_id;
-  final String user_id;
-  final bool is_admin;
-  final DateTime? last_read_at;
+  final int calendarId;
+  final String userId;
+  final bool isAdmin;
+  final DateTime? lastReadAt;
   final String nickname;
   final String? profileUrl;
 
   CalendarMemberModel({
-    required this.calendar_id,
-    required this.user_id,
-    required this.is_admin,
-    required this.last_read_at,
+    required this.calendarId,
+    required this.userId,
+    required this.isAdmin,
+    required this.lastReadAt,
     required this.nickname,
     required this.profileUrl,
   });
@@ -23,10 +23,10 @@ class CalendarMemberModel {
 
     final String? profileUrl = userJson?['profileurl'] as String?;
     return CalendarMemberModel(
-      calendar_id: json["calendar_id"] as int,
-      user_id: json["user_id"] as String,
-      is_admin: json["is_admin"] as bool,
-      last_read_at: DateTime.parse(json["last_read_at"] as String),
+      calendarId: json["calendar_id"] as int,
+      userId: json["user_id"] as String,
+      isAdmin: json["is_admin"] as bool,
+      lastReadAt: DateTime.parse(json["last_read_at"] as String),
       nickname: memberNickname,
       profileUrl: profileUrl,
     );
@@ -34,28 +34,28 @@ class CalendarMemberModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'calendar_id': calendar_id,
-      'user_id': user_id,
-      'is_admin': is_admin,
-      'last_read_at': last_read_at,
+      'calendar_id': calendarId,
+      'user_id': userId,
+      'is_admin': isAdmin,
+      'last_read_at': lastReadAt,
       'nickname': nickname,
       'profileUrl': profileUrl,
     };
   }
 
   CalendarMemberModel copyWith({
-    int? calendar_id,
-    String? user_id,
-    bool? is_admin,
-    DateTime? last_read_at,
+    int? calendarId,
+    String? userId,
+    bool? isAdmin,
+    DateTime? lastReadAt,
     String? nickname,
     String? profileUrl,
   }) {
     return CalendarMemberModel(
-      calendar_id: calendar_id ?? this.calendar_id,
-      user_id: user_id ?? this.user_id,
-      is_admin: is_admin ?? this.is_admin,
-      last_read_at: last_read_at ?? this.last_read_at,
+      calendarId: calendarId ?? this.calendarId,
+      userId: userId ?? this.userId,
+      isAdmin: isAdmin ?? this.isAdmin,
+      lastReadAt: lastReadAt ?? this.lastReadAt,
       nickname: nickname ?? this.nickname,
       profileUrl: profileUrl,
     );

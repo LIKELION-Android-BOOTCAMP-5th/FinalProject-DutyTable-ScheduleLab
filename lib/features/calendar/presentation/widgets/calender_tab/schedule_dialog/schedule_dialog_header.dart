@@ -2,8 +2,8 @@ import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/extensions.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class ScheduleDialogHeader extends StatelessWidget {
   final DateTime day;
@@ -14,7 +14,7 @@ class ScheduleDialogHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleViewModel>();
-    final isAdmin = viewModel.calendar?.user_id == viewModel.currentUserId;
+    final isAdmin = viewModel.calendar?.userId == viewModel.currentUserId;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
