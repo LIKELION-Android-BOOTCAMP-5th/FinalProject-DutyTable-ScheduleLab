@@ -33,6 +33,13 @@ class SupabaseStorageService {
     return supabase.storage.from('calendar-images').getPublicUrl(filePath);
   }
 
+  /// 캘린더 이미지 삭제(캘린더 수정)
+  Future<void> deleteCalendarImage(String path) async {
+    List<String> paths = [];
+    paths.add(path);
+    await supabase.storage.from('calendar-images').remove(paths);
+  }
+
   /// 프로필 이미지 저장(회원가입, 프로필 변경)
   Future<String?> uploadProfileImage(File imageFile) async {
     final user = supabase.auth.currentUser;
@@ -56,5 +63,12 @@ class SupabaseStorageService {
       print('Storage Error: $e');
       return null;
     }
+  }
+
+  /// 프로필 이미지 삭제(프로필 변경)
+  Future<void> deleteProfileImage(String path) async {
+    List<String> paths = [];
+    paths.add(path);
+    await supabase.storage.from('profile-images').remove(paths);
   }
 }
