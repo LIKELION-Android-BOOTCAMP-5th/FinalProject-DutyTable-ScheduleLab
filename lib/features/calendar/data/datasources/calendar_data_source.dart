@@ -77,7 +77,7 @@ class CalendarDataSource {
       // 2. 전달된 값이 있을 때만(Null이 아닐 때만) 맵에 추가
       if (title != null) data['title'] = title;
       if (description != null) data['description'] = description;
-      if (imageURL != null) data['imageURL'] = imageURL;
+      data['imageURL'] = imageURL;
 
       // 3. 값이 없다면 호출 X
       if (data.isEmpty) return true;

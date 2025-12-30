@@ -3,14 +3,15 @@ import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_edit_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class EditButtonSection extends StatelessWidget {
-  final CalendarEditViewModel viewModel;
-
-  const EditButtonSection({super.key, required this.viewModel});
+  const EditButtonSection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<CalendarEditViewModel>();
+
     // 텍스트 변경 여부
     final bool isTitleChanged =
         viewModel.titleController.text != viewModel.initialCalendar.title;

@@ -34,10 +34,22 @@ class SupabaseStorageService {
   }
 
   /// 캘린더 이미지 삭제(캘린더 수정)
-  Future<void> deleteCalendarImage(String path) async {
-    List<String> paths = [];
-    paths.add(path);
-    await supabase.storage.from('calendar-images').remove(paths);
+  Future<void> deleteCalendarImage(String imageUrl) async {
+    try {
+      final String bucketName = 'calendar-images';
+      final String pattern = '$bucketName/';
+
+      if (!imageUrl.contains(pattern)) return;
+
+      final int startIndex = imageUrl.indexOf(pattern) + pattern.length;
+      final String filePath = imageUrl.substring(startIndex);
+
+      await supabase.storage.from(bucketName).remove([filePath]);
+
+      print('이미지 삭제 성공');
+    } catch (e) {
+      print('이미지 삭제 중 오류 발생: $e');
+    }
   }
 
   /// 프로필 이미지 저장(회원가입, 프로필 변경)

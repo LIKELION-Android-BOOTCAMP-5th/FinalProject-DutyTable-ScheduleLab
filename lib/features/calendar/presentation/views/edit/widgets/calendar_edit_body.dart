@@ -12,12 +12,11 @@ import 'package:provider/provider.dart';
 import '../../setting/widgets/custom_calendar_image_box.dart';
 
 class CalendarEditBody extends StatelessWidget {
-  final CalendarEditViewModel viewModel;
-  const CalendarEditBody({super.key, required this.viewModel});
+  const CalendarEditBody({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.read<CalendarEditViewModel>();
+    final viewModel = context.watch<CalendarEditViewModel>();
 
     return SafeArea(
       child: Padding(
