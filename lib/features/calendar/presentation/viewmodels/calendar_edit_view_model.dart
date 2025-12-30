@@ -7,7 +7,21 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/services/supabase_storage_service.dart';
 
+enum ViewState { loading, success, error }
+
 class CalendarEditViewModel extends ChangeNotifier {
+  /// 데이터 로딩 상태(private)
+  ViewState _state = ViewState.success;
+
+  /// 데이터 로딩 상태(public)
+  ViewState get state => _state;
+
+  /// 에러 메세지(private)
+  String? _errorMessage;
+
+  /// 에러 메세지(public)
+  String? get errorMessage => _errorMessage;
+
   /// 캘린더 제목 컨트롤러(private)
   late final TextEditingController _titleController = TextEditingController(
     text: _calendar.title,
@@ -36,6 +50,9 @@ class CalendarEditViewModel extends ChangeNotifier {
   File? _newImage;
   File? get newImage => _newImage;
   final ImagePicker picker = ImagePicker();
+
+  ///삭제할 이미지 URL(private)
+  String? _deleteImageURL;
 
   /// 캘린더 수정 뷰모델
   CalendarEditViewModel({CalendarModel? initialCalendarData}) {
@@ -70,7 +87,7 @@ class CalendarEditViewModel extends ChangeNotifier {
                 title: const Text("사진 촬영"),
                 onTap: () async {
                   Navigator.pop(context);
-                  _pickProfileImageCamera();
+                  _pickProfileImage('camera');
                 },
               ),
               ListTile(
@@ -78,7 +95,7 @@ class CalendarEditViewModel extends ChangeNotifier {
                 title: const Text("앨범에서 선택"),
                 onTap: () async {
                   Navigator.pop(context);
-                  _pickProfileImageAlbum();
+                  _pickProfileImage('gallery');
                 },
               ),
               ListTile(
@@ -96,36 +113,34 @@ class CalendarEditViewModel extends ChangeNotifier {
     );
   }
 
-  /// 카메라에서 이미지를 가져오기
-  Future<void> _pickProfileImageCamera() async {
-    // 카메라에서 선택된 이미지
-    final XFile? pickedFile = await picker.pickImage(
-      source: ImageSource.camera,
-    );
-    if (pickedFile != null) {
-      _newImage = File(pickedFile.path); //이미지 가져와서 _image에 로컬 경로 저장
-    }
+  /// 이미지 가져오기
+  Future<void> _pickProfileImage(String type) async {
+    _state = ViewState.loading;
     notifyListeners();
-  }
 
-  /// 갤러리에서 이미지를 가져오기
-  Future<void> _pickProfileImageAlbum() async {
-    // 갤러리에서 선택된 이미지
-    final XFile? pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-    );
-    if (pickedFile != null) {
-      _newImage = File(pickedFile.path); //이미지 가져와서 _image에 로컬 경로 저장
+    try {
+      final XFile? pickedFile = await picker.pickImage(
+        source: type == 'camera' ? ImageSource.camera : ImageSource.gallery,
+      );
+
+      if (pickedFile != null) {
+        _newImage = File(pickedFile.path);
+        _state = ViewState.success;
+      } else {
+        _state = ViewState.success;
+      }
+    } catch (e) {
+      _state = ViewState.error;
+      _errorMessage = e.toString();
+    } finally {
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   /// 이미지 지우기
   Future<void> _deleteImage() async {
-    await SupabaseStorageService().deleteCalendarImage(
-      _calendar.imageURL ?? "",
-    );
     _newImage = null;
+    _deleteImageURL = _calendar.imageURL;
     _calendar = _calendar.copyWith(imageURL: null);
     notifyListeners();
   }
@@ -133,23 +148,37 @@ class CalendarEditViewModel extends ChangeNotifier {
   /// 캘린더 정보 업데이트
   Future<bool> updateCalendarInfo() async {
     String? finalImageUrl;
+    bool result = false;
 
-    if (_newImage != null) {
-      finalImageUrl = await SupabaseStorageService().uploadCalendarImage(
-        _newImage,
-        calendar.id,
+    _state = ViewState.loading;
+    notifyListeners();
+
+    try {
+      if (_newImage != null) {
+        finalImageUrl = await SupabaseStorageService().uploadCalendarImage(
+          _newImage,
+          calendar.id,
+        );
+      } else {
+        finalImageUrl = _calendar.imageURL;
+      }
+
+      if (_deleteImageURL != null) {
+        await SupabaseStorageService().deleteCalendarImage(
+          _deleteImageURL ?? "",
+        );
+      }
+
+      result = await CalendarDataSource.instance.updateCalendarInfo(
+        title: _titleController.text,
+        description: _descController.text,
+        imageURL: finalImageUrl,
+        calendarId: _calendar.id,
       );
-    } else {
-      finalImageUrl = _calendar.imageURL;
+    } catch (e) {
+      _state = ViewState.error;
+      _errorMessage = e.toString();
     }
-
-    final bool result = await CalendarDataSource.instance.updateCalendarInfo(
-      title: _titleController.text,
-      description: _descController.text,
-      imageURL: finalImageUrl,
-      calendarId: _calendar.id,
-    );
-
     return result;
   }
 
