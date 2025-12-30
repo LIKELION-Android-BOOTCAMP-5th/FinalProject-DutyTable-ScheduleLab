@@ -10,7 +10,7 @@ import 'package:dutytable/features/notification/data/datasources/notification_da
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/widgets/loading_dialog.dart';
+import '../../../../core/utils/loading_dialog.dart';
 
 class LoginViewModel extends ChangeNotifier {
   final AuthDataSource _authDataSource;
@@ -27,9 +27,9 @@ class LoginViewModel extends ChangeNotifier {
     AuthDataSource? authDataSource,
     UserDataSource? userDataSource,
     LocalDataSource? localDataSource,
-  })  : _authDataSource = authDataSource ?? AuthDataSource(),
-        _userDataSource = userDataSource ?? UserDataSource(),
-        _localDataSource = localDataSource ?? LocalDataSource() {
+  }) : _authDataSource = authDataSource ?? AuthDataSource(),
+       _userDataSource = userDataSource ?? UserDataSource(),
+       _localDataSource = localDataSource ?? LocalDataSource() {
     _init();
   }
 
@@ -52,9 +52,9 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<void> googleSignIn(
-      BuildContext context, {
-        required bool isAutoLogin,
-      }) async {
+    BuildContext context, {
+    required bool isAutoLogin,
+  }) async {
     showFullScreenLoading(context);
     try {
       await _authDataSource.signInWithGoogle();
@@ -84,9 +84,9 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<void> signInWithApple(
-      BuildContext context, {
-        required bool isAutoLogin,
-      }) async {
+    BuildContext context, {
+    required bool isAutoLogin,
+  }) async {
     showFullScreenLoading(context);
     try {
       if (!Platform.isIOS) {
@@ -143,9 +143,9 @@ class LoginViewModel extends ChangeNotifier {
 
   void _showError(BuildContext context, String msg) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: Colors.red),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
   }
 
   void _closeLoadingSafely(BuildContext context) {

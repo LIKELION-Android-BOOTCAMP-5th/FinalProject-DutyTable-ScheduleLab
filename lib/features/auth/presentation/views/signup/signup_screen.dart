@@ -3,9 +3,10 @@ import 'package:dutytable/features/auth/presentation/viewmodels/signup_viewmodel
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../core/utils/image_picker_utils.dart';
 import 'widgets/signup_app_bar.dart';
-import 'widgets/signup_profile_image_picker.dart';
 import 'widgets/signup_form_card.dart';
+import 'widgets/signup_profile_image_picker.dart';
 import 'widgets/signup_submit_button.dart';
 
 class SignupScreen extends StatelessWidget {
@@ -46,7 +47,14 @@ class _SignupScreenUI extends StatelessWidget {
 
                   SignupProfileImagePicker(
                     selectedImage: viewmodel.selectedImage,
-                    onPickImage: viewmodel.pickImage,
+                    onPickImage: () {
+                      ImagePickerUtils.showImagePicker(
+                        context: context,
+                        onImageSelected: (source) =>
+                            viewmodel.pickProfileImage(source),
+                        onDelete: viewmodel.deleteImage,
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 20),

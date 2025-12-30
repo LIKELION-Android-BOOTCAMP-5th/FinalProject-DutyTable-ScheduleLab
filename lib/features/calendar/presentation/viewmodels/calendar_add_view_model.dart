@@ -5,10 +5,13 @@ import 'package:dutytable/features/calendar/data/datasources/calendar_data_sourc
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/services/device_resource_service.dart';
 import '../../../../main.dart';
 import '../../data/datasources/user_data_source.dart';
 
 class CalendarAddViewModel extends ChangeNotifier {
+  /// 디바이스 리소스 서비스(private)
+  final DeviceResourceService _resourceService = DeviceResourceService();
   bool _isLoading = false;
 
   File? _imageFile;
@@ -59,15 +62,19 @@ class CalendarAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 갤러리에서 프로필 이미지를 선택하는 함수
-  Future<void> pickImage() async {
-    final picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      _imageFile = File(image.path);
+  /// 이미지 선택
+  Future<void> pickProfileImage(ImageSource source) async {
+    final File? pickedFile = await _resourceService.pickImage(source);
+    if (pickedFile != null) {
+      _imageFile = File(pickedFile.path);
       notifyListeners();
     }
+  }
+
+  /// 이미지 삭제
+  Future<void> deleteImage() async {
+    _imageFile = null;
+    notifyListeners();
   }
 
   /// 멤버 추가

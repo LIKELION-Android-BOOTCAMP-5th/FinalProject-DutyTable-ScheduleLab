@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/services/device_resource_service.dart';
 import '../../../../core/services/supabase_storage_service.dart';
 
 enum ViewState { loading, success, error }
@@ -50,10 +50,12 @@ class CalendarEditViewModel extends ChangeNotifier {
   // 이미지 피커로 갤러리에서 사진 가져오기
   File? _newImage;
   File? get newImage => _newImage;
-  final ImagePicker picker = ImagePicker();
 
   ///삭제할 이미지 URL(private)
   String? _deleteImageURL;
+
+  /// 디바이스 리소스 서비스(private)
+  final DeviceResourceService _resourceService = DeviceResourceService();
 
   /// 캘린더 수정 뷰모델
   CalendarEditViewModel({CalendarModel? initialCalendarData}) {
@@ -71,59 +73,13 @@ class CalendarEditViewModel extends ChangeNotifier {
     );
   }
 
-  /// 이미지 옵션 선택
-  Future<void> pickImage(BuildContext context) async {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text("사진 촬영"),
-                onTap: () async {
-                  context.pop(context);
-                  _pickProfileImage('camera');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text("앨범에서 선택"),
-                onTap: () async {
-                  context.pop(context);
-                  _pickProfileImage('gallery');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.no_photography_outlined),
-                title: const Text("이미지 삭제"),
-                onTap: () async {
-                  context.pop(context);
-                  _deleteImage();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  /// 이미지 가져오기
-  Future<void> _pickProfileImage(String type) async {
+  /// 이미지 선택
+  Future<void> pickProfileImage(ImageSource source) async {
     _state = ViewState.loading;
     notifyListeners();
 
     try {
-      final XFile? pickedFile = await picker.pickImage(
-        source: type == 'camera' ? ImageSource.camera : ImageSource.gallery,
-      );
-
+      final File? pickedFile = await _resourceService.pickImage(source);
       if (pickedFile != null) {
         _newImage = File(pickedFile.path);
         _state = ViewState.success;
@@ -138,8 +94,8 @@ class CalendarEditViewModel extends ChangeNotifier {
     }
   }
 
-  /// 이미지 지우기
-  Future<void> _deleteImage() async {
+  /// 이미지 삭제
+  Future<void> deleteImage() async {
     _newImage = null;
     _deleteImageURL = _calendar.imageURL;
     _calendar = _calendar.copyWith(imageURL: null);

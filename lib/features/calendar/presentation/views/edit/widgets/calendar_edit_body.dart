@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../../core/utils/image_picker_utils.dart';
 import '../../setting/widgets/custom_calendar_image_box.dart';
 
 class CalendarEditBody extends StatelessWidget {
@@ -28,7 +29,12 @@ class CalendarEditBody extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  viewModel.pickImage(context);
+                  ImagePickerUtils.showImagePicker(
+                    context: context,
+                    onImageSelected: (source) =>
+                        viewModel.pickProfileImage(source),
+                    onDelete: viewModel.deleteImage,
+                  );
                 },
                 child: CustomCalendarImageBox(
                   imageUrl: viewModel.newImage != null
