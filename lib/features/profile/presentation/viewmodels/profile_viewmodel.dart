@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dutytable/core/services/supabase_storage_service.dart';
+import 'package:dutytable/features/profile/data/datasources/profile_data_source.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -55,12 +56,6 @@ class ProfileViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // // 동기화 연결,연결해제
-  // void googleSync() {
-  //   is_sync = !is_sync;
-  //   notifyListeners();
-  // }
-
   // 닉네임 텍스트 수정
   void editNickname() {
     this.nickname = nicknameController.text.trim();
@@ -75,21 +70,17 @@ class ProfileViewmodel extends ChangeNotifier {
 
   //닉네임 수정한거 수파베이스에 반영하기
   Future<void> updateNickname(userId) async {
-    await supabase
-        .from('users')
-        .update({'nickname': nicknameController.text})
-        .eq('id', userId);
-    this.nickname = nicknameController.text;
+    await ProfileDataSource.instance.update(
+      userId: userId,
+      payload: {'nickname': nicknameController.text.trim()},
+    );
+    nickname = nicknameController.text.trim();
     notifyListeners();
   }
 
   // 닉네임,이메일, 프로필 사진 불러오기
   Future<void> fetchUser() async {
-    final data = await supabase
-        .from('users')
-        .select()
-        .eq('id', user!.id)
-        .maybeSingle();
+    final data = await ProfileDataSource.instance.fetchUserProfile();
     nickname = data!['nickname'];
     nicknameController.text = nickname;
     email = data['email'];
@@ -99,31 +90,22 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   // 구글 연동하기
-  // Future<void> updateGoogleSync(userId, bool bool) async {
-  //   await supabase
-  //       .from('users')
-  //       .update({'is_google_calendar_connect': is_sync})
-  //       .eq('id', userId);
-  //   this.is_sync = is_sync;
-  //   notifyListeners();
-  // }
-  // 구글 연동하기
   Future<void> updateGoogleSync(userId, bool syncStatus) async {
-    await supabase
-        .from('users')
-        .update({'is_google_calendar_connect': syncStatus})
-        .eq('id', userId);
-    this.is_sync = syncStatus;
+    await ProfileDataSource.instance.update(
+      userId: userId,
+      payload: {'is_google_calendar_connect': syncStatus},
+    );
+    is_sync = syncStatus;
     notifyListeners();
   }
 
   //알림 on/off하기
   Future<void> updateNotification(userId) async {
-    await supabase
-        .from('users')
-        .update({'allowed_notification': is_active_notification})
-        .eq('id', userId);
-    this.is_active_notification = is_active_notification;
+    await ProfileDataSource.instance.update(
+      userId: userId,
+      payload: {'allowed_notification': is_active_notification},
+    );
+    is_active_notification = is_active_notification;
     notifyListeners();
   }
 
@@ -162,11 +144,11 @@ class ProfileViewmodel extends ChangeNotifier {
 
   // 수파베이스에 저장
   Future<void> updateImage(userId, String? publicUrl) async {
-    await supabase
-        .from('users')
-        .update({'profileurl': publicUrl}) // 사진 경로 업데이트
-        .eq('id', userId);
-    this.image = publicUrl;
+    await ProfileDataSource.instance.update(
+      userId: userId,
+      payload: {'profileurl': publicUrl},
+    );
+    image = publicUrl;
     notifyListeners();
   }
 
@@ -183,13 +165,14 @@ class ProfileViewmodel extends ChangeNotifier {
 
   //  닉네임 중복
   Future<void> nicknameOverlapping() async {
-    final count = await supabase
-        .from('users')
-        .select()
-        .eq('nickname', nicknameController.text)
-        .neq('id', user!.id);
-    if (count.length > 0) {
+    final editingNickname = nicknameController.text;
+    final count = await ProfileDataSource.instance.fetchUserNickname(
+      editingNickname,
+    );
+    if (count == false) {
+      // 중복임
       is_overlapping = true;
+      Fluttertoast.showToast(msg: "중복된 닉네임입니다.");
     } else if (nicknameController.text.length < 2 ||
         nicknameController.text.length > 10) {
       Fluttertoast.showToast(msg: "닉네임은 2~10글자로 입력해야 합니다.");
@@ -209,7 +192,7 @@ class ProfileViewmodel extends ChangeNotifier {
 
   // 회원탈퇴
   Future<void> deleteUser() async {
-    await supabase.from('users').delete().eq('id', user!.id);
+    await ProfileDataSource.instance.deleteUser(user!.id);
   }
 
   // 버튼 텍스트
@@ -218,8 +201,8 @@ class ProfileViewmodel extends ChangeNotifier {
     (is_edit == false)
         ? result = "수정"
         : (nickname == nicknameController.text)
-        ? result = "  취소  "
-        : result = "  저장  ";
+        ? result = "취소"
+        : result = "저장";
     return result;
   }
 

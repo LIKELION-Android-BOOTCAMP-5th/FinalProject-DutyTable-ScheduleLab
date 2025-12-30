@@ -4,27 +4,27 @@ import 'package:flutter/material.dart';
 /// 다이얼로그
 class CustomDialog extends StatelessWidget {
   /// 다이얼로그 높이
-  final height;
+  final double height;
 
   /// 아이콘배경색
-  final iconBackgroundColor;
+  final Color iconBackgroundColor;
 
   /// 아이콘
-  final icon;
+  final IconData icon;
 
   /// 아이콘 색
-  final iconColor;
+  final Color iconColor;
 
   /// 다이얼로그 이름
-  final title;
+  final String title;
 
   /// 다이얼로그 설명
-  final message;
+  final String message;
 
   /// 확인버튼
-  final allow;
+  final String allow;
 
-  final onClosed;
+  final void Function() onClosed;
 
   /// 뷰모델 호출
   final onChangeSelected;
@@ -35,16 +35,16 @@ class CustomDialog extends StatelessWidget {
   CustomDialog(
     BuildContext context, {
     super.key,
-    this.height,
-    this.iconBackgroundColor,
-    this.icon,
-    this.iconColor,
-    this.title,
-    this.message,
-    this.allow,
+    required this.height,
+    required this.iconBackgroundColor,
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.message,
+    required this.allow,
     this.onChangeSelected,
     this.announcement,
-    this.onClosed,
+    required this.onClosed,
   });
 
   @override

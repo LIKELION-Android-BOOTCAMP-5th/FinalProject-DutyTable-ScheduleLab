@@ -1,14 +1,12 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/core/providers/theme_provider.dart';
 import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
 import 'package:dutytable/features/profile/presentation/viewmodels/profile_viewmodel.dart';
+import 'package:dutytable/features/profile/presentation/views/widgets/profile_button_section.dart';
+import 'package:dutytable/features/profile/presentation/views/widgets/user_profile_section.dart';
 import 'package:dutytable/features/profile/presentation/widgets/custom_dialog.dart';
-import 'package:dutytable/features/profile/presentation/widgets/profile_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -27,8 +25,6 @@ class _ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 테마 변경 실시간 감지를 위해 watch 사용
-    final themeProvider = context.watch<ThemeProvider>();
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Consumer<ProfileViewmodel>(
@@ -78,260 +74,10 @@ class _ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 10),
 
                     // 프로필 섹션
-                    Row(
-                      children: [
-                        const Padding(padding: EdgeInsets.only(left: 10)),
-                        Stack(
-                          children: [
-                            SizedBox(
-                              width: 60,
-                              height: 60,
-                              child:
-                                  (viewModel.image == null ||
-                                      viewModel.image!.isEmpty)
-                                  ? Icon(
-                                      Icons.account_circle,
-                                      size: 60,
-                                      color: AppColors.iconSub(context),
-                                    )
-                                  : ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: Image.network(
-                                        viewModel.image!,
-                                        width: double.infinity,
-                                        height: 350,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                            ),
-                            if (viewModel.is_edit)
-                              Positioned(
-                                right: 0,
-                                bottom: 0,
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    await viewModel.getImage(
-                                      ImageSource.gallery,
-                                    );
-                                    await viewModel.upload();
-                                  },
-                                  child: CircleAvatar(
-                                    radius: 12,
-                                    backgroundColor: AppColors.primary(context),
-                                    child: const Icon(
-                                      Icons.camera_alt_outlined,
-                                      size: 14,
-                                      color: AppColors.pureWhite,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const Padding(padding: EdgeInsets.only(left: 10)),
-                        if (viewModel.is_edit)
-                          Expanded(
-                            child: TextField(
-                              controller: viewModel.nicknameController,
-                              style: TextStyle(
-                                color: AppColors.textMain(context),
-                              ),
-                              decoration: InputDecoration(
-                                hintText: "닉네임을 입력해주세요",
-                                hintStyle: TextStyle(
-                                  color: AppColors.textSub(context),
-                                ),
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppColors.lBorder,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        else
-                          Text(
-                            viewModel.nickname,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textMain(context),
-                            ),
-                          ),
-                        if (viewModel.is_edit)
-                          TextButton(
-                            onPressed: () => viewModel.nicknameOverlapping(),
-                            child: const Text("중복체크"),
-                          )
-                        else
-                          const Spacer(),
-                        GestureDetector(
-                          onTap: () => viewModel.nicknameButtonFunc(),
-                          child: Text(
-                            viewModel.nicknameButtonText(),
-                            style: const TextStyle(
-                              color: AppColors.primaryBlue,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const Padding(padding: EdgeInsets.only(right: 10)),
-                      ],
-                    ),
-                    const Padding(padding: EdgeInsets.all(10)),
+                    UserProfileSection(),
 
-                    // 내 계정 섹션
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: AppColors.surface(context), // 배경색 대응
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        child: Text(
-                          "   내 계정 : ${viewModel.email}",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSub(context),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const Padding(padding: EdgeInsets.all(7)),
-
-                    // 구글 캘린더 동기화
-                    CustomTab(
-                      icon: Icons.settings_outlined,
-                      buttonText: "  구글 캘린더 동기화",
-                      padding: 7.0,
-                      addWidget: GestureDetector(
-                        onTap: () async {
-                          await viewModel.googleSync();
-                        },
-                        child: Text(
-                          (viewModel.is_sync) ? "연결해제    " : "   연결    ",
-                          style: const TextStyle(
-                            color: AppColors.primaryBlue,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Padding(padding: EdgeInsets.all(5)),
-
-                    // 테마 설정 (ExpansionTile) - 리플 효과 삭제
-                    Theme(
-                      data: Theme.of(
-                        context,
-                      ).copyWith(splashFactory: NoSplash.splashFactory),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: ExpansionTile(
-                          iconColor: AppColors.textMain(context),
-                          collapsedIconColor: AppColors.iconSub(context),
-                          title: Row(
-                            children: [
-                              Icon(
-                                Icons.nightlight_outlined,
-                                color: AppColors.textMain(context),
-                              ),
-                              Text(
-                                "  테마",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textMain(context),
-                                ),
-                              ),
-                            ],
-                          ),
-                          collapsedShape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              color: isDarkMode
-                                  ? AppColors.dBorder
-                                  : AppColors.lBorder,
-                            ),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              color: AppColors.primary(context),
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          children: themeProvider.themeList.map((option) {
-                            return RadioListTile<String>(
-                              title: Text(
-                                option,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textMain(context),
-                                ),
-                              ),
-                              value: option,
-                              groupValue: themeProvider.selectedOption,
-                              activeColor: AppColors.primaryBlue,
-                              onChanged: (value) {
-                                if (value != null) {
-                                  themeProvider.updateTheme(value);
-                                }
-                              },
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-
-                    const Padding(padding: EdgeInsets.all(5)),
-
-                    // 알림 설정
-                    CustomTab(
-                      icon: Icons.notifications_active_outlined,
-                      buttonText: "  알림",
-                      padding: 0.0,
-                      addWidget: Transform.scale(
-                        scale: 0.7,
-                        child: Switch(
-                          value: viewModel.is_active_notification,
-                          onChanged: (value) {
-                            viewModel.activeNotification();
-                            viewModel.updateNotification(viewModel.user!.id);
-                          },
-                          activeThumbColor: AppColors.pureWhite,
-                          activeTrackColor: AppColors.primaryBlue,
-                        ),
-                      ),
-                    ),
-                    const Padding(padding: EdgeInsets.all(5)),
-
-                    // 앱 소개 다시보기
-                    GestureDetector(
-                      onTap: () async {
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool("isOnboardingDone", false);
-                        viewModel.logout();
-                        if (context.mounted) context.push("/login");
-                      },
-                      child: CustomTab(
-                        icon: Icons.lightbulb_outline_rounded,
-                        buttonText: "  앱 소개 다시보기",
-                        padding: 7.0,
-                        addWidget: Padding(
-                          padding: const EdgeInsets.only(right: 15.0),
-                          child: Icon(
-                            Icons.keyboard_arrow_right,
-                            size: 20,
-                            color: AppColors.textSub(context),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Padding(padding: EdgeInsets.all(5)),
+                    // 버튼 섹션(동기화, 테마, 알림, 앱소개 다시보기)
+                    second_section(),
 
                     // 회원탈퇴
                     GestureDetector(

@@ -216,22 +216,22 @@ class CustomNextDayLine extends StatelessWidget {
 
 class CustomChatCard extends StatelessWidget {
   /// 내가 보낸 채팅인가
-  final isMyChat;
+  final bool isMyChat;
 
   /// 채팅 보낸 시간
-  final chatTime;
+  final String chatTime;
 
   /// 채팅 메세지
-  final message;
+  final String message;
 
   /// 프로필 이미지
-  final image;
+  final String? image;
 
   /// 닉네임
-  final nickname;
+  final String nickname;
 
   /// 채팅 아이디
-  final id;
+  final int id;
 
   /// 커스텀 채팅 소유자에 따른 UI 변경 카드
   const CustomChatCard({
@@ -280,13 +280,13 @@ class CustomMyChatCard extends StatelessWidget {
   final String message;
 
   /// 프로필 이미지
-  final image;
+  final String? image;
 
   /// 닉네임
-  final nickname;
+  final String nickname;
 
   /// 채팅 아이디
-  final id;
+  final int id;
 
   /// 내 채팅 UI 카드
   const CustomMyChatCard({
@@ -350,13 +350,13 @@ class CustomOtherChatCard extends StatelessWidget {
   final String message;
 
   /// 프로필 이미지
-  final image;
+  final String? image;
 
   /// 닉네임
-  final nickname;
+  final String nickname;
 
   /// 채팅 아이디
-  final id;
+  final int id;
 
   /// 다른 유저 채팅 UI 카드
   const CustomOtherChatCard({
@@ -456,7 +456,7 @@ class CustomChatBox extends StatelessWidget {
   final String message;
 
   /// 채팅 아이디
-  final id;
+  final int id;
 
   /// 커스텀 채팅 박스
   const CustomChatBox({
@@ -465,7 +465,7 @@ class CustomChatBox extends StatelessWidget {
     required this.isMyChat,
     required this.chatTime,
     required this.message,
-    this.id,
+    required this.id,
   });
 
   @override
