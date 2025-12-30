@@ -1,6 +1,7 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/calendar_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
+import 'package:dutytable/features/calendar/presentation/widgets/custom_appbar_icon.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/list_tab.dart';
 import 'package:dutytable/features/notification/presentation/widgets/notification_icon.dart';
 import 'package:flutter/material.dart';
@@ -95,31 +96,6 @@ class _PersonalCalendarScreen extends StatelessWidget {
       body: SafeArea(
         // 커스텀 캘린더 탭뷰 사용
         child: bodyContent,
-      ),
-    );
-  }
-}
-
-class CustomAppBarIcon extends StatelessWidget {
-  /// 아이콘
-  final IconData icon;
-
-  /// 실행 함수
-  final void Function() onTap;
-
-  /// 커스텀 캘린더 앱바 아이콘
-  const CustomAppBarIcon({super.key, required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    // 리플 없는 버튼
-    return GestureDetector(
-      // 전체 영역 터치 가능
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Icon(icon, size: 28, color: AppColors.textMain(context)),
       ),
     );
   }
