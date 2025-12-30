@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/services/supabase_storage_service.dart';
@@ -86,7 +87,7 @@ class CalendarEditViewModel extends ChangeNotifier {
                 leading: const Icon(Icons.camera_alt),
                 title: const Text("사진 촬영"),
                 onTap: () async {
-                  Navigator.pop(context);
+                  context.pop(context);
                   _pickProfileImage('camera');
                 },
               ),
@@ -94,7 +95,7 @@ class CalendarEditViewModel extends ChangeNotifier {
                 leading: const Icon(Icons.photo_library),
                 title: const Text("앨범에서 선택"),
                 onTap: () async {
-                  Navigator.pop(context);
+                  context.pop(context);
                   _pickProfileImage('gallery');
                 },
               ),
@@ -102,7 +103,7 @@ class CalendarEditViewModel extends ChangeNotifier {
                 leading: const Icon(Icons.no_photography_outlined),
                 title: const Text("이미지 삭제"),
                 onTap: () async {
-                  Navigator.pop(context);
+                  context.pop(context);
                   _deleteImage();
                 },
               ),
