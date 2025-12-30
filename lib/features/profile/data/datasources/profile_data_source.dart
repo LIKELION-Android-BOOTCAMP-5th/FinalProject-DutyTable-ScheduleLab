@@ -26,6 +26,19 @@ class ProfileDataSource {
   // 회원탈퇴
   Future<void> deleteUser(String userId) async {
     await _dio.delete('/rest/v1/users', queryParameters: {'id': 'eq.$userId'});
+    try {
+      final String bucketName = 'profile-images';
+      final imageFile = await supabase.storage
+          .from(bucketName)
+          .list(path: userId); // List<FileObject> 형식이라서
+      final filePaths = imageFile
+          .map((file) => '$userId/${file.name}')
+          .toList(); // List<String> 형식으로 바꿔줌
+      await supabase.storage.from(bucketName).remove(filePaths);
+      print('이미지 삭제 성공!!!!!!');
+    } catch (e) {
+      print('이미지 삭제 중 오류 발생: $e');
+    }
   }
 
   /// READ
