@@ -77,7 +77,7 @@ class _ProfileScreen extends StatelessWidget {
                     UserProfileSection(),
 
                     // 버튼 섹션(동기화, 테마, 알림, 앱소개 다시보기)
-                    second_section(),
+                    ProfileButtonSection(),
 
                     // 회원탈퇴
                     GestureDetector(

@@ -11,8 +11,8 @@ class ProfileDataSource {
 
   /// UPDATE
   // 닉네임, 구글연동, 알림, 수파베이스에 이미지 저장
-  Future<void> update({
-    required userId,
+  Future<void> updateUserProfile({
+    required String userId,
     required Map<String, dynamic> payload,
   }) async {
     await _dio.patch(
@@ -24,7 +24,7 @@ class ProfileDataSource {
 
   /// DELETE
   // 회원탈퇴
-  Future<void> deleteUser(userId) async {
+  Future<void> deleteUser(String userId) async {
     await _dio.delete('/rest/v1/users', queryParameters: {'id': 'eq.$userId'});
   }
 
@@ -44,7 +44,7 @@ class ProfileDataSource {
   }
 
   // 닉네임 중복 검사
-  Future<bool> fetchUserNickname(editingNickname) async {
+  Future<bool> isDuplicateNickname(editingNickname) async {
     final currentUserId = supabase.auth.currentUser?.id;
 
     final response = await _dio.get(

@@ -69,8 +69,8 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   //닉네임 수정한거 수파베이스에 반영하기
-  Future<void> updateNickname(userId) async {
-    await ProfileDataSource.instance.update(
+  Future<void> updateNickname(String userId) async {
+    await ProfileDataSource.instance.updateUserProfile(
       userId: userId,
       payload: {'nickname': nicknameController.text.trim()},
     );
@@ -90,8 +90,8 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   // 구글 연동하기
-  Future<void> updateGoogleSync(userId, bool syncStatus) async {
-    await ProfileDataSource.instance.update(
+  Future<void> updateGoogleSync(String userId, bool syncStatus) async {
+    await ProfileDataSource.instance.updateUserProfile(
       userId: userId,
       payload: {'is_google_calendar_connect': syncStatus},
     );
@@ -100,8 +100,8 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   //알림 on/off하기
-  Future<void> updateNotification(userId) async {
-    await ProfileDataSource.instance.update(
+  Future<void> updateNotification(String userId) async {
+    await ProfileDataSource.instance.updateUserProfile(
       userId: userId,
       payload: {'allowed_notification': is_active_notification},
     );
@@ -143,8 +143,8 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   // 수파베이스에 저장
-  Future<void> updateImage(userId, String? publicUrl) async {
-    await ProfileDataSource.instance.update(
+  Future<void> updateImage(String userId, String? publicUrl) async {
+    await ProfileDataSource.instance.updateUserProfile(
       userId: userId,
       payload: {'profileurl': publicUrl},
     );
@@ -166,7 +166,7 @@ class ProfileViewmodel extends ChangeNotifier {
   //  닉네임 중복
   Future<void> nicknameOverlapping() async {
     final editingNickname = nicknameController.text;
-    final count = await ProfileDataSource.instance.fetchUserNickname(
+    final count = await ProfileDataSource.instance.isDuplicateNickname(
       editingNickname,
     );
     if (count == false) {
