@@ -1,262 +1,157 @@
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:crypto/crypto.dart';
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/services/supabase_manager.dart';
+import 'package:dutytable/features/auth/data/datasources/auth_data_source.dart';
+import 'package:dutytable/features/auth/data/datasources/local_data_source.dart';
+import 'package:dutytable/features/auth/data/datasources/user_data_source.dart';
+import 'package:dutytable/features/auth/data/models/login_result_model.dart';
 import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/services/supabase_manager.dart';
 import '../../../../core/widgets/loading_dialog.dart';
-import '../../../../main.dart';
-import '../../data/models/supabase_user_model.dart';
 
-// LoginScreen의 비즈니스 로직을 관리하는 ViewModel
 class LoginViewModel extends ChangeNotifier {
-  // 구글 로그인 시 얻는 사용자 정보
-  GoogleSignInAccount? _googleUser;
+  final AuthDataSource _authDataSource;
+  final UserDataSource _userDataSource;
+  final LocalDataSource _localDataSource;
 
-  // 외부에서 구글 사용자 정보에 접근하기 위한 getter
-  GoogleSignInAccount? get googleUser => _googleUser;
-  // Supabase에 저장된 사용자 프로필 정보
-  SupabaseUserModel? userAccount;
+  bool _isAutoLogin = true;
+  bool get isAutoLogin => _isAutoLogin;
 
-  // 구글 로그인을 처리하는 메인 함수
+  bool _showOnboarding = false;
+  bool get showOnboarding => _showOnboarding;
+
+  LoginViewModel({
+    AuthDataSource? authDataSource,
+    UserDataSource? userDataSource,
+    LocalDataSource? localDataSource,
+  })  : _authDataSource = authDataSource ?? AuthDataSource(),
+        _userDataSource = userDataSource ?? UserDataSource(),
+        _localDataSource = localDataSource ?? LocalDataSource() {
+    _init();
+  }
+
+  Future<void> _init() async {
+    final done = await _localDataSource.isOnboardingDone();
+    if (!done) {
+      _showOnboarding = true;
+      notifyListeners();
+    }
+  }
+
+  void finishOnboarding() {
+    _showOnboarding = false;
+    notifyListeners();
+  }
+
+  void setAutoLogin(bool value) {
+    _isAutoLogin = value;
+    notifyListeners();
+  }
+
   Future<void> googleSignIn(
-    BuildContext context, {
-    required bool isAutoLogin,
-  }) async {
-    // 전체 화면 로딩 인디케이터 표시
+      BuildContext context, {
+        required bool isAutoLogin,
+      }) async {
     showFullScreenLoading(context);
     try {
-      // 구글 로그인 시 요청할 권한 범위
-      final scopes = ['email', 'profile'];
-      final String? platformClientId;
+      await _authDataSource.signInWithGoogle();
+      await _localDataSource.setAutoLogin(isAutoLogin);
 
-      if (Platform.isIOS) {
-        platformClientId =
-            '174693600398-kt7o6r2jne782tkfbna9g5sl9b72vdjm.apps.googleusercontent.com';
-      } else if (Platform.isAndroid) {
-        platformClientId =
-            '174693600398-dnhnb2j1l6bhkl2g3r1goj7lcj3e53d8.apps.googleusercontent.com';
-      } else {
-        platformClientId = null;
-      }
+      final result = await _userDataSource.postLoginProcess();
 
-      // 구글 로그인 인스턴스 생성 및 초기화
-      final googleSignIn = GoogleSignIn.instance;
-      await googleSignIn.initialize(
-        serverClientId:
-            '174693600398-vng406q0u208sbnonb5hc3va8u9384u9.apps.googleusercontent.com',
-        clientId: platformClientId,
-      );
+      if (!context.mounted) return;
 
-      // 구글 인증 UI를 통해 사용자 계정 정보 가져오기
-      final user = await googleSignIn.authenticate();
+      // 기존 사용자일 때만 기존 로직 유지(프리패치/알림 세팅)
+      if (result.success && result.route == PostLoginRoute.shared) {
+        try {
+          await SupabaseManager.shared.getCalendars();
+        } catch (_) {}
 
-      // 사용자 정보가 Null이면 즉시 오류 처리
-      if (user == null) {
-        throw AuthException(
-          'Failed to sign in with Google or sign in cancelled.',
-        );
-      }
-      _googleUser = user; // 널 체크 후 _googleUser에 할당
-
-      final authorization = await _googleUser!.authorizationClient
-          .authorizationForScopes(scopes)
-          .catchError((_) async {
-            // 첫 번째 시도가 실패하면 authorizeScopes로 다시 시도
-            return await _googleUser!.authorizationClient.authorizeScopes(
-              scopes,
-            );
-          });
-
-      // Supabase 인증에 필요한 ID 토큰 가져오기
-      final idToken = _googleUser!.authentication.idToken;
-
-      if (idToken == null) {
-        throw AuthException(
-          'No ID Token found after successful Google sign-in.',
+        await NotificationDataSource.shared.setupNotificationListenersAndState(
+          context,
         );
       }
 
-      // ID 토큰을 사용하여 Supabase에 로그인
-      final response = await supabase.auth.signInWithIdToken(
-        provider: OAuthProvider.google,
-        idToken: idToken,
-        accessToken: authorization?.accessToken,
-      );
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('auto_login', isAutoLogin);
-      // 로그인 후 프로필 확인 및 화면 이동 로직 처리
-      await _handlePostSignIn(context);
+      _applyLoginResult(context, result);
     } catch (e) {
-      // TODO: 나중에 스낵바 제거
-      // 오류 발생 시 스낵바로 오류 메시지 표시
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('로그인 처리 중 오류 발생: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        GoRouter.of(context).pop();
-      }
+      _showError(context, '로그인 처리 중 오류 발생: $e');
     } finally {
-      // 로딩 인디케이터 닫기
-      if (context.mounted) {
-        // Pop하기 전에 context가 여전히 화면에 마운트되어 있는지 다시 확인
-        if (ModalRoute.of(context)?.isCurrent == true) {
-          GoRouter.of(context).pop();
-        }
-      }
+      _closeLoadingSafely(context);
     }
   }
 
   Future<void> signInWithApple(
-    BuildContext context, {
-    required bool isAutoLogin,
-  }) async {
-    // 전체 화면 로딩 인디케이터 표시
+      BuildContext context, {
+        required bool isAutoLogin,
+      }) async {
     showFullScreenLoading(context);
     try {
-      final rawNonce = supabase.auth.generateRawNonce();
-      final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-        nonce: hashedNonce,
-      );
-      final idToken = credential.identityToken;
-      if (idToken == null) {
-        throw const AuthException(
-          'Could not find ID Token from generated credential.',
-        );
+      if (!Platform.isIOS) {
+        throw Exception('Apple 로그인은 iOS에서만 지원합니다.');
       }
-      final response = await supabase.auth.signInWithIdToken(
-        provider: OAuthProvider.apple,
-        idToken: idToken,
-        nonce: rawNonce,
-      );
-      if (credential.givenName != null || credential.familyName != null) {
-        final nameParts = <String>[];
-        if (credential.givenName != null) nameParts.add(credential.givenName!);
-        if (credential.familyName != null)
-          nameParts.add(credential.familyName!);
-        final fullName = nameParts.join(' ');
-        await supabase.auth.updateUser(
-          UserAttributes(
-            data: {
-              'full_name': fullName,
-              'given_name': credential.givenName,
-              'family_name': credential.familyName,
-            },
-          ),
-        );
-      }
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('auto_login', isAutoLogin);
-      // 로그인 후 프로필 확인 및 화면 이동 로직 처리
-      await _handlePostSignIn(context);
-    } catch (e) {
-      // TODO: 나중에 스낵바 제거
-      // 오류 발생 시 스낵바로 오류 메시지 표시
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('로그인 처리 중 오류 발생: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        // GoRouter.of(context).pop();
-      }
-    } finally {
-      // 로딩 인디케이터 닫기
-      if (context.mounted) {
-        // Pop하기 전에 context가 여전히 화면에 마운트되어 있는지 다시 확인
-        if (ModalRoute.of(context)?.isCurrent == true) {
-          // GoRouter.of(context).pop();
-        }
-      }
-    }
-  }
 
-  // 로그인 성공 후 공통 로직을 처리하는 함수
-  Future<void> _handlePostSignIn(BuildContext context) async {
-    await FirebaseMessaging.instance.requestPermission();
+      await _authDataSource.signInWithApple();
+      await _localDataSource.setAutoLogin(isAutoLogin);
 
-    await FirebaseMessaging.instance.getAPNSToken();
+      final result = await _userDataSource.postLoginProcess();
 
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    final userId = supabase.auth.currentUser!.id;
-    if (fcmToken != null) {
-      await supabase
-          .from('users')
-          .update({'fcm_token': fcmToken})
-          .eq('id', userId);
-    }
-
-    // 현재 Supabase에 로그인된 사용자 정보 가져오기
-    final currentUser = supabase.auth.currentUser;
-    if (currentUser == null) {
-      throw AuthException('Failed to get user from Supabase.');
-    }
-
-    try {
-      // 'users' 테이블에서 현재 사용자 ID와 일치하는 프로필 정보 조회
-      final response = await supabase
-          .from('users')
-          .select()
-          .eq('id', currentUser.id)
-          .maybeSingle();
-
-      // 위젯이 화면에 마운트되어 있는지 확인
       if (!context.mounted) return;
 
-      // 프로필 정보가 없으면 (신규 사용자) 회원가입 화면으로 이동
-      if (response == null) {
-        GoRouter.of(context).go('/signup');
-      } else {
-        // 데이터 가져오기
+      if (result.success && result.route == PostLoginRoute.shared) {
         try {
-          final calendars = await SupabaseManager.shared.getCalendars();
-        } catch (e) {}
+          await SupabaseManager.shared.getCalendars();
+        } catch (_) {}
 
-        // 알림 리스너 및 상태 설정
         await NotificationDataSource.shared.setupNotificationListenersAndState(
           context,
         );
-
-        // 프로필 정보가 있으면 (기존 사용자) 로그인 성공 스낵바 표시 후 메인 화면으로 이동
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('로그인이 성공하였습니다.'),
-              backgroundColor: AppColors.pureSuccess,
-            ),
-          );
-          GoRouter.of(context).go('/shared');
-        }
       }
+
+      _applyLoginResult(context, result);
     } catch (e) {
-      // 오류 발생 시 스낵바로 오류 메시지 표시
-      if (!context.mounted) return;
+      _showError(context, '로그인 처리 중 오류 발생: $e');
+    } finally {
+      _closeLoadingSafely(context);
+    }
+  }
+
+  void _applyLoginResult(BuildContext context, LoginResultModel result) {
+    if (!result.success) {
+      _showError(context, result.message ?? '알 수 없는 오류');
+      return;
+    }
+
+    if (result.route == PostLoginRoute.shared) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('프로필 확인 중 오류 발생: $e'),
-          backgroundColor: Colors.red,
+        const SnackBar(
+          content: Text('로그인이 성공하였습니다.'),
+          backgroundColor: AppColors.pureSuccess,
         ),
       );
+      GoRouter.of(context).go('/shared');
+      return;
+    }
+
+    if (result.route == PostLoginRoute.signup) {
+      GoRouter.of(context).go('/signup');
+      return;
+    }
+  }
+
+  void _showError(BuildContext context, String msg) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: Colors.red),
+    );
+  }
+
+  void _closeLoadingSafely(BuildContext context) {
+    if (!context.mounted) return;
+    if (ModalRoute.of(context)?.isCurrent == true) {
+      GoRouter.of(context).pop();
     }
   }
 }

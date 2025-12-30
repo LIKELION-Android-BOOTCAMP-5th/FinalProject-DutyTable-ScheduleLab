@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dutytable/core/services/supabase_storage_service.dart';
+import 'package:dutytable/features/auth/data/datasources/user_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,6 +22,8 @@ class SignupViewModel with ChangeNotifier {
   String? nicknameMessage; // 닉네임 필드 아래에 표시될 메시지
   bool isNicknameMessageError = false; // 닉네임 메시지가 오류 메시지인지 여부
 
+  final UserDataSource _userDataSource;
+
   File? get selectedImage => _selectedImage;
   bool get isNicknameValid => _isNicknameValid;
   bool get isNicknameChecked => _isNicknameChecked;
@@ -33,18 +35,18 @@ class SignupViewModel with ChangeNotifier {
   bool get isFormComplete =>
       _isNicknameChecked && _isTermsAgreed && !_isLoading;
 
-  SignupViewModel() {
+  SignupViewModel({UserDataSource? userDataSource})
+      : _userDataSource = userDataSource ?? UserDataSource() {
     // 닉네임 컨트롤러에 리스너를 추가하여 입력이 변경될 때마다 _validateNickname 함수 호출
     nicknameController.addListener(_validateNickname);
   }
 
   // 갤러리에서 프로필 이미지를 선택하는 함수
   Future<void> pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    final file = await _userDataSource.pickProfileImageFromGallery();
 
-    if (image != null) {
-      _selectedImage = File(image.path);
+    if (file != null) {
+      _selectedImage = file;
       notifyListeners(); // 상태 변경을 UI에 알림
     }
   }
@@ -109,15 +111,9 @@ class SignupViewModel with ChangeNotifier {
     _setLoading(true);
     final nicknameToTest = nicknameController.text;
     try {
-      // 'users' 테이블에서 동일한 닉네임이 있는지 조회
-      final response = await supabase
-          .from('users')
-          .select('nickname')
-          .eq('nickname', nicknameToTest)
-          .limit(1)
-          .maybeSingle();
+      final duplicated = await _userDataSource.isNicknameDuplicated(nicknameToTest);
 
-      if (response == null) {
+      if (!duplicated) {
         // 중복된 닉네임이 없는 경우
         _isNicknameChecked = true;
         _lastCheckedNickname = nicknameToTest; // 확인 완료된 닉네임 저장
@@ -140,6 +136,25 @@ class SignupViewModel with ChangeNotifier {
     }
   }
 
+  // 프로필 이미지를 Supabase Storage에 업로드하는 내부 함수
+  Future<String> _uploadProfileImage() async {
+    if (_selectedImage == null) {
+      throw Exception('Image not selected');
+    }
+
+    final currentUser = supabase.auth.currentUser;
+    if (currentUser == null) {
+      throw Exception('User not authenticated');
+    }
+
+    final imageFile = _selectedImage!;
+    final imageUrl = await _userDataSource.uploadProfileImage(
+      userId: currentUser.id,
+      imageFile: imageFile,
+    );
+    return imageUrl;
+  }
+
   // 회원가입 완료 및 프로필 정보 업데이트
   Future<void> completeSignup(BuildContext context) async {
     if (!isFormComplete) return;
@@ -155,9 +170,7 @@ class SignupViewModel with ChangeNotifier {
       // 프로필 이미지가 있으면 업로드하고 URL 가져오기
       String? imageUrl;
       if (_selectedImage != null) {
-        imageUrl = await SupabaseStorageService().uploadProfileImage(
-          _selectedImage!,
-        );
+        imageUrl = await _uploadProfileImage();
       }
 
       // 'users' 테이블에 저장할 프로필 정보
@@ -171,7 +184,7 @@ class SignupViewModel with ChangeNotifier {
       };
 
       // upsert: 데이터가 없으면 새로 만들고, 있으면 업데이트
-      await supabase.from('users').upsert(updates);
+      await _userDataSource.upsertUserProfile(updates);
 
       // 회원가입 성공 후 메인 화면으로 이동
       if (context.mounted) {
