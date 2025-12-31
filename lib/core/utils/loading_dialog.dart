@@ -1,5 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 void showFullScreenLoading(BuildContext context) {
   showDialog(
@@ -20,6 +21,6 @@ void showFullScreenLoading(BuildContext context) {
 // 다이얼로그를 닫는 함수
 void hideLoading(BuildContext context) {
   if (context.mounted) {
-    Navigator.of(context).pop();
+    context.pop();
   }
 }
