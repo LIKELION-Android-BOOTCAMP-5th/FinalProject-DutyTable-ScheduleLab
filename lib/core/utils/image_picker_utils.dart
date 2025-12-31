@@ -1,5 +1,3 @@
-// core/utils/image_picker_utils.dart
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
