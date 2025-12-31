@@ -63,7 +63,7 @@ class CalendarAddViewModel extends ChangeNotifier {
   }
 
   /// 이미지 선택
-  Future<void> pickProfileImage(ImageSource source) async {
+  Future<void> pickCalendarImage(ImageSource source) async {
     final File? pickedFile = await _resourceService.pickImage(source);
     if (pickedFile != null) {
       _imageFile = File(pickedFile.path);

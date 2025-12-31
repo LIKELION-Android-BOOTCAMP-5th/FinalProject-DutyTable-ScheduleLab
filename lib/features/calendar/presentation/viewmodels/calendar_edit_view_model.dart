@@ -74,7 +74,7 @@ class CalendarEditViewModel extends ChangeNotifier {
   }
 
   /// 이미지 선택
-  Future<void> pickProfileImage(ImageSource source) async {
+  Future<void> pickCalendarImage(ImageSource source) async {
     _state = ViewState.loading;
     notifyListeners();
 

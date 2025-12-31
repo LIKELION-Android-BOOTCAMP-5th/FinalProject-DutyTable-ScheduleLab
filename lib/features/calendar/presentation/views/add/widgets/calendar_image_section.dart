@@ -33,7 +33,7 @@ class CalendarImageSection extends StatelessWidget {
           onTap: () async {
             ImagePickerUtils.showImagePicker(
               context: context,
-              onImageSelected: (source) => viewModel.pickProfileImage(source),
+              onImageSelected: (source) => viewModel.pickCalendarImage(source),
               onDelete: viewModel.deleteImage,
             );
           },
