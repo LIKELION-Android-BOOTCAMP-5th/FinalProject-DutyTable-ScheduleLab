@@ -19,5 +19,7 @@ void showFullScreenLoading(BuildContext context) {
 
 // 다이얼로그를 닫는 함수
 void hideLoading(BuildContext context) {
-  Navigator.of(context).pop();
+  if (context.mounted) {
+    Navigator.of(context).pop();
+  }
 }
