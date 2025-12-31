@@ -437,7 +437,7 @@ class CustomChatProfileImageBox extends StatelessWidget {
                 color: AppColors.textSub(context),
               ),
             )
-          : ClipOval(child: Image.network(imageUrl!)),
+          : ClipOval(child: Image.network(imageUrl!, fit: BoxFit.cover)),
     );
   }
 }

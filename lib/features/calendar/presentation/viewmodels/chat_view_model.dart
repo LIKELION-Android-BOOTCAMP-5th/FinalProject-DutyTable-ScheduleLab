@@ -1,4 +1,4 @@
-import 'package:dutytable/extensions.dart';
+import 'package:dutytable/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

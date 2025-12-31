@@ -11,9 +11,9 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as timezone;
 
+import 'core/network/firebase_options.dart';
 import 'core/router/app_router.dart';
 import 'features/notification/presentation/viewmodels/notification_state.dart';
-import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
