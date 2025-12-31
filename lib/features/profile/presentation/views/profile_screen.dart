@@ -1,6 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/logo_actions_app_bar.dart';
-import 'package:dutytable/features/profile/presentation/viewmodels/profile_viewmodel.dart';
+import 'package:dutytable/features/profile/presentation/viewmodels/profile_view_model.dart';
 import 'package:dutytable/features/profile/presentation/views/widgets/profile_button_section.dart';
 import 'package:dutytable/features/profile/presentation/views/widgets/user_profile_section.dart';
 import 'package:dutytable/features/profile/presentation/widgets/custom_dialog.dart';
