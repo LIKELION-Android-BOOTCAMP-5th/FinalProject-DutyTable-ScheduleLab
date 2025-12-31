@@ -1,6 +1,4 @@
-import 'dart:developer';
-
-import 'package:dutytable/extensions.dart';
+import 'package:dutytable/core/utils/extensions.dart';
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';

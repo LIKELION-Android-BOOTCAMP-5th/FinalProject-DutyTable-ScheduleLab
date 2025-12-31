@@ -1,8 +1,8 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/core/widgets/custom_calendar_setting_content_box.dart';
 import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_member_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
+import 'package:dutytable/features/calendar/presentation/views/setting/widgets/custom_calendar_setting_content_box.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';

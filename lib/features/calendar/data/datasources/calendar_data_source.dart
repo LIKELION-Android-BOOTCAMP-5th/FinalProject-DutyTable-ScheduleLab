@@ -2,7 +2,7 @@ import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:flutter/foundation.dart'; // debugPrint를 위해 추가
 
-import '../../../../extensions.dart';
+import '../../../../core/utils/extensions.dart';
 import '../../../../main.dart';
 import '../models/calendar_member_model.dart';
 import '../models/calendar_model.dart';

@@ -1,5 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/extensions.dart';
+import 'package:dutytable/core/utils/extensions.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

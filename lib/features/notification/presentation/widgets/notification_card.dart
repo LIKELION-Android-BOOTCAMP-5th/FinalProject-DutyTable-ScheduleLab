@@ -1,5 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/extensions.dart';
+import 'package:dutytable/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
 class NotificationCard extends StatelessWidget {
