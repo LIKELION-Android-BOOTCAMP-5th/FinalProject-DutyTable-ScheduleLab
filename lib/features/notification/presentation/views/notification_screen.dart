@@ -1,6 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
-import 'package:dutytable/features/notification/presentation/viewmodels/notification_viewmodel.dart';
+import 'package:dutytable/features/notification/presentation/viewmodels/notification_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
