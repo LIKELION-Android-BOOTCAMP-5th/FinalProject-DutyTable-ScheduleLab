@@ -1,15 +1,16 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/core/widgets/custom_calendar_setting_content_box.dart';
-import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_member_model.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_edit_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/edit/widgets/custom_calendar_edit_text_field.dart';
-import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../../core/utils/image_picker_utils.dart';
+import '../../../../../../core/widgets/custom_confirm_dialog.dart';
+import '../../../../data/models/calendar_member_model.dart';
+import '../../../widgets/chat_tab.dart';
 import '../../setting/widgets/custom_calendar_image_box.dart';
+import '../../setting/widgets/custom_calendar_setting_content_box.dart';
 
 class CalendarEditBody extends StatelessWidget {
   const CalendarEditBody({super.key});
@@ -28,7 +29,12 @@ class CalendarEditBody extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: () {
-                  viewModel.pickImage(context);
+                  ImagePickerUtils.showImagePicker(
+                    context: context,
+                    onImageSelected: (source) =>
+                        viewModel.pickCalendarImage(source),
+                    onDelete: viewModel.deleteImage,
+                  );
                 },
                 child: CustomCalendarImageBox(
                   imageUrl: viewModel.newImage != null

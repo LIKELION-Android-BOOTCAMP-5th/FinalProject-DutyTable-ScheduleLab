@@ -3,6 +3,8 @@ import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_add
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../../core/utils/image_picker_utils.dart';
+
 class CalendarImageSection extends StatelessWidget {
   /// 캘린더 이미지
   const CalendarImageSection({super.key});
@@ -29,7 +31,11 @@ class CalendarImageSection extends StatelessWidget {
         /// 이미지 추가 및 이미지 추가된 이미지 보여주기
         GestureDetector(
           onTap: () async {
-            await context.read<CalendarAddViewModel>().pickImage();
+            ImagePickerUtils.showImagePicker(
+              context: context,
+              onImageSelected: (source) => viewModel.pickCalendarImage(source),
+              onDelete: viewModel.deleteImage,
+            );
           },
           child: Container(
             width: 120,

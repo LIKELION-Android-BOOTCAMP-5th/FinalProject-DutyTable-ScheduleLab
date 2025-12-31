@@ -6,11 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/services/device_resource_service.dart';
 import '../../../../main.dart';
 
 // SignupScreen의 비즈니스 로직을 담당하는 ViewModel
 class SignupViewModel with ChangeNotifier {
   final TextEditingController nicknameController = TextEditingController();
+  final DeviceResourceService _resourceService = DeviceResourceService();
 
   File? _selectedImage; // 선택된 프로필 이미지 파일
   bool _isNicknameValid = false; // 닉네임 유효성 (2글자 이상)
@@ -21,7 +23,6 @@ class SignupViewModel with ChangeNotifier {
   String? _lastCheckedNickname; // 마지막으로 중복 확인한 닉네임
   String? nicknameMessage; // 닉네임 필드 아래에 표시될 메시지
   bool isNicknameMessageError = false; // 닉네임 메시지가 오류 메시지인지 여부
-
   final UserDataSource _userDataSource;
 
   File? get selectedImage => _selectedImage;
@@ -36,19 +37,24 @@ class SignupViewModel with ChangeNotifier {
       _isNicknameChecked && _isTermsAgreed && !_isLoading;
 
   SignupViewModel({UserDataSource? userDataSource})
-      : _userDataSource = userDataSource ?? UserDataSource() {
+    : _userDataSource = userDataSource ?? UserDataSource() {
     // 닉네임 컨트롤러에 리스너를 추가하여 입력이 변경될 때마다 _validateNickname 함수 호출
     nicknameController.addListener(_validateNickname);
   }
 
-  // 갤러리에서 프로필 이미지를 선택하는 함수
-  Future<void> pickImage() async {
-    final file = await _userDataSource.pickProfileImageFromGallery();
-
-    if (file != null) {
-      _selectedImage = file;
-      notifyListeners(); // 상태 변경을 UI에 알림
+  /// 이미지 선택
+  Future<void> pickProfileImage(ImageSource source) async {
+    final File? pickedFile = await _resourceService.pickImage(source);
+    if (pickedFile != null) {
+      _selectedImage = File(pickedFile.path);
     }
+    notifyListeners();
+  }
+
+  /// 이미지 삭제
+  Future<void> deleteImage() async {
+    _selectedImage = null;
+    notifyListeners();
   }
 
   // 약관을 봤음을 기록하는 함수
@@ -111,7 +117,9 @@ class SignupViewModel with ChangeNotifier {
     _setLoading(true);
     final nicknameToTest = nicknameController.text;
     try {
-      final duplicated = await _userDataSource.isNicknameDuplicated(nicknameToTest);
+      final duplicated = await _userDataSource.isNicknameDuplicated(
+        nicknameToTest,
+      );
 
       if (!duplicated) {
         // 중복된 닉네임이 없는 경우

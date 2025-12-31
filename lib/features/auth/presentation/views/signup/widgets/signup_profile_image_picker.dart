@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class SignupProfileImagePicker extends StatelessWidget {
   final File? selectedImage;
-  final VoidCallback onPickImage;
+  final void Function() onPickImage;
 
   const SignupProfileImagePicker({
     super.key,
@@ -68,7 +68,9 @@ class SignupProfileImagePicker extends StatelessWidget {
                 color: AppColors.iconSub(context),
                 size: 20,
               ),
-              onPressed: onPickImage,
+              onPressed: () {
+                onPickImage();
+              },
             ),
           ),
         ),

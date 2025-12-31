@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../models/login_result_model.dart';
 
@@ -10,7 +9,7 @@ class UserDataSource {
   final SupabaseClient supabase;
 
   UserDataSource({SupabaseClient? supabaseClient})
-      : supabase = supabaseClient ?? Supabase.instance.client;
+    : supabase = supabaseClient ?? Supabase.instance.client;
 
   /// 닉네임 중복 체크
   Future<bool> isNicknameDuplicated(String nickname) async {
@@ -61,13 +60,6 @@ class UserDataSource {
     return LoginResultModel.shared();
   }
 
-  Future<File?> pickProfileImageFromGallery() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image == null) return null;
-    return File(image.path);
-  }
-
   Future<String> uploadProfileImage({
     required String userId,
     required File imageFile,
@@ -75,13 +67,14 @@ class UserDataSource {
     final fileExtension = imageFile.path.split('.').last;
     final filePath = '$userId/profile.$fileExtension';
 
-    await supabase.storage.from('profile-images').upload(
-      filePath,
-      imageFile,
-      fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
-    );
+    await supabase.storage
+        .from('profile-images')
+        .upload(
+          filePath,
+          imageFile,
+          fileOptions: const FileOptions(cacheControl: '3600', upsert: true),
+        );
 
     return supabase.storage.from('profile-images').getPublicUrl(filePath);
   }
-
 }
