@@ -43,6 +43,10 @@ class ProfileViewmodel extends ChangeNotifier {
   /// 닉네임 중복 여부
   bool is_overlapping = true;
 
+  /// 온보딩 다시보기
+  bool _isShowOnboarding = false;
+  bool get isShowOnboarding => _isShowOnboarding;
+
   // 시작할때 닉네임,이메일,프로필 이미지 호출
   void _init() {
     fetchUser();
@@ -65,6 +69,12 @@ class ProfileViewmodel extends ChangeNotifier {
   //알림 토글
   void activeNotification() {
     is_active_notification = !is_active_notification;
+    notifyListeners();
+  }
+
+  // 온보딩 토글
+  void toggleOnboarding() {
+    _isShowOnboarding = !isShowOnboarding;
     notifyListeners();
   }
 
