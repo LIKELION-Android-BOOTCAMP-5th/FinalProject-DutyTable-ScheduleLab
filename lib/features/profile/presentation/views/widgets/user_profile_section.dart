@@ -2,8 +2,9 @@ import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/profile/presentation/viewmodels/profile_view_model.dart';
 import 'package:dutytable/features/profile/presentation/views/widgets/account_section.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+
+import '../../../../../core/utils/image_picker_utils.dart';
 
 class UserProfileSection extends StatelessWidget {
   const UserProfileSection({super.key});
@@ -23,7 +24,9 @@ class UserProfileSection extends StatelessWidget {
                 SizedBox(
                   width: 60,
                   height: 60,
-                  child: (viewModel.image == null || viewModel.image!.isEmpty)
+                  child: viewModel.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : (viewModel.image == null || viewModel.image!.isEmpty)
                       ? Icon(
                           Icons.account_circle,
                           size: 60,
@@ -44,9 +47,15 @@ class UserProfileSection extends StatelessWidget {
                     right: 0,
                     bottom: 0,
                     child: GestureDetector(
-                      onTap: () async {
-                        await viewModel.getImage(ImageSource.gallery);
-                        await viewModel.upload();
+                      onTap: () {
+                        ImagePickerUtils.showImagePicker(
+                          context: context,
+                          onImageSelected: (source) async {
+                            await viewModel.pickProfileImage(source);
+                            await viewModel.upload();
+                          },
+                          onDelete: viewModel.deleteImage,
+                        );
                       },
                       child: CircleAvatar(
                         radius: 12,
