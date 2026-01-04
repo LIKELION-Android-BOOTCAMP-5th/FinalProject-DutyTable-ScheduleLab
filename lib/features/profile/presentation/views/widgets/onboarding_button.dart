@@ -2,9 +2,7 @@ import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/profile/presentation/viewmodels/profile_view_model.dart';
 import 'package:dutytable/features/profile/presentation/widgets/profile_tab.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingButton extends StatelessWidget {
   const OnboardingButton({super.key});
@@ -15,10 +13,7 @@ class OnboardingButton extends StatelessWidget {
 
     return GestureDetector(
       onTap: () async {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool("isOnboardingDone", false);
-        viewModel.logout();
-        if (context.mounted) context.push("/login");
+        viewModel.toggleOnboarding();
       },
       child: CustomTab(
         icon: Icons.lightbulb_outline_rounded,
