@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 class SchedulePreviewCard extends StatelessWidget {
   final ScheduleModel item;
 
+  /// 일정 더보기 - 바디 : 일정(요약 카드)
   const SchedulePreviewCard({super.key, required this.item});
 
   @override
