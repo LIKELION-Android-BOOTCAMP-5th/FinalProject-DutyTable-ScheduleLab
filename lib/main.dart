@@ -33,7 +33,19 @@ Future<void> main() async {
   );
 
   // 네이버 맵 초기화
-  await FlutterNaverMap().init(clientId: 'e98nekb2dd');
+  await FlutterNaverMap().init(
+    clientId: 'e98nekb2dd',
+    onAuthFailed: (ex) {
+      switch (ex) {
+        case NQuotaExceededException(:final message):
+          break;
+        case NUnauthorizedClientException() ||
+            NClientUnspecifiedException() ||
+            NAnotherAuthFailedException():
+          break;
+      }
+    },
+  );
 
   // 위젯 데이터 초기 업데이트 로직 분리
   await _initialWidgetUpdate();
