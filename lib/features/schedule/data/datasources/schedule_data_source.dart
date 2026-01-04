@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/main.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../models/schedule_model.dart';
 
@@ -81,6 +80,71 @@ class ScheduleDataSource {
     }
   }
 
+  /// 모든 일정 불러오기
+  Future<List<ScheduleModel>> fetchJoinedSharedSchedules() async {
+    try {
+      final currentUserId = supabase.auth.currentUser?.id;
+      if (currentUserId == null) return [];
+
+      // 1. 내가 멤버로 등록된 캘린더 ID들을 가져옴
+      final memberResponse = await _dio.get(
+        '/rest/v1/calendar_members',
+        queryParameters: {
+          'select': 'calendar_id',
+          'user_id': 'eq.$currentUserId',
+        },
+      );
+
+      final List<dynamic> memberData = memberResponse.data;
+      if (memberData.isEmpty) return [];
+
+      final List<int> calendarIds = memberData
+          .map((item) => item['calendar_id'] as int)
+          .toList();
+
+      // 2. 해당 ID들에 속한 모든 일정 로드
+      final idsQuery = "(${calendarIds.join(',')})";
+      final scheduleResponse = await _dio.get(
+        '/rest/v1/schedules',
+        queryParameters: {'select': '*', 'calendar_id': 'in.$idsQuery'},
+      );
+
+      if (scheduleResponse.statusCode == 200) {
+        final List<dynamic> jsonList = scheduleResponse.data;
+        return jsonList.map((json) => ScheduleModel.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      print("❌ fetchJoinedSharedSchedules 에러: $e");
+      return [];
+    }
+  }
+
+  Future<List<ScheduleModel>> fetchSchedulesByRange({
+    required int calendarId,
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    final response = await _dio.get(
+      '/rest/v1/schedules',
+      queryParameters: {
+        'select': '*',
+        'calendar_id': 'eq.$calendarId',
+        // 1. 시작일이 종료 범위(to)보다 작거나 같고 (검색 범위 끝보다 먼저 시작)
+        // 2. 종료일이 시작 범위(from)보다 크거나 같아야 함 (검색 범위 시작보다 나중에 끝남)
+        'started_at': 'lte.${to.toIso8601String()}',
+        'ended_at': 'gte.${from.toIso8601String()}',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = response.data;
+      return jsonList.map((json) => ScheduleModel.fromJson(json)).toList();
+    } else {
+      throw Exception("Failed to load schedules by range");
+    }
+  }
+
   /// 스케줄 조회
   Future<List<ScheduleModel>> fetchSchedules(int calendarId) async {
     final response = await _dio.get(
@@ -97,7 +161,10 @@ class ScheduleDataSource {
   }
 
   /// 내 일정 불러오기
-  Future<List<ScheduleModel>> fetchMySchedules() async {
+  Future<List<ScheduleModel>> fetchMySchedules({
+    DateTime? from,
+    DateTime? to,
+  }) async {
     final currentUserId = supabase.auth.currentUser?.id;
     final data = await _dio.get(
       '/rest/v1/calendars',
@@ -109,21 +176,19 @@ class ScheduleDataSource {
     );
 
     final List<dynamic> jsonData = data.data;
-
     if (jsonData.isEmpty) return [];
 
     final myCalendarId = jsonData.first['id'];
 
-    final response = await _dio.get(
-      '/rest/v1/schedules',
-      queryParameters: {'select': '*', 'calendar_id': 'eq.$myCalendarId'},
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonList = response.data;
-      return jsonList.map((json) => ScheduleModel.fromJson(json)).toList();
+    // 기간 파라미터가 있으면 범위 쿼리, 없으면 전체 쿼리 실행(위젯을 위해 확장성 있게 변경함)
+    if (from != null && to != null) {
+      return fetchSchedulesByRange(
+        calendarId: myCalendarId,
+        from: from,
+        to: to,
+      );
     } else {
-      throw Exception("Failed to load schedules");
+      return fetchSchedules(myCalendarId);
     }
   }
 

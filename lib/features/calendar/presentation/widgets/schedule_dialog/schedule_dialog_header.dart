@@ -14,7 +14,18 @@ class ScheduleDialogHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleViewModel>();
-    final isAdmin = viewModel.calendar?.userId == viewModel.currentUserId;
+
+    // 1. 기본 권한: 내가 이 캘린더의 방장인가?
+    final isCalendarAdmin =
+        viewModel.calendar?.userId == viewModel.currentUserId;
+
+    // 2. 추가 체크: 현재 선택된 날(day)의 일정 중 '내 것(삭제 가능한 것)'이 하나라도 있는가?
+    final hasDeletableItem = viewModel.displaySchedules
+        .where((s) => s.containsDay(day))
+        .any((s) => s.calendarId == viewModel.calendar?.id);
+
+    // 최종 노출 조건: 방장이어야 하며, 삭제할 수 있는 내 일정이 존재해야 함
+    final showDeleteOption = isCalendarAdmin && hasDeletableItem;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -45,7 +56,7 @@ class ScheduleDialogHeader extends StatelessWidget {
           ),
 
           /// 일정 더보기 다이얼로그 - 헤더 오른쪽 : 전체 삭제(삭제 모드 시 취소 + 삭제)
-          if (isAdmin)
+          if (showDeleteOption)
             Row(
               children: [
                 // 삭제 모드일 때만 취소 버튼
@@ -74,6 +85,9 @@ class ScheduleDialogHeader extends StatelessWidget {
                       viewModel.toggleDeleteMode();
                       return;
                     }
+
+                    // 아무것도 선택하지 않았을 때는 삭제 동작 방지
+                    if (viewModel.selectedIds.isEmpty) return;
 
                     // 삭제 전 확인 다이얼로그
                     final confirmed = await showDialog<bool>(

@@ -7,13 +7,16 @@ import 'package:provider/provider.dart';
 class SchedulePreviewCard extends StatelessWidget {
   final ScheduleModel item;
 
-  /// 일정 더보기 - 바디 : 일정(요약 카드)
   const SchedulePreviewCard({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ScheduleViewModel>();
     final isSelected = viewModel.isSelected(item.id.toString());
+
+    // 권한 확인: 현재 캘린더의 일정인지
+    final bool isMySchedule = item.calendarId == viewModel.calendar?.id;
+
     final color = Color(int.parse(item.colorValue));
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -26,14 +29,14 @@ class SchedulePreviewCard extends StatelessWidget {
               ? color.withValues(alpha: 0.15)
               : color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
-          border: viewModel.deleteMode && isSelected
+          // 내 일정이고 선택되었을 때만 붉은 테두리 표시
+          border: viewModel.deleteMode && isSelected && isMySchedule
               ? Border.all(color: AppColors.pureDanger, width: 2)
               : Border.all(color: Colors.transparent, width: 2),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            /// 일정 더보기 다이얼로그 - 바디 : 일정(요약 카드)
             Expanded(
               child: IntrinsicHeight(
                 child: Row(
@@ -43,13 +46,9 @@ class SchedulePreviewCard extends StatelessWidget {
                       item.emotionTag ?? "🙂",
                       style: const TextStyle(fontSize: 28),
                     ),
-
                     const SizedBox(width: 12),
-
                     Container(width: 6, color: color),
-
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: Text(
                         item.title,
@@ -67,8 +66,8 @@ class SchedulePreviewCard extends StatelessWidget {
               ),
             ),
 
-            /// 일정 더보기 다이얼로그 - 바디 : 전체삭제 클릭 시 체크박스
-            if (viewModel.deleteMode)
+            /// 삭제 모드이면서 + 내 일정인 경우에만 체크박스 노출
+            if (viewModel.deleteMode && isMySchedule)
               Transform.scale(
                 scale: 0.9,
                 child: Checkbox(

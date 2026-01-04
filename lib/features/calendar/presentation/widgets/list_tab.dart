@@ -191,25 +191,53 @@ class _ListTab extends StatelessWidget {
                             : SizedBox.shrink(),
                       ],
                     ),
-                    if (viewModel.calendar!.type != "personal") ...[
-                      Row(
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Checkbox(
-                            value: viewModel.isFetchMySchedule,
-                            activeColor: AppColors.primaryBlue,
-                            onChanged: (_) => viewModel.toggleFetchMySchedule(),
-                          ),
-                          Text(
-                            "내 일정 불러오기",
-                            style: TextStyle(
-                              color: AppColors.textMain(context),
+                          // 공유 캘린더일 때: 내 일정 불러오기
+                          if (viewModel.calendar?.type != "personal") ...[
+                            Checkbox(
+                              value: viewModel.isShowMySchedule,
+                              activeColor: AppColors.primaryBlue,
+                              checkColor: AppColors.pureWhite,
+                              side: BorderSide(
+                                color: AppColors.textSub(context),
+                              ),
+                              onChanged: (_) =>
+                                  viewModel.toggleFetchMySchedule(),
                             ),
-                          ),
+                            Text(
+                              "내 일정 불러오기",
+                              style: TextStyle(
+                                color: AppColors.textMain(context),
+                              ),
+                            ),
+                          ]
+                          // 내 캘린더일 때: 모든 공유 일정 불러오기
+                          else ...[
+                            Checkbox(
+                              value: viewModel.isShowAllSchedule,
+                              activeColor: AppColors.primaryBlue,
+                              checkColor: AppColors.pureWhite,
+                              side: BorderSide(
+                                color: AppColors.textSub(context),
+                              ),
+                              onChanged: (_) =>
+                                  viewModel.toggleFetchAllSchedule(),
+                            ),
+                            Text(
+                              "공유 일정 불러오기",
+                              style: TextStyle(
+                                color: AppColors.textMain(context),
+                              ),
+                            ),
+                          ],
                           const SizedBox(width: 8),
                         ],
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),
@@ -223,38 +251,50 @@ class _ListTab extends StatelessWidget {
                     itemCount: viewModel.selectedFilteringList.length,
                     itemBuilder: (context, index) {
                       final item = items[index];
+                      // 이 일정이 현재 탭의 캘린더 소유인지 확인 (삭제 권한 여부)
+                      final bool isMySchedule =
+                          item.calendarId == viewModel.calendar?.id;
+
                       return CustomScheduleCard(
-                        emoji:
-                            viewModel.selectedFilteringList[index].emotionTag ??
-                            "",
-                        title: viewModel.selectedFilteringList[index].title,
-                        color:
-                            viewModel.selectedFilteringList[index].colorValue,
-                        startedAt:
-                            viewModel.selectedFilteringList[index].startedAt,
-                        endedAt: viewModel.selectedFilteringList[index].endedAt,
-                        isDeleteMode: viewModel.deleteMode,
-                        isSelected: viewModel.isSelected(
-                          viewModel.selectedFilteringList[index].id.toString(),
-                        ),
+                        emoji: item.emotionTag ?? "",
+                        title: item.title,
+                        color: item.colorValue,
+                        startedAt: item.startedAt,
+                        endedAt: item.endedAt,
+                        // 1. 내 일정이면서 삭제 모드일 때만 체크박스를 보여줌
+                        isDeleteMode: viewModel.deleteMode && isMySchedule,
+                        // 2. 내 일정이 아닌데 혹시 선택되어 있더라도 테두리를 표시하지 않음
+                        isSelected:
+                            isMySchedule &&
+                            viewModel.isSelected(item.id.toString()),
                         onChangeSelected: () {
-                          viewModel.toggleSelected(
-                            viewModel.selectedFilteringList[index].id
-                                .toString(),
-                          );
+                          if (isMySchedule) {
+                            viewModel.toggleSelected(item.id.toString());
+                          }
                         },
                         onTap: () async {
                           if (viewModel.deleteMode) {
-                            viewModel.toggleSelected(item.id.toString());
+                            // 3. 삭제 모드일 때: 내 일정인 경우만 토글, 아니면 아무것도 안 함
+                            if (isMySchedule) {
+                              viewModel.toggleSelected(item.id.toString());
+                            }
                             return;
                           }
-                          final isAdmin =
-                              viewModel.calendar?.userId ==
-                              viewModel.currentUserId;
+
+                          // 일반 모드 상세 페이지 이동 로직
+                          bool canEdit = false;
+                          if (viewModel.calendar?.type == "personal") {
+                            canEdit = isMySchedule;
+                          } else {
+                            final isTabAdmin =
+                                viewModel.calendar?.userId ==
+                                viewModel.currentUserId;
+                            canEdit = isTabAdmin && isMySchedule;
+                          }
 
                           final bool? isDeleted = await context.push<bool>(
                             "/schedule/detail",
-                            extra: {"schedule": item, "isAdmin": isAdmin},
+                            extra: {"schedule": item, "isAdmin": canEdit},
                           );
 
                           if (isDeleted == true) {
@@ -263,9 +303,8 @@ class _ListTab extends StatelessWidget {
                         },
                       );
                     },
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 12.0);
-                    },
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12.0),
                   ),
                 ),
               ),
