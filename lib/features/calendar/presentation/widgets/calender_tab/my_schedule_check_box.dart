@@ -10,7 +10,25 @@ class MyScheduleCheckBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (viewModel.calendar?.type == "personal") {
-      return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.only(right: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Checkbox(
+              value: viewModel.isShowAllSchedule,
+              onChanged: (_) => viewModel.toggleFetchAllSchedule(),
+              activeColor: AppColors.primaryBlue,
+              checkColor: AppColors.pureWhite,
+              side: BorderSide(color: AppColors.textSub(context)),
+            ),
+            Text(
+              "모든 일정 불러오기",
+              style: TextStyle(color: AppColors.textMain(context)),
+            ),
+          ],
+        ),
+      );
     }
 
     return Padding(
@@ -19,7 +37,7 @@ class MyScheduleCheckBox extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Checkbox(
-            value: viewModel.isFetchMySchedule,
+            value: viewModel.isShowMySchedule,
             onChanged: (_) => viewModel.toggleFetchMySchedule(),
             activeColor: AppColors.primaryBlue,
             checkColor: AppColors.pureWhite,

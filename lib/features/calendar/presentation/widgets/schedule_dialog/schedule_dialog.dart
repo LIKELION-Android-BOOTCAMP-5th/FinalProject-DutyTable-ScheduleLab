@@ -49,26 +49,54 @@ class ScheduleDialog extends StatelessWidget {
                     final item = items[index];
                     return GestureDetector(
                       onTap: () async {
+                        // 1. 삭제 모드일 때 권한 체크 (내 일정만 선택 가능)
                         if (viewModel.deleteMode) {
-                          viewModel.toggleSelected(item.id.toString());
+                          final bool isMySchedule =
+                              item.calendarId == viewModel.calendar?.id;
+                          if (isMySchedule) {
+                            viewModel.toggleSelected(item.id.toString());
+                          }
                           return;
                         }
-                        final isAdmin =
-                            viewModel.calendar?.userId ==
-                            viewModel.currentUserId;
 
+                        // 2. 상세 페이지 이동 시 권한 체크 로직
+                        bool canEdit = false;
+
+                        if (viewModel.calendar?.type == "personal") {
+                          // 내 캘린더 탭: 내 고유 일정만 수정 가능
+                          canEdit = item.calendarId == viewModel.calendar?.id;
+                        } else {
+                          // 공유 캘린더 탭: 내가 방장이고 + 현재 탭의 일정인 경우만 수정 가능
+                          final isTabAdmin =
+                              viewModel.calendar?.userId ==
+                              viewModel.currentUserId;
+                          final isCurrentTabSchedule =
+                              item.calendarId == viewModel.calendar?.id;
+                          canEdit = isTabAdmin && isCurrentTabSchedule;
+                        }
+
+                        // 다이얼로그 닫기
                         context.pop();
 
+                        // 상세 페이지 이동 (isAdmin에 계산된 canEdit 전달)
                         final bool? isDeleted = await context.push<bool>(
                           "/schedule/detail",
-                          extra: {"schedule": item, "isAdmin": isAdmin},
+                          extra: {"schedule": item, "isAdmin": canEdit},
                         );
 
                         if (isDeleted == true) {
                           await viewModel.fetchSchedules();
                         }
                       },
-                      child: SchedulePreviewCard(item: item),
+                      // 삭제 모드일 때 내 일정이 아니면 투명도를 주어 시각적으로 구분 (선택 사항)
+                      child: Opacity(
+                        opacity:
+                            viewModel.deleteMode &&
+                                (item.calendarId != viewModel.calendar?.id)
+                            ? 0.5
+                            : 1.0,
+                        child: SchedulePreviewCard(item: item),
+                      ),
                     );
                   },
                 ),
