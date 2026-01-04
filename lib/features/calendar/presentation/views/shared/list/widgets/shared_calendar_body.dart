@@ -68,6 +68,8 @@ class _CalendarListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.read<SharedCalendarViewModel>();
+
     /// 방장인지 여부
     final isAdmin = context.select<SharedCalendarViewModel, bool>(
       (vm) => calendar.userId == vm.currentUserId,
@@ -85,8 +87,20 @@ class _CalendarListItem extends StatelessWidget {
 
     return GestureDetector(
       onTap: () async {
+        if (deleteMode) {
+          if (isAdmin) {
+            // 1. 삭제 모드이면서 방장인 경우: 아무것도 하지 않음 (화면 이동 차단)
+            return;
+          } else {
+            // 2. 삭제 모드이면서 일반 멤버인 경우: 선택 토글만 수행
+            viewModel.toggleSelected(calendar.id.toString());
+            return;
+          }
+        }
+
+        // 3. 일반 모드일 때만 상세 화면으로 이동
         await context.push("/shared/schedule", extra: calendar);
-        context.read<SharedCalendarViewModel>().fetchCalendars();
+        viewModel.fetchCalendars();
       },
       child: CalendarCard(
         imageUrl: calendar.imageURL,
