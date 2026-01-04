@@ -35,6 +35,7 @@ class BackActionsAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         backgroundColor: Colors.transparent,
         title: title,
+        centerTitle: false,
         titleSpacing: 0,
         actions: actions,
         systemOverlayStyle: SystemUiOverlayStyle(
