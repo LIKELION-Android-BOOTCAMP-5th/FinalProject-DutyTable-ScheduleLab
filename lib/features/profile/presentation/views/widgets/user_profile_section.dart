@@ -1,5 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/profile/presentation/viewmodels/profile_viewmodel.dart';
+import 'package:dutytable/features/profile/presentation/viewmodels/profile_view_model.dart';
 import 'package:dutytable/features/profile/presentation/views/widgets/account_section.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';

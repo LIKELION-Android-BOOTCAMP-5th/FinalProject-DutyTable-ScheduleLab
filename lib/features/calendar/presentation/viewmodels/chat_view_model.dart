@@ -1,4 +1,5 @@
-import 'package:dutytable/extensions.dart';
+import 'package:dutytable/core/utils/extensions.dart';
+import 'package:dutytable/features/calendar/data/datasources/chat_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -83,15 +84,10 @@ class ChatViewModel extends ChangeNotifier {
             final newMessage = payload.newRecord;
             final createdAtString = newMessage['created_at'] as String;
             final createdAt = DateTime.parse(createdAtString).toLocal();
-            final userImage = await supabase
-                .from('users')
-                .select('profileurl')
-                .eq('id', newMessage['user_id']);
-            final nickname = await supabase
-                .from('users')
-                .select('nickname')
-                .eq('id', newMessage['user_id']);
-
+            final data = await ChatDataSource.instance
+                .fetchNewChatImageNickname();
+            final userImage = (data['profileurl'] ?? "");
+            final nickname = (data['nickname']);
             final newChatMessage = ChatMessage(
               id: newMessage['id'] as int,
               image: (userImage.isNotEmpty)
@@ -127,15 +123,10 @@ class ChatViewModel extends ChangeNotifier {
 
   // 채팅을 수파베이스에 저장
   Future<void> chatInsert() async {
+    final chatMessage = chatController.text;
     // 메시지가 비어있으면 전송하지 않음
     if (chatController.text.trim().isEmpty) return;
-
-    await supabase.from('chat_messages').insert({
-      'user_id': user!.id,
-      'calendar_id': calendarId,
-      'message': chatController.text,
-      'created_at': DateTime.now().toUtc().toIso8601String(),
-    });
+    await ChatDataSource.instance.chatInsert(chatMessage, calendarId);
     chatController.clear();
   }
 
@@ -143,12 +134,7 @@ class ChatViewModel extends ChangeNotifier {
   Future<void> fetchChatMessages() async {
     _state = ViewState.loading;
     try {
-      final data = await supabase
-          .from('chat_messages')
-          .select('id,message,created_at,user_id,users (profileurl,nickname)')
-          .eq('calendar_id', calendarId)
-          .order('created_at', ascending: true);
-
+      final data = await ChatDataSource.instance.fetchChatMessages(calendarId);
       chatMessages = data.map((row) {
         final createdAtString = row['created_at'] as String;
         final createdAt = DateTime.parse(createdAtString).toLocal();
@@ -183,17 +169,17 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   // last_read_at 업데이트 하기
-  Future<void> updateLastReadAt(int calendarId) async {
-    await supabase
-        .from('calendar_members')
-        .update({'last_read_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('user_id', user!.id)
-        .eq('calendar_id', calendarId);
+  Future<void> updateLastReadAt(String userId, int calendarId) async {
+    await ChatDataSource.instance.updateLastReadAt(
+      userId: userId,
+      calendarId: calendarId,
+      payload: {'last_read_at': DateTime.now().toUtc().toIso8601String()},
+    );
   }
 
   @override
   Future<void> dispose() async {
-    await updateLastReadAt(calendarId);
+    await updateLastReadAt(user!.id, calendarId);
     channel?.unsubscribe();
     chatController.dispose();
     scrollController.dispose();
