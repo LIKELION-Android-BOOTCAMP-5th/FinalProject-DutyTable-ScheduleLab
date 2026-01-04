@@ -105,7 +105,19 @@ class CalendarCard extends StatelessWidget {
   //   가운데 텍스트 정보
   // ------------------------------
   Widget _buildInfoText(BuildContext context) {
-    final viewModel = context.watch<SharedCalendarViewModel>();
+    final int id = calendarId ?? -1;
+
+    // context.select를 사용하여 특정 ID의 데이터만 추출
+    final String month = context.select<SharedCalendarViewModel, String>(
+      (vm) => vm.nextScheduleDateMonth[id] ?? "",
+    );
+    final String day = context.select<SharedCalendarViewModel, String>(
+      (vm) => vm.nextScheduleDateDay[id] ?? "",
+    );
+    final String scheduleTitle = context
+        .select<SharedCalendarViewModel, String>(
+          (vm) => vm.nextScheduleTitle[id] ?? "",
+        );
 
     return Expanded(
       child: Column(
@@ -113,45 +125,38 @@ class CalendarCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textMain(context),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textMain(context),
                 ),
               ),
               const SizedBox(width: 8),
               _buildMemberChip(context),
             ],
           ),
-
           const SizedBox(height: 6),
-
           Row(
             children: [
-              Text(
-                "다음 일정 : ${viewModel.nextScheduleDateMonth[calendarId ?? " "]}월 ${viewModel.nextScheduleDateDay[calendarId ?? " "]}일 ",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSub(context),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  "${viewModel.nextScheduleTitle[calendarId ?? " "]}",
+              // 데이터가 있을 때만 날짜 표시
+              if (month.isNotEmpty && day.isNotEmpty)
+                Text(
+                  "다음 일정 : ${month}월 ${day}일",
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textSub(context),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
+              Text(
+                scheduleTitle.isEmpty ? "예정된 일정 없음" : " / ${[scheduleTitle]}",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSub(context),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -185,22 +190,27 @@ class CalendarCard extends StatelessWidget {
     final viewModel = context.watch<SharedCalendarViewModel>();
     if (!deleteMode) {
       /// 일반 모드 → 알림 표시
-      return Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: AppColors.danger(context),
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          "${viewModel.unreadCount[calendarId ?? 0] ?? 0}",
-          style: TextStyle(
-            color: AppColors.pureWhite,
-            fontWeight: FontWeight.bold,
+      // 새로운 채팅이 있을때만 표시
+      if (viewModel.unreadCount[calendarId ?? 0] != 0) {
+        return Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: AppColors.danger(context),
+            shape: BoxShape.circle,
           ),
-        ),
-      );
+          alignment: Alignment.center,
+          child: Text(
+            "${viewModel.unreadCount[calendarId ?? 0] ?? 0}",
+            style: TextStyle(
+              color: AppColors.pureWhite,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        );
+      } else {
+        return SizedBox(width: 42, height: 42);
+      }
     }
 
     /// deleteMode === true
