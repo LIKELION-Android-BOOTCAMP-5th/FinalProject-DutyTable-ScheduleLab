@@ -75,6 +75,14 @@ class _PersonalCalendarScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background(context),
       appBar: LogoActionsAppBar(
+        leftActions: Text(
+          viewModel.calendar?.title ?? "",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: AppColors.textMain(context),
+          ),
+        ),
         rightActions: Row(
           children: [
             const NotificationIcon(),
