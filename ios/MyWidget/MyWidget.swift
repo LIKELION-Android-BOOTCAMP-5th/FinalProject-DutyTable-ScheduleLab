@@ -28,7 +28,7 @@ struct Provider: AppIntentTimelineProvider {
             tomorrowDate: sharedDefaults?.string(forKey: "tomorrow_date") ?? "1월 4일 (일)",
             tomorrowDuties: sharedDefaults?.string(forKey: "tomorrow_duties") ?? "이브닝",
             calendarJson: sharedDefaults?.string(forKey: "calendar_json") ?? "{}",
-            firstDayOffset: sharedDefaults?.string(forKey: "first_day_offset") ?? "4",
+            firstDayOffset: sharedDefaults?.string(forKey: "first_day_offset") ?? "0",
             lastDay: sharedDefaults?.string(forKey: "last_day") ?? "31",
             currentMonthText: sharedDefaults?.string(forKey: "current_month_text") ?? "2026년 1월",
             configuration: configuration
@@ -122,83 +122,98 @@ struct MyWidgetEntryView : View {
     }
 
   @ViewBuilder
-    var largeView: some View {
-        let calendarData = decodeCalendar(entry.calendarJson)
-        let offset = Int(entry.firstDayOffset) ?? 0
-        let lastDay = Int(entry.lastDay) ?? 31
-        
-        // ✅ 추가: 오늘 날짜(일) 추출
-        let todayDay = Calendar.current.component(.day, from: entry.date)
-        
-        let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
+  var largeView: some View {
+      let calendarData = decodeCalendar(entry.calendarJson)
+      let offset = Int(entry.firstDayOffset) ?? 0
+      let lastDay = Int(entry.lastDay) ?? 31
+      let todayDay = Calendar.current.component(.day, from: entry.date)
+      
+      // 1. 전체 슬롯 계산 (빈 칸 + 날짜)
+      let totalSlots: [Int?] = Array(repeating: nil, count: offset) + Array(1...lastDay).map { $0 }
+      
+      // 2. 7개씩 묶어서 주(Week) 단위로 분리
+      let weeks: [[Int?]] = stride(from: 0, to: totalSlots.count, by: 7).map {
+          Array(totalSlots[$0..<min($0 + 7, totalSlots.count)])
+      }
 
-        VStack(spacing: 0) {
-            VStack(spacing: 4) {
-                Text(entry.currentMonthText)
-                    .font(.system(size: 18, weight: .black))
-                    .foregroundColor(.primary)
-                
-                HStack(spacing: 0) {
-                    let days = ["일", "월", "화", "수", "목", "금", "토"]
-                    ForEach(days, id: \.self) { d in
-                        Text(d)
-                            .font(.system(size: 11, weight: .bold))
-                            .frame(maxWidth: .infinity)
-                            .foregroundColor(d == "일" ? .red : d == "토" ? .blue : .secondary)
-                    }
-                }
-            }
-            .padding(.top, 12)
-            .padding(.bottom, 8)
-            .padding(.horizontal, 8)
+      VStack(spacing: 0) {
+          // --- [헤더 섹션] ---
+          VStack(spacing: 4) {
+              Text(entry.currentMonthText)
+                  .font(.system(size: 18, weight: .black))
+                  .foregroundColor(.primary)
+              
+              HStack(spacing: 0) {
+                  let days = ["일", "월", "화", "수", "목", "금", "토"]
+                  ForEach(days, id: \.self) { d in
+                      Text(d)
+                          .font(.system(size: 11, weight: .bold))
+                          .frame(maxWidth: .infinity)
+                          .foregroundColor(d == "일" ? .red : d == "토" ? .blue : .secondary)
+                  }
+              }
+          }
+          .padding(.top, 12)
+          .padding(.bottom, 8)
+          .padding(.horizontal, 8)
+          // ------------------
 
-            GeometryReader { geometry in
-                let cellHeight = geometry.size.height / 6
-                
-                LazyVGrid(columns: columns, spacing: 0) {
-                    ForEach(0..<offset, id: \.self) { _ in
-                        Rectangle()
-                            .fill(Color.clear)
-                            .frame(height: cellHeight)
-                    }
-                    
-                    ForEach(1...lastDay, id: \.self) { day in
-                        VStack(spacing: 2) {
-                            // ✅ 수정: 날짜 하이라이트 로직 적용
-                            Text("\(day)")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(day == todayDay ? .white : .primary)
-                                .frame(width: 20, height: 20)
-                                .background(
-                                    Circle()
-                                        .fill(day == todayDay ? Color.accentColor : Color.clear)
-                                )
-                            
-                            if let rawData = calendarData["\(day)"] {
-                                let info = parseDutyData(rawData)
-                                Text(info.title)
-                                    .font(.system(size: 9, weight: .heavy))
-                                    .lineLimit(1)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 16)
-                                    .background(info.color)
-                                    .foregroundColor(.black)
-                                    .cornerRadius(3)
-                                    .padding(.horizontal, 2)
-                            } else {
-                                Spacer().frame(height: 16)
-                            }
-                        }
-                        .frame(height: cellHeight, alignment: .top)
-                        .contentShape(Rectangle())
-                    }
-                }
-            }
-            .padding(.horizontal, 5)
-            
-            Spacer(minLength: 0)
-        }
-    }
+          // --- [달력 본문 섹션] ---
+          GeometryReader { geometry in
+              let rowCount = CGFloat(weeks.count)
+              let cellHeight = geometry.size.height / rowCount
+              
+              VStack(spacing: 0) {
+                  ForEach(0..<weeks.count, id: \.self) { weekIndex in
+                      HStack(spacing: 0) {
+                          let week = weeks[weekIndex]
+                          
+                          ForEach(0..<7, id: \.self) { dayIndex in
+                              Group {
+                                  if dayIndex < week.count, let day = week[dayIndex] {
+                                      // 실제 날짜 칸
+                                      VStack(spacing: 2) {
+                                          Text("\(day)")
+                                              .font(.system(size: 11, weight: .bold))
+                                              .foregroundColor(day == todayDay ? .white : .primary)
+                                              .frame(width: 20, height: 20)
+                                              .background(
+                                                  Circle().fill(day == todayDay ? Color.accentColor : Color.clear)
+                                              )
+                                          
+                                          if let rawData = calendarData["\(day)"] {
+                                              let info = parseDutyData(rawData)
+                                              Text(info.title)
+                                                  .font(.system(size: 9, weight: .heavy))
+                                                  .lineLimit(1)
+                                                  .frame(maxWidth: .infinity)
+                                                  .frame(height: 16)
+                                                  .background(info.color)
+                                                  .cornerRadius(3)
+                                                  .padding(.horizontal, 2)
+                                          } else {
+                                              Spacer().frame(height: 16)
+                                          }
+                                          Spacer(minLength: 0)
+                                      }
+                                  } else {
+                                      // 빈 칸 (offset 및 마지막 주 남은 칸)
+                                      Color.clear
+                                  }
+                              }
+                              .frame(maxWidth: .infinity)
+                              .frame(height: cellHeight, alignment: .top)
+                          }
+                      }
+                  }
+              }
+              // 전체 그리드를 상단 정렬하여 첫 줄이 밀리지 않게 함
+              .frame(maxHeight: .infinity, alignment: .top)
+          }
+          .padding(.horizontal, 5)
+          .padding(.bottom, 6)
+      }
+  }
 
     func decodeCalendar(_ json: String) -> [String: String] {
         guard let data = json.data(using: .utf8) else { return [:] }
