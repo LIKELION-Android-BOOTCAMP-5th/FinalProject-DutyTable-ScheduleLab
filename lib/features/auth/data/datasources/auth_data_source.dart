@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,25 +16,30 @@ class AuthDataSource {
   GoogleSignInAccount? _googleUser;
   GoogleSignInAccount? get googleUser => _googleUser;
 
+  String _env(String key) {
+    final value = dotenv.env[key];
+    if (value == null || value.isEmpty) {
+      throw Exception('Missing .env key: $key');
+    }
+    return value;
+  }
+
   /// Google 로그인 + Supabase Auth
   Future<void> signInWithGoogle() async {
     final scopes = ['email', 'profile'];
 
     final String? platformClientId;
     if (Platform.isIOS) {
-      platformClientId =
-      '174693600398-kt7o6r2jne782tkfbna9g5sl9b72vdjm.apps.googleusercontent.com';
+      platformClientId = _env('GOOGLE_IOS_CLIENT_ID');
     } else if (Platform.isAndroid) {
-      platformClientId =
-      '174693600398-dnhnb2j1l6bhkl2g3r1goj7lcj3e53d8.apps.googleusercontent.com';
+      platformClientId = _env('GOOGLE_ANDROID_CLIENT_ID');
     } else {
       platformClientId = null;
     }
 
     final googleSignIn = GoogleSignIn.instance;
     await googleSignIn.initialize(
-      serverClientId:
-      '174693600398-vng406q0u208sbnonb5hc3va8u9384u9.apps.googleusercontent.com',
+      serverClientId: _env('GOOGLE_SERVER_CLIENT_ID'),
       clientId: platformClientId,
     );
 

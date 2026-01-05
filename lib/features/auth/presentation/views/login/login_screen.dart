@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/auth/presentation/viewmodels/login_viewmodel.dart';
+import 'package:dutytable/features/auth/presentation/viewmodels/login_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

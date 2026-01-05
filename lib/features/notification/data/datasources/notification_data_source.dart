@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
+import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +16,7 @@ class NotificationDataSource {
 
   // Supabase 클라이언트 참조
   final supabase = Supabase.instance.client;
+  final Dio _dio = DioClient.shared.dio;
 
   // 새로운 알림을 전달하기 위한 StreamController
   final _inviteNotificationController =
@@ -69,13 +72,21 @@ class NotificationDataSource {
   Future<List<InviteNotificationModel>> getInviteNotifications() async {
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) return [];
-    final response = await supabase
-        .from('invite_notifications')
-        .select()
-        .eq('user_id', userId)
-        .order('created_at', ascending: false);
+    final response = await _dio.get(
+      '/rest/v1/invite_notifications',
+      queryParameters: {
+        'select': '*',
+        'user_id': 'eq.$userId',
+        'order': 'created_at.desc',
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
 
-    return (response as List)
+    return (response.data as List)
         .map((json) => InviteNotificationModel.fromJson(json))
         .toList();
   }
@@ -84,13 +95,21 @@ class NotificationDataSource {
   Future<List<ReminderNotificationModel>> getReminderNotifications() async {
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) return [];
-    final response = await supabase
-        .from('reminder_notifications')
-        .select()
-        .eq('user_id', userId)
-        .order('created_at', ascending: false);
+    final response = await _dio.get(
+      '/rest/v1/reminder_notifications',
+      queryParameters: {
+        'select': '*',
+        'user_id': 'eq.$userId',
+        'order': 'created_at.desc',
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
 
-    return (response as List)
+    return (response.data as List)
         .map((json) => ReminderNotificationModel.fromJson(json))
         .toList();
   }
@@ -100,11 +119,25 @@ class NotificationDataSource {
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) return;
 
-    // 두 테이블에서 동시에 삭제
-    await Future.wait([
-      supabase.from('invite_notifications').delete().eq('user_id', userId),
-      supabase.from('reminder_notifications').delete().eq('user_id', userId),
-    ]);
+    await _dio.delete(
+      '/rest/v1/invite_notifications',
+      queryParameters: {'user_id': 'eq.$userId'},
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
+
+    await _dio.delete(
+      '/rest/v1/reminder_notifications',
+      queryParameters: {'user_id': 'eq.$userId'},
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
   }
 
   /// 특정 알림을 읽음으로 표시
@@ -112,10 +145,16 @@ class NotificationDataSource {
     final tableName = type == 'invite'
         ? 'invite_notifications'
         : 'reminder_notifications';
-    await supabase
-        .from(tableName)
-        .update({'is_read': true})
-        .eq('id', notificationId);
+    await _dio.patch(
+      '/rest/v1/$tableName',
+      queryParameters: {'id': 'eq.$notificationId'},
+      data: {'is_read': true},
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
   }
 
   /// 초대 수락
@@ -124,26 +163,48 @@ class NotificationDataSource {
     if (userId == null) throw Exception("User not logged in");
 
     // 사용자가 이미 멤버인지 확인
-    final existingMember = await supabase
-        .from('calendar_members')
-        .select()
-        .eq('calendar_id', notification.calendarId)
-        .eq('user_id', userId)
-        .maybeSingle();
+    final existingMemberResponse = await _dio.get(
+      '/rest/v1/calendar_members',
+      queryParameters: {
+        'select': '*',
+        'calendar_id': 'eq.${notification.calendarId}',
+        'user_id': 'eq.$userId',
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
 
     // 멤버가 아닌 경우에만 추가
-    if (existingMember == null) {
-      await supabase.from('calendar_members').insert({
-        'calendar_id': notification.calendarId,
-        'user_id': userId,
-      });
+    if ((existingMemberResponse.data as List).isEmpty) {
+      await _dio.post(
+        '/rest/v1/calendar_members',
+        data: {
+          'calendar_id': notification.calendarId,
+          'user_id': userId,
+        },
+        options: Options(
+          headers: {
+            'Authorization':
+            'Bearer ${supabase.auth.currentSession?.accessToken}',
+          },
+        ),
+      );
     }
 
     // invite_notifications 테이블에서 is_accepted를 true로 업데이트하고 읽음 처리
-    await supabase
-        .from('invite_notifications')
-        .update({'is_accepted': true, 'is_read': true})
-        .eq('id', notification.id);
+    await _dio.patch(
+      '/rest/v1/invite_notifications',
+      queryParameters: {'id': 'eq.${notification.id}'},
+      data: {'is_accepted': true, 'is_read': true},
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
   }
 
   /// Realtime 알림 리스너 시작
