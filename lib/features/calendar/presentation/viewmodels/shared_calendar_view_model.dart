@@ -86,23 +86,12 @@ class SharedCalendarViewModel extends ChangeNotifier {
   }
 
   /// 공유 캘린더 목록 뷰모델
-  SharedCalendarViewModel({
-    List<CalendarModel>? calendarList,
-    CalendarModel? calendar,
-  }) {
+  SharedCalendarViewModel({CalendarModel? calendar}) {
     if (calendar != null) {
       // 5단계 : 데이터 받아서 입력
       _calendar = calendar;
     }
-    if (calendarList != null) {
-      // splash 화면에서 받아온 데이터 있을 때
-      _calendarList = calendarList;
-      _state = ViewState.success;
-    } else {
-      // splash 화면에서 받아온 데이터 없을 때
-      _state = ViewState.loading;
-      fetchCalendars();
-    }
+    fetchCalendars();
   }
 
   Future<void> addInvitedUserByNickname(String nickname) async {
@@ -162,15 +151,6 @@ class SharedCalendarViewModel extends ChangeNotifier {
   void clearError() {
     _inviteError = null;
     notifyListeners();
-  }
-
-  void setInitialData(List<CalendarModel>? initialData) {
-    if (initialData != null && _calendarList == null) {
-      _calendarList = initialData;
-      _state = ViewState.success;
-      // build 단계에서 호출될 수 있으므로 마이크로태스크나 다음 프레임에 알림
-      Future.microtask(() => notifyListeners());
-    }
   }
 
   @override

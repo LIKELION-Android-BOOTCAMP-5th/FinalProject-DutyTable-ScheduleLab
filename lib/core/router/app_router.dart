@@ -1,4 +1,3 @@
-import 'package:dutytable/features/auth/presentation/views/login/login_screen.dart' hide LoginScreen;
 import 'package:dutytable/features/calendar/presentation/views/add/calendar_add_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/edit/calendar_edit_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
@@ -18,7 +17,6 @@ import '../../features/auth/presentation/views/signup/signup_screen.dart';
 import '../../features/auth/presentation/views/splash_screen.dart';
 import '../../features/calendar/data/models/calendar_model.dart';
 import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
-import '../../features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import '../../features/calendar/presentation/views/setting/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/list/shared_calendar_list_screen.dart';
 import 'app_shell.dart';
@@ -119,16 +117,7 @@ GoRouter createRouter(BuildContext context) {
           GoRoute(
             path: '/shared',
             builder: (context, state) {
-              Map<String, dynamic>? extraMap;
-              if (state.extra is Map<String, dynamic>) {
-                extraMap = state.extra as Map<String, dynamic>;
-              }
-              final List<CalendarModel>? initialCalendars =
-              extraMap?['sharedCalendars'] as List<CalendarModel>?;
-
-              return SharedCalendarListScreen(
-                initialCalendars: initialCalendars,
-              );
+              return SharedCalendarListScreen();
             },
             routes: [
               GoRoute(

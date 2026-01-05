@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context.go('/login');
       } else {
         // 인증 및 데이터 로드에 성공하면 메인 화면으로 이동하며 데이터를 전달
-        context.go('/shared', extra: {'sharedCalendars': sharedCalendars});
+        context.go('/shared');
       }
     }
   }
