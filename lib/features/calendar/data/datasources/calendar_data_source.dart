@@ -141,55 +141,6 @@ class CalendarDataSource {
     }
   }
 
-  // /// 로그인 정보 받기
-  // void setGoogleAccount(GoogleSignInAccount? account) {
-  //   _connectedAccount = account;
-  // }
-  //
-  // /// 일정 가져와서 리스트에 넣기
-  // GoogleSignInAccount? _connectedAccount;
-  // Future<List<Map<String, dynamic>>> syncGoogleCalendarToSchedule() async {
-  //   try {
-  //     if (_connectedAccount == null) {
-  //       Fluttertoast.showToast(msg: "구글 로그인 정보가 없습니다.");
-  //       return [];
-  //     }
-  //
-  //     final account = _connectedAccount!;
-  //
-  //     final authorization = await account.authorizationClient
-  //         .authorizationForScopes(['https://www.googleapis.com/auth/calendar']);
-  //     final client = _GoogleAuthClient(authorization!.accessToken);
-  //
-  //     final calendarApi = calendar.CalendarApi(client);
-  //
-  //     final events = await calendarApi.events.list("primary");
-  //
-  //     if (events.items == null || events.items!.isEmpty) {
-  //       Fluttertoast.showToast(msg: "가져올 일정이 없습니다.");
-  //       return [];
-  //     }
-  //     Fluttertoast.showToast(msg: "${events.items!.length}개의 일정을 가져왔습니다.");
-  //     List<Map<String, dynamic>> googleSyncSchedule = [];
-  //
-  //     for (var event in events.items!) {
-  //       googleSyncSchedule.add({
-  //         'title': event.summary ?? '(제목 없음)',
-  //         'memo': event.description,
-  //         'started_at': event.start?.dateTime?.toIso8601String(),
-  //         'ended_at': event.end?.dateTime?.toIso8601String(),
-  //         'location': event.location,
-  //         'color_value': '0xFF4285F4',
-  //       });
-  //     }
-  //
-  //     return googleSyncSchedule;
-  //   } catch (e) {
-  //     Fluttertoast.showToast(msg: "일정 가져오기에 실패했습니다.");
-  //     return [];
-  //   }
-  // }
-
   /// 수파베이스에서 is_google_calendar_connection 정보 가져오기
   Future<bool> fetchIsGoogleCalendarConnection() async {
     final currentUserId = supabase.auth.currentUser?.id;
