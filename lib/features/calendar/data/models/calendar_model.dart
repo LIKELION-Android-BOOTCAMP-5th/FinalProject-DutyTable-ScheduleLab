@@ -10,6 +10,7 @@ class CalendarModel {
   final String? description;
   final String? imageURL;
   List<CalendarMemberModel>? calendarMemberModel;
+  List<Map<String, dynamic>>? schedules;
 
   CalendarModel({
     required this.id,
@@ -21,6 +22,7 @@ class CalendarModel {
     this.imageURL,
     this.calendarMemberModel,
     required this.ownerProfileUrl,
+    this.schedules,
   });
 
   factory CalendarModel.fromJson(Map<String, dynamic> json) {
@@ -52,6 +54,9 @@ class CalendarModel {
       imageURL: json["imageURL"] as String?,
       calendarMemberModel: members.isNotEmpty ? members : null,
       ownerProfileUrl: ownerProfileUrl,
+      schedules: json["schedules"] != null
+          ? List<Map<String, dynamic>>.from(json["schedules"])
+          : null,
     );
   }
 
@@ -68,6 +73,7 @@ class CalendarModel {
           ?.map((e) => e.toJson())
           .toList(),
       'ownerProfileUrl': ownerProfileUrl,
+      'schedules': schedules,
     };
   }
 
@@ -81,6 +87,7 @@ class CalendarModel {
     String? description,
     String? imageURL,
     List<CalendarMemberModel>? calendarMemberModel,
+    List<Map<String, dynamic>>? schedules,
   }) {
     return CalendarModel(
       id: id ?? this.id,
@@ -92,6 +99,7 @@ class CalendarModel {
       description: description ?? this.description,
       imageURL: imageURL,
       calendarMemberModel: calendarMemberModel ?? this.calendarMemberModel,
+      schedules: schedules ?? this.schedules,
     );
   }
 }

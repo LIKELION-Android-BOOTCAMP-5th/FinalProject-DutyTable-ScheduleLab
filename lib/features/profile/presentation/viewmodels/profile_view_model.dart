@@ -2,13 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dutytable/core/services/supabase_storage_service.dart';
+import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/profile/data/datasources/profile_data_source.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:googleapis/calendar/v3.dart' as calendar;
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/services/device_resource_service.dart';
@@ -278,6 +277,9 @@ class ProfileViewmodel extends ChangeNotifier {
         );
 
         final account = await googleSignIn.authenticate();
+        CalendarDataSource.instance.setGoogleAccount(
+          account,
+        ); // 로그인한 정보 calendar_data_source에 전달하기
 
         if (account == null) {
           Fluttertoast.showToast(msg: "구글 로그인이 취소되었습니다.");
@@ -296,8 +298,8 @@ class ProfileViewmodel extends ChangeNotifier {
 
         Fluttertoast.showToast(msg: "구글 캘린더 연동이 완료되었습니다.");
 
-        // 일정 동기화 호출
-        await syncGoogleCalendarToSchedule();
+        // 일정 불러서 리스트로 만들기 호출
+        await CalendarDataSource.instance.syncGoogleCalendarToSchedule();
       } catch (e) {
         print('연동 오류: $e');
         Fluttertoast.showToast(msg: "구글 캘린더 연동에 실패했습니다.");
@@ -309,7 +311,6 @@ class ProfileViewmodel extends ChangeNotifier {
         await googleSignIn.signOut();
 
         _connectedAccount = null; // 초기화 추가
-        await _deleteGoogleCalendarEvents();
         await updateGoogleSync(user!.id, false);
         is_sync = false;
         notifyListeners();
@@ -323,133 +324,4 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   GoogleSignInAccount? _connectedAccount;
-
-  // 구글 캘린더 일정을 스케줄 테이블에 추가
-  Future<void> syncGoogleCalendarToSchedule() async {
-    try {
-      if (_connectedAccount == null) {
-        Fluttertoast.showToast(msg: "구글 로그인 정보가 없습니다.");
-        return;
-      }
-
-      final account = _connectedAccount!;
-
-      // 2. API 클라이언트 생성
-      final authorization = await account.authorizationClient
-          .authorizationForScopes(['https://www.googleapis.com/auth/calendar']);
-      final client = _GoogleAuthClient(authorization!.accessToken);
-
-      final calendarApi = calendar.CalendarApi(client);
-
-      // 3. 구글 캘린더 이벤트 가져오기
-      final events = await calendarApi.events.list("primary");
-
-      if (events.items == null || events.items!.isEmpty) {
-        print("가져올 일정이 없습니다.");
-        Fluttertoast.showToast(msg: "가져올 일정이 없습니다.");
-        return;
-      }
-
-      Fluttertoast.showToast(msg: "${events.items!.length}개의 일정을 가져왔습니다.");
-      await _addEventsToScheduleTable(events.items!);
-    } catch (e) {
-      print('일정 가져오기 오류: $e');
-      Fluttertoast.showToast(msg: "일정 가져오기에 실패했습니다.");
-    }
-  }
-
-  // 일정들을 스케줄 테이블에 추가하는 함수
-  Future<void> _addEventsToScheduleTable(List<calendar.Event> events) async {
-    try {
-      // personal 캘린더 찾기
-      final calendarData = await supabase
-          .from('calendars')
-          .select('id')
-          .eq('user_id', user!.id)
-          .eq('type', 'personal')
-          .maybeSingle();
-
-      if (calendarData == null) {
-        Fluttertoast.showToast(msg: "개인 캘린더를 찾을 수 없습니다.");
-        return;
-      }
-
-      final calendarId = calendarData['id'];
-
-      // 스케줄 테이블에 추가
-      int successCount = 0;
-      for (var event in events) {
-        try {
-          await supabase.from('schedules').insert({
-            'calendar_id': calendarId,
-            'title': event.summary ?? '제목 없음',
-            'started_at':
-                event.start?.dateTime?.toIso8601String() ??
-                event.start?.date?.toString(),
-            'ended_at':
-                event.end?.dateTime?.toIso8601String() ??
-                event.end?.date?.toString(),
-            'memo': event.description,
-            'is_done': false,
-            'is_repeat': false,
-            'color_value': 0xFF4285F4,
-          });
-          successCount++;
-        } catch (e) {
-          print('일정 추가 실패: ${event.summary}, 오류: $e');
-        }
-      }
-
-      Fluttertoast.showToast(msg: "$successCount개의 일정을 동기화했습니다.");
-    } catch (e) {
-      print('테이블 추가 오류: $e');
-      Fluttertoast.showToast(msg: "일정 추가에 실패했습니다.");
-    }
-  }
-
-  // 구글 캘린더 일정 삭제
-  Future<void> _deleteGoogleCalendarEvents() async {
-    try {
-      // personal 캘린더 찾기
-      final calendarData = await supabase
-          .from('calendars')
-          .select('id')
-          .eq('user_id', user!.id)
-          .eq('type', 'personal')
-          .maybeSingle();
-
-      if (calendarData == null) {
-        Fluttertoast.showToast(msg: "개인 캘린더를 찾을 수 없습니다.");
-        return;
-      }
-
-      final calendarId = calendarData['id'];
-
-      // 구글에서 가져온 일정 삭제 (color_value로 구분)
-      await supabase
-          .from('schedules')
-          .delete()
-          .eq('calendar_id', calendarId)
-          .eq('color_value', 0xFF4285F4);
-
-      Fluttertoast.showToast(msg: "구글 캘린더 일정이 삭제되었습니다.");
-    } catch (e) {
-      print('일정 삭제 오류: $e');
-      Fluttertoast.showToast(msg: "일정 삭제에 실패했습니다.");
-    }
-  }
-}
-
-// HTTP 클라이언트 (ProfileViewmodel 클래스 밖에 추가)
-class _GoogleAuthClient extends http.BaseClient {
-  final String _token;
-  final http.Client _client = http.Client();
-
-  _GoogleAuthClient(this._token);
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    request.headers['Authorization'] = 'Bearer $_token';
-    return _client.send(request);
-  }
 }

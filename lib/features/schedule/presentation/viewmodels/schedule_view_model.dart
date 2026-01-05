@@ -268,6 +268,43 @@ class ScheduleViewModel extends ChangeNotifier {
           _calendar.id,
         );
 
+        if (_calendar.schedules != null && _calendar.schedules!.isNotEmpty) {
+          final googleSchedules = <ScheduleModel>[];
+
+          for (var scheduleMap in _calendar.schedules!) {
+            try {
+              final startedAtStr = scheduleMap['started_at'];
+              final endedAtStr = scheduleMap['ended_at'];
+
+              if (startedAtStr == null || endedAtStr == null) {
+                continue;
+              }
+
+              final schedule = ScheduleModel(
+                id:
+                    DateTime.now().millisecondsSinceEpoch +
+                    googleSchedules.length,
+                calendarId: _calendar.id,
+                title: scheduleMap['title'] ?? '제목 없음',
+                colorValue:
+                    scheduleMap['color_value']?.toString() ?? '0xFF4285F4',
+                isDone: false,
+                startedAt: DateTime.parse(startedAtStr).toLocal(),
+                endedAt: DateTime.parse(endedAtStr).toLocal(),
+                isRepeat: false,
+                createdAt: DateTime.now(),
+                memo: scheduleMap['memo'],
+              );
+
+              googleSchedules.add(schedule);
+            } catch (e) {
+              continue;
+            }
+          }
+
+          // 기존 일정에 구글 일정 추가
+          _schedules.addAll(googleSchedules);
+        }
         _scheduleDate = _schedules
             .map((e) => e.startedAt.toPureDate())
             .toList();

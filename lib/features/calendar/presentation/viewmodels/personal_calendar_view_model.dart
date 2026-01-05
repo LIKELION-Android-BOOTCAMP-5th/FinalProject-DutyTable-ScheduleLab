@@ -1,3 +1,4 @@
+import 'package:dutytable/core/services/supabase_manager.dart';
 import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,24 @@ class PersonalCalendarViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       _calendar = await CalendarDataSource.instance.fetchPersonalCalendar();
+
+      final userId = SupabaseManager.shared.supabase.auth.currentUser?.id;
+
+      if (userId != null) {
+        final userData = await CalendarDataSource.instance
+            .fetchIsGoogleCalendarConnection();
+        if (userData) {
+          final googleSchedules = await CalendarDataSource.instance
+              .syncGoogleCalendarToSchedule();
+
+          if (googleSchedules.isNotEmpty) {
+            _calendar = _calendar!.copyWith(schedules: googleSchedules);
+          }
+        } else {
+          _calendar = _calendar!.copyWith(schedules: null);
+        }
+      }
+
       _state = ViewState.success;
     } catch (e) {
       _state = ViewState.error;

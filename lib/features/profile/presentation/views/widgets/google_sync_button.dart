@@ -4,6 +4,8 @@ import 'package:dutytable/features/profile/presentation/widgets/profile_tab.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../calendar/presentation/viewmodels/personal_calendar_view_model.dart';
+
 class GoogleSyncButton extends StatelessWidget {
   const GoogleSyncButton({super.key});
 
@@ -17,6 +19,7 @@ class GoogleSyncButton extends StatelessWidget {
       addWidget: GestureDetector(
         onTap: () async {
           await viewModel.googleSync();
+          await context.read<PersonalCalendarViewModel>().fetchCalendar();
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
