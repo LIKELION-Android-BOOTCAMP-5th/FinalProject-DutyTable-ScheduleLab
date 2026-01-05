@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:flutter/foundation.dart'; // debugPrint를 위해 추가
-import 'package:http/http.dart' as http;
 
 import '../../../../core/utils/extensions.dart';
 import '../../../../main.dart';
@@ -501,19 +500,5 @@ class CalendarDataSource {
         'user_id': 'eq.$userId',
       },
     );
-  }
-}
-
-// HTTP 클라이언트 (ProfileViewmodel 클래스 밖에 추가)
-class _GoogleAuthClient extends http.BaseClient {
-  final String _token;
-  final http.Client _client = http.Client();
-
-  _GoogleAuthClient(this._token);
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    request.headers['Authorization'] = 'Bearer $_token';
-    return _client.send(request);
   }
 }
