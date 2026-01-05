@@ -11,6 +11,8 @@ import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/services/device_resource_service.dart';
+
 class ProfileViewmodel extends ChangeNotifier {
   ProfileViewmodel() {
     _init();
@@ -21,6 +23,8 @@ class ProfileViewmodel extends ChangeNotifier {
 
   /// 닉네임 수정
   final nicknameController = TextEditingController();
+
+  final DeviceResourceService _resourceService = DeviceResourceService();
 
   /// 이메일
   String email = "";
@@ -42,6 +46,14 @@ class ProfileViewmodel extends ChangeNotifier {
 
   /// 닉네임 중복 여부
   bool is_overlapping = true;
+
+  /// 온보딩 다시보기
+  bool _isShowOnboarding = false;
+  bool get isShowOnboarding => _isShowOnboarding;
+
+  /// 이미지 업로드
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   // 시작할때 닉네임,이메일,프로필 이미지 호출
   void _init() {
@@ -65,6 +77,12 @@ class ProfileViewmodel extends ChangeNotifier {
   //알림 토글
   void activeNotification() {
     is_active_notification = !is_active_notification;
+    notifyListeners();
+  }
+
+  // 온보딩 토글
+  void toggleOnboarding() {
+    _isShowOnboarding = !isShowOnboarding;
     notifyListeners();
   }
 
@@ -110,21 +128,29 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   // 이미지 피커로 갤러리에서 사진 가져오기
-  XFile? _image;
+  File? _image;
   final ImagePicker picker = ImagePicker();
 
-  //이미지를 가져오기
-  Future getImage(ImageSource imageSource) async {
-    // 갤러리에서 선택된 이미지
-    final XFile? pickedFile = await picker.pickImage(source: imageSource);
+  /// 이미지 선택
+  Future<void> pickProfileImage(ImageSource source) async {
+    final File? pickedFile = await _resourceService.pickImage(source);
     if (pickedFile != null) {
-      _image = XFile(pickedFile.path); //이미지 가져와서 _image에 로컬 경로 저장
+      _image = File(pickedFile.path);
     }
+    notifyListeners();
+  }
+
+  /// 이미지 삭제
+  Future<void> deleteImage() async {
+    _image = null;
     notifyListeners();
   }
 
   Future<void> upload() async {
     if (_image == null) return;
+
+    _isLoading = true;
+    notifyListeners();
 
     try {
       final fileToUpload = File(_image!.path);
@@ -135,6 +161,7 @@ class ProfileViewmodel extends ChangeNotifier {
 
       if (publicUrl != null) {
         await updateImage(user!.id, publicUrl);
+        _isLoading = false;
         notifyListeners();
       }
     } catch (e) {

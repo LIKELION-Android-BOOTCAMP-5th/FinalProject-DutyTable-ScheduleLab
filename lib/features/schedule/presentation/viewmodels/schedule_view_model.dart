@@ -5,11 +5,14 @@ import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:flutter/material.dart';
 
 import '../../../calendar/data/models/calendar_model.dart';
+import '../../../home_widget/data/datasources/widget_local_data_source.dart';
 
 /// 스케쥴 뷰모델
 class ScheduleViewModel extends ChangeNotifier {
-  /// 현재 캘린더 데이터
+  /// 현재 캘린더 데이터(private)
   final CalendarModel? _calendar;
+
+  /// 현재 캘린더 데이터(puclic)
   CalendarModel? get calendar => _calendar;
 
   final String _currentUserId =
@@ -27,6 +30,9 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 내 일정 리스트(public)
   List<ScheduleModel> get mySchedules => _mySchedules;
+
+  /// 내가 속한 모든 공유 캘린더의 일정 리스트(private)
+  List<ScheduleModel> _allSharedSchedules = [];
 
   /// 일정 날짜만 담을 리스트(private)
   List<DateTime?> _scheduleDate = [];
@@ -71,7 +77,13 @@ class ScheduleViewModel extends ChangeNotifier {
   bool _isShowMySchedule = false;
 
   /// 내 캘린더 불러오기(public)
-  bool get isFetchMySchedule => _isShowMySchedule;
+  bool get isShowMySchedule => _isShowMySchedule;
+
+  /// 모든 캘린더 불러오기(private)
+  bool _isShowAllSchedule = false;
+
+  /// 모든 캘린더 불러오기(public)
+  bool get isShowAllSchedule => _isShowAllSchedule;
 
   /// 화면에 표시될 필터링된 일정 리스트(private)
   List<ScheduleModel> _selectedFilteringList = [];
@@ -90,6 +102,8 @@ class ScheduleViewModel extends ChangeNotifier {
   bool _deleteMode = false;
   bool get deleteMode => _deleteMode;
 
+  final _widgetDataSource = WidgetDataSourceImpl();
+
   /// 앱 실행될 때
   /// 초기화 함수 실행
   ScheduleViewModel({CalendarModel? calendar}) : _calendar = calendar {
@@ -98,13 +112,26 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 실제로 화면(캘린더)에 그려질 일정 리스트
   List<ScheduleModel> get displaySchedules {
-    List<ScheduleModel> combined = _isShowMySchedule
-        ? [..._schedules, ..._mySchedules]
-        : _schedules;
+    List<ScheduleModel> combined = [];
 
-    // 시간순 정렬
+    // 1. 현재 들어와 있는 캘린더의 일정 추가
+    combined.addAll(_schedules);
+
+    // 2. 내 개인 일정 토글 시 추가
+    if (_isShowMySchedule) {
+      combined.addAll(_mySchedules);
+    }
+
+    // 3. 모든 공유 일정 토글 시 추가
+    if (_isShowAllSchedule) {
+      combined.addAll(_allSharedSchedules);
+    }
+
+    // ID 중복 제거 (여러 리스트에 같은 일정이 있을 경우 대비)
+    final ids = <String>{};
+    combined.retainWhere((s) => ids.add(s.id.toString()));
+
     combined.sort((a, b) => a.startedAt.compareTo(b.startedAt));
-
     return combined;
   }
 
@@ -115,7 +142,7 @@ class ScheduleViewModel extends ChangeNotifier {
           .fetchMySchedules();
 
       _mySchedules = rawSchedules.map((schedule) {
-        return schedule.copyWith(title: "My : ${schedule.title}");
+        return schedule.copyWith(title: "[My] ${schedule.title}");
       }).toList();
     } catch (e) {
       debugPrint("내 일정 로드 실패: $e");
@@ -124,9 +151,33 @@ class ScheduleViewModel extends ChangeNotifier {
     }
   }
 
+  /// 모든 공유 캘린더 일정 불러오기
+  Future<void> fetchAllSharedSchedules() async {
+    try {
+      final List<ScheduleModel> raw = await ScheduleDataSource.instance
+          .fetchJoinedSharedSchedules();
+
+      // 구분을 위해 타이틀 앞에 태그 추가 (선택 사항)
+      _allSharedSchedules = raw
+          .map((s) => s.copyWith(title: "[공유] ${s.title}"))
+          .toList();
+    } catch (e) {
+      debugPrint("공유 일정 로드 실패: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
+
   /// 내 일정 불러오기 모드
   void toggleFetchMySchedule() {
     _isShowMySchedule = !_isShowMySchedule;
+    applyFilter();
+    notifyListeners();
+  }
+
+  /// 모든 일정 불러오기 모드
+  void toggleFetchAllSchedule() {
+    _isShowAllSchedule = !_isShowAllSchedule;
     applyFilter();
     notifyListeners();
   }
@@ -180,6 +231,7 @@ class ScheduleViewModel extends ChangeNotifier {
     selectedFilterMonth = DateTime.now().month;
     fetchSchedules();
     fetchMySchedules();
+    fetchAllSharedSchedules();
   }
 
   /// 캘린더 날짜 선택
@@ -220,6 +272,7 @@ class ScheduleViewModel extends ChangeNotifier {
             .map((e) => e.startedAt.toPureDate())
             .toList();
 
+        await _widgetDataSource.syncAllCalendarsToWidget(); // 위젯 다시 싱크
         applyFilter();
       } catch (e) {
         debugPrint("❌ fetchSchedules error: $e");
@@ -229,9 +282,7 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 일정 목록 필터링
   void applyFilter() {
-    final List<ScheduleModel> baseList = _isShowMySchedule
-        ? [..._schedules, ..._mySchedules]
-        : _schedules;
+    final List<ScheduleModel> baseList = displaySchedules;
 
     _selectedFilteringList = baseList.where((schedule) {
       final startedAt = schedule.startedAt;
@@ -263,7 +314,12 @@ class ScheduleViewModel extends ChangeNotifier {
   Future<void> deleteAllSchedules() async {
     try {
       await ScheduleDataSource.instance.deleteAllSchedules(selectedIds);
-      fetchSchedules();
+      // 삭제 후 모든 데이터 리프레시
+      await Future.wait([
+        fetchSchedules(),
+        fetchMySchedules(),
+        fetchAllSharedSchedules(),
+      ]);
     } catch (e) {
       rethrow;
     }

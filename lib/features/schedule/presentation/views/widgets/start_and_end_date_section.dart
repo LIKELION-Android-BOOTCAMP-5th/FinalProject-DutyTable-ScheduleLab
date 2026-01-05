@@ -21,6 +21,7 @@ class StartAndEndDateSection extends StatelessWidget {
     DateTime initial,
     ValueChanged<DateTime> onSelected,
   ) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final selected = await showDatePicker(
       context: context,
       initialDate: initial,

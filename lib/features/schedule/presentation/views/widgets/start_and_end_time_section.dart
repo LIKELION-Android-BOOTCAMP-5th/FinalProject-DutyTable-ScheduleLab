@@ -1,7 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_edit_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class StartAndEndTimeSection extends StatelessWidget {
   final TimeOfDay startTime;
@@ -23,6 +21,7 @@ class StartAndEndTimeSection extends StatelessWidget {
     TimeOfDay initial,
     ValueChanged<TimeOfDay> onSelected,
   ) async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final selected = await showTimePicker(
       context: context,
       initialTime: initial,

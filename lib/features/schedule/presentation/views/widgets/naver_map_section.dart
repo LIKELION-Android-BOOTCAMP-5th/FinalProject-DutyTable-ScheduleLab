@@ -27,10 +27,12 @@ class NaverMapSection extends StatelessWidget {
         width: deviceWidth,
         height: deviceWidth,
         child: NaverMap(
+          forceGesture: true,
           options: NaverMapViewOptions(
             initialCameraPosition: NCameraPosition(target: latLng, zoom: 15),
             zoomGesturesEnable: true,
-            logoClickEnable: false,
+            logoClickEnable: true,
+            scrollGesturesEnable: true,
             nightModeEnable: isDark,
           ),
 

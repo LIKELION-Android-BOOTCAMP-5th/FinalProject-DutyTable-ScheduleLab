@@ -319,6 +319,60 @@ class CalendarDataSource {
     return calendars;
   }
 
+  /// 특정 캘린더의 안 읽은 채팅 개수 가져오기
+  Future<int> fetchUnreadChatCount(int calendarId, String userId) async {
+    // 1. 유저의 마지막 읽은 시간(last_read_at) 가져오기
+    final memberResponse = await _dio.get(
+      '/rest/v1/calendar_members',
+      queryParameters: {
+        'select': 'last_read_at',
+        'calendar_id': 'eq.$calendarId',
+        'user_id': 'eq.$userId',
+      },
+    );
+
+    if (memberResponse.data == null || (memberResponse.data as List).isEmpty) {
+      return 0;
+    }
+
+    final String? lastReadAt = memberResponse.data[0]['last_read_at'];
+    if (lastReadAt == null) return 0;
+
+    // 2. last_read_at 이후에 생성된 메시지 카운트
+    final chatResponse = await _dio.get(
+      '/rest/v1/chat_messages',
+      queryParameters: {
+        'select': 'id',
+        'calendar_id': 'eq.$calendarId',
+        'created_at': 'gt.$lastReadAt',
+      },
+      options: Options(headers: {'Prefer': 'count=exact'}),
+    );
+
+    return (chatResponse.data as List).length;
+  }
+
+  /// 다음 일정 가져오기
+  Future<Map<String, dynamic>?> fetchNextSchedule(int calendarId) async {
+    final String now = DateTime.now().toUtc().toIso8601String();
+
+    final response = await _dio.get(
+      '/rest/v1/schedules',
+      queryParameters: {
+        'select': 'title,started_at',
+        'calendar_id': 'eq.$calendarId',
+        'started_at': 'gt.$now',
+        'order': 'started_at.asc',
+        'limit': 1,
+      },
+    );
+
+    if (response.data is List && (response.data as List).isNotEmpty) {
+      return response.data[0] as Map<String, dynamic>;
+    }
+    return null;
+  }
+
   /// DELETE
   /// supabase storage 에 이미지 삭제
   Future<void> deleteCalendarImage(String? imageUrl) async {

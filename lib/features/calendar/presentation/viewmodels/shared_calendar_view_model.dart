@@ -224,29 +224,37 @@ class SharedCalendarViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _calendarList = await CalendarDataSource.instance.fetchCalendarFinalList(
-        "group",
-      );
+      // 1. 기본 목록 가져오기
+      final calendars = await CalendarDataSource.instance
+          .fetchCalendarFinalList("group");
+      _calendarList = calendars;
 
       if (_isDisposed) return;
-      _state = ViewState.success;
-      if (_calendarList != null) {
-        for (var calendar in _calendarList!) {
-          await loadUnreadCount(calendar.id);
-          await nextSchedule(calendar.id);
-        }
+
+      if (_calendarList != null && _calendarList!.isNotEmpty) {
+        // 2. 모든 추가 데이터를 병렬로 가져옴
+        await Future.wait(
+          _calendarList!.map((calendar) async {
+            await loadUnreadCount(calendar.id, shouldNotify: false);
+            await nextSchedule(calendar.id, shouldNotify: false);
+          }),
+        );
       }
+
+      if (_isDisposed) return;
+
+      // 3. 모든 데이터(Map 포함)가 완벽히 준비된 후 상태 변경
+      _state = ViewState.success;
     } catch (e) {
       if (_isDisposed) return;
-
       _state = ViewState.error;
       _errorMessage = e.toString();
-      debugPrint("Error loading calendars: $e");
     } finally {
       if (!_isDisposed) {
+        // 4. 실시간 구독 시작 및 최종 UI 업데이트 알림
+        _subscribeToNewMessages();
         notifyListeners();
       }
-      _subscribeToNewMessages();
     }
   }
 
@@ -316,10 +324,21 @@ class SharedCalendarViewModel extends ChangeNotifier {
     return data.length;
   }
 
-  Future<void> loadUnreadCount(int calendarId) async {
-    final int count = await chatCount(calendarId);
-    unreadCount[calendarId] = count;
-    notifyListeners();
+  // 안읽은 채팅 개수 로드
+  Future<void> loadUnreadCount(
+    int calendarId, {
+    bool shouldNotify = true,
+  }) async {
+    try {
+      final int count = await CalendarDataSource.instance.fetchUnreadChatCount(
+        calendarId,
+        currentUserId,
+      );
+      unreadCount[calendarId] = count;
+      if (shouldNotify) notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading unread count: $e');
+    }
   }
 
   List<RealtimeChannel> _channels = [];
@@ -342,7 +361,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
               value: calendar.id,
             ),
             callback: (payload) {
-              loadUnreadCount(calendar.id);
+              loadUnreadCount(calendar.id, shouldNotify: true);
             },
           )
           .subscribe();
@@ -374,30 +393,32 @@ class SharedCalendarViewModel extends ChangeNotifier {
   Map<int, String?> nextScheduleDateMonth = {};
   Map<int, String?> nextScheduleDateDay = {};
 
-  Future<void> nextSchedule(int? calendarId) async {
+  // 다음 일정 로드
+  Future<void> nextSchedule(
+    int? calendarId, {
+    bool shouldNotify = false,
+  }) async {
     if (calendarId == null) return;
-    final titleData = await supabase
-        .from('schedules')
-        .select('title')
-        .eq('calendar_id', calendarId)
-        .gt('started_at', DateTime.now().toUtc().toIso8601String())
-        .order('started_at', ascending: true)
-        .limit(1);
-    final dateData = await supabase
-        .from('schedules')
-        .select('started_at')
-        .eq('calendar_id', calendarId)
-        .gt('started_at', DateTime.now().toUtc().toIso8601String())
-        .order('started_at', ascending: true)
-        .limit(1);
-    nextScheduleTitle[calendarId] = titleData.isNotEmpty
-        ? titleData[0]['title']
-        : "";
-    nextScheduleDateMonth[calendarId] = dateData.isNotEmpty
-        ? dateData[0]['started_at'].substring(5, 7)
-        : "";
-    nextScheduleDateDay[calendarId] = dateData.isNotEmpty
-        ? dateData[0]['started_at'].substring(8, 10)
-        : "";
+
+    try {
+      final data = await CalendarDataSource.instance.fetchNextSchedule(
+        calendarId,
+      );
+
+      if (data != null) {
+        final DateTime date = DateTime.parse(data['started_at']).toLocal();
+        nextScheduleTitle[calendarId] = data['title'];
+        nextScheduleDateMonth[calendarId] = date.month.toString();
+        nextScheduleDateDay[calendarId] = date.day.toString();
+      } else {
+        nextScheduleTitle[calendarId] = "";
+        nextScheduleDateMonth[calendarId] = "";
+        nextScheduleDateDay[calendarId] = "";
+      }
+
+      if (shouldNotify) notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading next schedule: $e');
+    }
   }
 }

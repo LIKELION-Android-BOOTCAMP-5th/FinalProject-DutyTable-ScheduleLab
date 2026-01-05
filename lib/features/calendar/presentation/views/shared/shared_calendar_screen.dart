@@ -37,7 +37,14 @@ class _SharedCalendarScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: AppColors.background(context),
           appBar: BackActionsAppBar(
-            title: const SizedBox.shrink(),
+            title: Text(
+              viewModel.calendar?.title ?? "",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: AppColors.textMain(context),
+              ),
+            ),
             actions: [
               Row(
                 children: [
