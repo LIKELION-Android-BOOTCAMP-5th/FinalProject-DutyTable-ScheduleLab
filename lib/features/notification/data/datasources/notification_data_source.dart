@@ -231,6 +231,27 @@ class NotificationDataSource {
     );
   }
 
+  /// 초대 보류중인지 확인
+  Future<bool> hasPendingInvite(int calendarId, String userId) async {
+    final response = await _dio.get(
+      '/rest/v1/invite_notifications',
+      queryParameters: {
+        'select': 'id',
+        'calendar_id': 'eq.$calendarId',
+        'user_id': 'eq.$userId',
+        'is_read': 'eq.false',
+        'limit': 1,
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
+
+    return (response.data as List).isNotEmpty;
+  }
+
   /// Realtime 알림 리스너 시작
   void startRealtimeListeners() {
     final userId = supabase.auth.currentUser?.id;

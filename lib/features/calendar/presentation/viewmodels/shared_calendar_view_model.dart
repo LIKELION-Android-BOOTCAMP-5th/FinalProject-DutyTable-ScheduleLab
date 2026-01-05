@@ -4,6 +4,7 @@ import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../features/notification/data/datasources/notification_data_source.dart';
 import '../../../../main.dart';
 import '../../data/datasources/user_data_source.dart';
 
@@ -86,12 +87,23 @@ class SharedCalendarViewModel extends ChangeNotifier {
   }
 
   /// 공유 캘린더 목록 뷰모델
-  SharedCalendarViewModel({CalendarModel? calendar}) {
+  SharedCalendarViewModel({
+    List<CalendarModel>? calendarList,
+    CalendarModel? calendar,
+  }) {
     if (calendar != null) {
       // 5단계 : 데이터 받아서 입력
       _calendar = calendar;
     }
-    fetchCalendars();
+    if (calendarList != null) {
+      // splash 화면에서 받아온 데이터 있을 때
+      _calendarList = calendarList;
+      _state = ViewState.success;
+    } else {
+      // splash 화면에서 받아온 데이터 없을 때
+      _state = ViewState.loading;
+      fetchCalendars();
+    }
   }
 
   Future<void> addInvitedUserByNickname(String nickname) async {
@@ -118,8 +130,15 @@ class SharedCalendarViewModel extends ChangeNotifier {
       } else if (memberIds.contains(user['id'])) {
         _inviteError = '이미 멤버인 사용자 입니다.';
       } else {
-        _invitedUsers[user['id']!] = user['nickname']!;
-        _inviteError = null;
+        // 초대 보류중인지 확인
+        final hasPending = await NotificationDataSource.shared
+            .hasPendingInvite(_calendar!.id, user['id']!);
+        if (hasPending) {
+          _inviteError = '이미 초대된 닉네임 입니다.';
+        } else {
+          _invitedUsers[user['id']!] = user['nickname']!;
+          _inviteError = null;
+        }
       }
     } catch (e) {
       _inviteError = '사용자 확인 중 오류가 발생했습니다.';
@@ -151,6 +170,15 @@ class SharedCalendarViewModel extends ChangeNotifier {
   void clearError() {
     _inviteError = null;
     notifyListeners();
+  }
+
+  void setInitialData(List<CalendarModel>? initialData) {
+    if (initialData != null && _calendarList == null) {
+      _calendarList = initialData;
+      _state = ViewState.success;
+      // build 단계에서 호출될 수 있으므로 마이크로태스크나 다음 프레임에 알림
+      Future.microtask(() => notifyListeners());
+    }
   }
 
   @override
