@@ -1,6 +1,7 @@
 import 'package:dutytable/core/services/supabase_manager.dart';
 import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:flutter/material.dart';
 
 enum ViewState { loading, success, error }
@@ -55,7 +56,7 @@ class PersonalCalendarViewModel extends ChangeNotifier {
         final userData = await CalendarDataSource.instance
             .fetchIsGoogleCalendarConnection();
         if (userData) {
-          final googleSchedules = await CalendarDataSource.instance
+          final googleSchedules = await ScheduleDataSource.instance
               .syncGoogleCalendarToSchedule();
 
           if (googleSchedules.isNotEmpty) {

@@ -1,6 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/main.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/calendar/v3.dart' as calendar;
+import 'package:http/http.dart' as http;
 
 import '../models/schedule_model.dart';
 
@@ -192,6 +196,55 @@ class ScheduleDataSource {
     }
   }
 
+  /// 로그인 정보 받기
+  void setGoogleAccount(GoogleSignInAccount? account) {
+    _connectedAccount = account;
+  }
+
+  /// 일정 가져와서 리스트에 넣기
+  GoogleSignInAccount? _connectedAccount;
+  Future<List<Map<String, dynamic>>> syncGoogleCalendarToSchedule() async {
+    try {
+      if (_connectedAccount == null) {
+        Fluttertoast.showToast(msg: "구글 로그인 정보가 없습니다.");
+        return [];
+      }
+
+      final account = _connectedAccount!;
+
+      final authorization = await account.authorizationClient
+          .authorizationForScopes(['https://www.googleapis.com/auth/calendar']);
+      final client = _GoogleAuthClient(authorization!.accessToken);
+
+      final calendarApi = calendar.CalendarApi(client);
+
+      final events = await calendarApi.events.list("primary");
+
+      if (events.items == null || events.items!.isEmpty) {
+        Fluttertoast.showToast(msg: "가져올 일정이 없습니다.");
+        return [];
+      }
+      Fluttertoast.showToast(msg: "${events.items!.length}개의 일정을 가져왔습니다.");
+      List<Map<String, dynamic>> googleSyncSchedule = [];
+
+      for (var event in events.items!) {
+        googleSyncSchedule.add({
+          'title': event.summary ?? '(제목 없음)',
+          'memo': event.description,
+          'started_at': event.start?.dateTime?.toIso8601String(),
+          'ended_at': event.end?.dateTime?.toIso8601String(),
+          'location': event.location,
+          'color_value': '0xFF4285F4',
+        });
+      }
+
+      return googleSyncSchedule;
+    } catch (e) {
+      Fluttertoast.showToast(msg: "일정 가져오기에 실패했습니다.");
+      return [];
+    }
+  }
+
   /// UPDATE
   /// 스케줄 수정
   Future<void> updateSchedule({
@@ -272,5 +325,19 @@ class ScheduleDataSource {
     if (response.statusCode != 204) {
       throw Exception('Failed to delete schedules');
     }
+  }
+}
+
+// HTTP 클라이언트 (ProfileViewmodel 클래스 밖에 추가)
+class _GoogleAuthClient extends http.BaseClient {
+  final String _token;
+  final http.Client _client = http.Client();
+
+  _GoogleAuthClient(this._token);
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    request.headers['Authorization'] = 'Bearer $_token';
+    return _client.send(request);
   }
 }

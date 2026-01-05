@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dutytable/core/services/supabase_storage_service.dart';
-import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
 import 'package:dutytable/features/profile/data/datasources/profile_data_source.dart';
+import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -277,7 +277,7 @@ class ProfileViewmodel extends ChangeNotifier {
         );
 
         final account = await googleSignIn.authenticate();
-        CalendarDataSource.instance.setGoogleAccount(
+        ScheduleDataSource.instance.setGoogleAccount(
           account,
         ); // 로그인한 정보 calendar_data_source에 전달하기
 
@@ -299,7 +299,7 @@ class ProfileViewmodel extends ChangeNotifier {
         Fluttertoast.showToast(msg: "구글 캘린더 연동이 완료되었습니다.");
 
         // 일정 불러서 리스트로 만들기 호출
-        await CalendarDataSource.instance.syncGoogleCalendarToSchedule();
+        await ScheduleDataSource.instance.syncGoogleCalendarToSchedule();
       } catch (e) {
         print('연동 오류: $e');
         Fluttertoast.showToast(msg: "구글 캘린더 연동에 실패했습니다.");
