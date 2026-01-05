@@ -371,4 +371,12 @@ class ScheduleViewModel extends ChangeNotifier {
       rethrow;
     }
   }
+
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
 }
