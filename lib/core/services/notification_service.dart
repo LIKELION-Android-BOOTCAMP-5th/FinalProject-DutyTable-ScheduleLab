@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:dutytable/features/notification/data/models/invite_notification_model.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import '../../features/notification/data/datasources/notification_data_source.dart';
 
 class NotificationService {
   // 싱글톤 패턴 설정
@@ -9,6 +14,11 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _localPlugin =
       FlutterLocalNotificationsPlugin();
+
+  final _invitationController =
+  StreamController<InviteNotificationModel>.broadcast();
+  Stream<InviteNotificationModel> get invitationStream =>
+      _invitationController.stream;
 
   // 전역에서 사용할 채널 ID 정의
   static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
@@ -34,8 +44,7 @@ class NotificationService {
     // Android 채널 생성
     await _localPlugin
         .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
+        AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_channel);
 
     // Local Notifications 초기화
@@ -59,27 +68,44 @@ class NotificationService {
 
   // 포그라운드 리스너
   void _setupMessageListeners() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      // 초대 알림 데이터 페이로드에 calendar_id가 포함되어 있는지 확인
+      if (message.data.containsKey('calendar_id')) {
+        try {
+          // 푸시 알림 데이터에 포함된 id를 사용하여 DB에서 전체 알림 정보 조회
+          final notificationId = int.parse(message.data['id'].toString());
+          final notification = await NotificationDataSource.shared
+              .getInviteNotificationById(notificationId);
+          _invitationController.add(notification as InviteNotificationModel);
+        } catch (e) {
+          print('전체 초대알림 정보를 가져오는데 실패했습니다: $e');
+        }
+      } else {
+        RemoteNotification? notification = message.notification;
+        AndroidNotification? android = message.notification?.android;
 
-      if (notification != null && android != null) {
-        _localPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              _channel.id,
-              _channel.name,
-              channelDescription: _channel.description,
-              importance: Importance.max,
-              priority: Priority.high,
-              icon: android.smallIcon,
+        if (notification != null && android != null) {
+          _localPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                _channel.id,
+                _channel.name,
+                channelDescription: _channel.description,
+                importance: Importance.max,
+                priority: Priority.high,
+                icon: android.smallIcon,
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
     });
+  }
+
+  void dispose() {
+    _invitationController.close();
   }
 }

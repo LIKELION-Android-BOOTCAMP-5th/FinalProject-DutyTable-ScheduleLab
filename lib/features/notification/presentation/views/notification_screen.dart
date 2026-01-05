@@ -15,7 +15,7 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => NotificationViewModel(context),
+      create: (_) => NotificationViewModel(),
       child: const _NotificationScreenUI(),
     );
   }
@@ -42,7 +42,7 @@ class _NotificationScreenUI extends StatelessWidget {
         actions: [
           if (!viewModel.isLoading && viewModel.notifications.isNotEmpty)
             GestureDetector(
-              onTap: viewModel.handleDeleteAll,
+              onTap: () => viewModel.handleDeleteAll(context),
               child: Text(
                 "전체삭제",
                 style: TextStyle(
@@ -59,6 +59,7 @@ class _NotificationScreenUI extends StatelessWidget {
           isLoading: viewModel.isLoading,
           notifications: viewModel.notifications,
           onNotificationTapped: viewModel.onNotificationTapped,
+          viewModel: viewModel,
         ),
       ),
     );
@@ -68,13 +69,15 @@ class _NotificationScreenUI extends StatelessWidget {
 class NotificationBody extends StatelessWidget {
   final bool isLoading;
   final List<dynamic> notifications;
-  final Function(dynamic) onNotificationTapped;
+  final Function(dynamic, BuildContext) onNotificationTapped;
+  final NotificationViewModel viewModel;
 
   const NotificationBody({
     super.key,
     required this.isLoading,
     required this.notifications,
     required this.onNotificationTapped,
+    required this.viewModel,
   });
 
   @override
@@ -100,11 +103,13 @@ class NotificationBody extends StatelessWidget {
         final notification = notifications[index];
 
         return GestureDetector(
-          onTap: () => onNotificationTapped(notification),
+          onTap: () => onNotificationTapped(notification, context),
           child: () {
             if (notification is InviteNotificationModel) {
+              final title =
+                  viewModel.calendarTitles[notification.calendarId] ?? '';
               return NotificationCard(
-                title: notification.message,
+                title: title,
                 createdAt: notification.createdAt,
                 type: "invite",
                 isRead: notification.isRead,
