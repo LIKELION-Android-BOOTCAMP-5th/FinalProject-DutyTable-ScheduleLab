@@ -101,7 +101,7 @@ class ProfileViewmodel extends ChangeNotifier {
     nickname = data!['nickname'];
     nicknameController.text = nickname;
     email = data['email'];
-    image = (data['profile_url'] ?? "");
+    image = data['profile_url'] ?? "";
     is_sync = data['is_google_calendar_connect'] ?? false;
     notifyListeners();
   }
@@ -279,7 +279,7 @@ class ProfileViewmodel extends ChangeNotifier {
         final account = await googleSignIn.authenticate();
         ScheduleDataSource.instance.setGoogleAccount(
           account,
-        ); // 로그인한 정보 calendar_data_source에 전달하기
+        ); // 로그인한 정보 schedule_data_source에 전달하기
 
         if (account == null) {
           Fluttertoast.showToast(msg: "구글 로그인이 취소되었습니다.");
