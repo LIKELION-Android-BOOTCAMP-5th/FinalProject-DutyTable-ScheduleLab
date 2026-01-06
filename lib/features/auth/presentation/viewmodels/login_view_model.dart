@@ -151,7 +151,6 @@ class LoginViewModel extends ChangeNotifier {
   void _closeLoadingSafely(BuildContext context) {
     if (!context.mounted) return;
 
-    final nav = Navigator.of(context, rootNavigator: true);
-    if (nav.canPop()) nav.pop();
+    if (context.canPop()) context.pop();
   }
 }

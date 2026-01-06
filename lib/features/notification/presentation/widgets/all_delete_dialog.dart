@@ -2,6 +2,7 @@ import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class AllDeleteDialog extends StatelessWidget {
@@ -45,7 +46,7 @@ class AllDeleteDialog extends StatelessWidget {
                 children: [
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => Navigator.of(context).pop(), // 취소
+                      onTap: () => context.pop(),
                       child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: AppColors.textSub(context)),
@@ -79,7 +80,7 @@ class AllDeleteDialog extends StatelessWidget {
                               .read<NotificationState>()
                               .setHasNewNotifications(hasUnread);
 
-                          Navigator.of(context).pop(true);
+                          context.pop(true);
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
