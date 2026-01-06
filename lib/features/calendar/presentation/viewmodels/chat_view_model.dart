@@ -84,10 +84,12 @@ class ChatViewModel extends ChangeNotifier {
             final newMessage = payload.newRecord;
             final createdAtString = newMessage['created_at'] as String;
             final createdAt = DateTime.parse(createdAtString).toLocal();
+            final senderId = newMessage['user_id'] as String;
             final data = await ChatDataSource.instance
-                .fetchNewChatImageNickname();
+                .fetchNewChatImageNickname(senderId);
             final userImage = data['profile_url'] ?? "";
             final nickname = data['nickname'];
+            print("🚨${data['nickname']}");
             final newChatMessage = ChatMessage(
               id: newMessage['id'] as int,
               image: (userImage.isNotEmpty) ? userImage as String? : null,

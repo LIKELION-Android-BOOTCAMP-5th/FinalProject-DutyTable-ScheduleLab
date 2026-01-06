@@ -219,7 +219,6 @@ class ScheduleDataSource {
       final calendarApi = calendar.CalendarApi(client);
 
       final events = await calendarApi.events.list("primary");
-
       if (events.items == null || events.items!.isEmpty) {
         Fluttertoast.showToast(msg: "가져올 일정이 없습니다.");
         return [];
@@ -229,7 +228,7 @@ class ScheduleDataSource {
 
       for (var event in events.items!) {
         googleSyncSchedule.add({
-          'title': event.summary ?? '(제목 없음)',
+          'title': "[구글] ${event.summary ?? '(제목 없음)'}",
           'memo': event.description,
           'started_at': event.start?.dateTime?.toIso8601String(),
           'ended_at': event.end?.dateTime?.toIso8601String(),
