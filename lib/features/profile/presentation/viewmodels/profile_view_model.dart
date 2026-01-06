@@ -101,8 +101,9 @@ class ProfileViewmodel extends ChangeNotifier {
     nickname = data!['nickname'];
     nicknameController.text = nickname;
     email = data['email'];
-    image = (data['profileurl'] ?? "");
+    image = data['profile_url'] ?? "";
     is_sync = data['is_google_calendar_connect'] ?? false;
+    is_active_notification = data['allowed_notification'];
     notifyListeners();
   }
 
@@ -172,7 +173,7 @@ class ProfileViewmodel extends ChangeNotifier {
   Future<void> updateImage(String userId, String? publicUrl) async {
     await ProfileDataSource.instance.updateUserProfile(
       userId: userId,
-      payload: {'profileurl': publicUrl},
+      payload: {'profile_url': publicUrl},
     );
     image = publicUrl;
     notifyListeners();
@@ -279,7 +280,7 @@ class ProfileViewmodel extends ChangeNotifier {
         final account = await googleSignIn.authenticate();
         ScheduleDataSource.instance.setGoogleAccount(
           account,
-        ); // 로그인한 정보 calendar_data_source에 전달하기
+        ); // 로그인한 정보 schedule_data_source에 전달하기
 
         if (account == null) {
           Fluttertoast.showToast(msg: "구글 로그인이 취소되었습니다.");

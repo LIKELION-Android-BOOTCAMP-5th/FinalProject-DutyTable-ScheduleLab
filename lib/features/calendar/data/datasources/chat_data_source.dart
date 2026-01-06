@@ -32,7 +32,7 @@ class ChatDataSource {
     final response = await _dio.get(
       '/rest/v1/chat_messages',
       queryParameters: {
-        'select': 'id,message,created_at,user_id,users (profileurl,nickname)',
+        'select': 'id,message,created_at,user_id,users (profile_url,nickname)',
         'calendar_id': 'eq.$calendarId',
         'order': 'created_at.asc',
       },
@@ -48,7 +48,7 @@ class ChatDataSource {
     final response = await _dio.get(
       '/rest/v1/users',
       queryParameters: {
-        'select': 'nickname,profileurl',
+        'select': 'nickname,profile_url',
         'id': 'eq.$currentUserId',
         'limit': 1,
       },

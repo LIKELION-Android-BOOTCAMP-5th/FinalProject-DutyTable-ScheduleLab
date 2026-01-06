@@ -48,7 +48,6 @@ class ScheduleModel {
     this.longitude,
     this.latitude,
     this.memo,
-    this.schedules,
   });
 
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
@@ -73,9 +72,6 @@ class ScheduleModel {
       latitude: json['latitude'] as String?,
       memo: json['memo'] as String?,
       createdAt: DateTime.parse(json['created_at']).toLocal(),
-      schedules: json["schedules"] != null
-          ? List<Map<String, dynamic>>.from(json["schedules"])
-          : null,
     );
   }
 
@@ -140,7 +136,6 @@ class ScheduleModel {
       latitude: latitude,
       memo: memo ?? this.memo,
       createdAt: createdAt,
-      schedules: schedules ?? this.schedules,
     );
   }
 }

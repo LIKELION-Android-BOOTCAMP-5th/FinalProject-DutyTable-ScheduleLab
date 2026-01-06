@@ -372,7 +372,7 @@ class CustomOtherChatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 12,
       children: [
         // 커스텀 프로필 이미지 박스 사용
