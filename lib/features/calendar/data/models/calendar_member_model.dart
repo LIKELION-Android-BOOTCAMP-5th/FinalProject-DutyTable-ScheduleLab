@@ -21,7 +21,7 @@ class CalendarMemberModel {
 
     final String memberNickname = userJson?['nickname'] as String? ?? 'Unknown';
 
-    final String? profileUrl = userJson?['profileurl'] as String?;
+    final String? profileUrl = userJson?['profile_url'] as String?;
     return CalendarMemberModel(
       calendarId: json["calendar_id"] as int,
       userId: json["user_id"] as String,

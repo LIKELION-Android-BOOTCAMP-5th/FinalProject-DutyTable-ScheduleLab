@@ -119,7 +119,7 @@ class CalendarDataSource {
     final response = await _dio.get(
       '/rest/v1/calendars',
       queryParameters: {
-        'select': '*,calendars_user_id_fkey(nickname, profileurl)',
+        'select': '*,calendars_user_id_fkey(nickname, profile_url)',
         'user_id': 'eq.$userId',
         'type': 'eq.personal',
         'limit': 1,
@@ -180,7 +180,7 @@ class CalendarDataSource {
     final response = await _dio.get(
       '/rest/v1/calendars',
       queryParameters: {
-        'select': '*,calendars_user_id_fkey(nickname, profileurl)',
+        'select': '*,calendars_user_id_fkey(nickname, profile_url)',
         'id': 'eq.$calendarId',
       },
     );
@@ -232,7 +232,7 @@ class CalendarDataSource {
     final response = await _dio.get(
       '/rest/v1/calendar_members',
       queryParameters: {
-        'select': '*,users(nickname, profileurl)',
+        'select': '*,users(nickname, profile_url)',
         'calendar_id': 'eq.$calendarId',
       },
     );
@@ -310,7 +310,7 @@ class CalendarDataSource {
       calendarResponse = await _dio.get(
         '/rest/v1/calendars',
         queryParameters: {
-          'select': '*,calendars_user_id_fkey(nickname, profileurl)',
+          'select': '*,calendars_user_id_fkey(nickname, profile_url)',
           'id': 'in.($idsQuery)',
           'type': 'eq.$type',
         },
