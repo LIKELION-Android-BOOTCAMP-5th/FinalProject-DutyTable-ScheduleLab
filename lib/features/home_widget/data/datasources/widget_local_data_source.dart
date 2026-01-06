@@ -16,7 +16,7 @@ abstract class WidgetDataSource {
 class WidgetDataSourceImpl implements WidgetDataSource {
   static const String appGroupId = 'group.com.schedulelab.dutytable';
   static const String iosWidgetName = 'MyWidgetExtension';
-  static const String androidWidgetName = 'MyWidgetExtension';
+  static const String androidWidgetName = 'MyWidgetProvider';
 
   @override
   Future<void> updateWidget(Map<String, String> data) async {
