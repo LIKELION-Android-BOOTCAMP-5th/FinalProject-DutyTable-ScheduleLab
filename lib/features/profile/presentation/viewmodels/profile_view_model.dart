@@ -103,6 +103,7 @@ class ProfileViewmodel extends ChangeNotifier {
     email = data['email'];
     image = data['profile_url'] ?? "";
     is_sync = data['is_google_calendar_connect'] ?? false;
+    is_active_notification = data['allowed_notification'];
     notifyListeners();
   }
 

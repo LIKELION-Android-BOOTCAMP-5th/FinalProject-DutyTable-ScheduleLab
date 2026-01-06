@@ -48,7 +48,8 @@ class ProfileDataSource {
     final response = await _dio.get(
       '/rest/v1/users',
       queryParameters: {
-        'select': 'nickname,email,profile_url,is_google_calendar_connect',
+        'select':
+            'nickname,email,profile_url,is_google_calendar_connect,allowed_notification',
         'id': 'eq.$currentUserId',
         'limit': 1,
       },
