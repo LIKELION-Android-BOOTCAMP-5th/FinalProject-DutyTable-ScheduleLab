@@ -114,6 +114,30 @@ class NotificationDataSource {
         .toList();
   }
 
+  /// 특정 ID의 초대 알림 가져오기
+  Future<InviteNotificationModel> getInviteNotificationById(
+      int notificationId) async {
+    final response = await _dio.get(
+      '/rest/v1/invite_notifications',
+      queryParameters: {
+        'select': '*',
+        'id': 'eq.$notificationId',
+        'limit': 1,
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
+
+    if (response.data != null && (response.data as List).isNotEmpty) {
+      return InviteNotificationModel.fromJson((response.data as List).first);
+    } else {
+      throw Exception('Notification not found');
+    }
+  }
+
   /// 모든 알림 삭제하기
   Future<void> deleteAllNotifications() async {
     final userId = supabase.auth.currentUser?.id;
@@ -207,6 +231,27 @@ class NotificationDataSource {
     );
   }
 
+  /// 초대 보류중인지 확인
+  Future<bool> hasPendingInvite(int calendarId, String userId) async {
+    final response = await _dio.get(
+      '/rest/v1/invite_notifications',
+      queryParameters: {
+        'select': 'id',
+        'calendar_id': 'eq.$calendarId',
+        'user_id': 'eq.$userId',
+        'is_read': 'eq.false',
+        'limit': 1,
+      },
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+        },
+      ),
+    );
+
+    return (response.data as List).isNotEmpty;
+  }
+
   /// Realtime 알림 리스너 시작
   void startRealtimeListeners() {
     final userId = supabase.auth.currentUser?.id;
@@ -222,22 +267,26 @@ class NotificationDataSource {
     _inviteNotificationChannel = supabase
         .channel('invite-notifications-channel')
         .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
-          schema: 'public',
-          table: 'invite_notifications',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'user_id',
-            value: userId,
-          ),
-          callback: (payload) {
-            debugPrint('초대 알림 변경 수신: ${payload.toString()}');
-            final newRecord = payload.newRecord;
-            final notification = InviteNotificationModel.fromJson(newRecord);
-            _inviteNotificationController.sink.add(notification);
-            debugPrint('새로운 초대 알림: ${notification.message}');
-          },
-        )
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'invite_notifications',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.eq,
+        column: 'user_id',
+        value: userId,
+      ),
+      callback: (payload) async {
+        try {
+          final newRecord = payload.newRecord;
+          final notificationId = int.parse(newRecord['id'].toString());
+          final notification =
+          await getInviteNotificationById(notificationId);
+          _inviteNotificationController.sink.add(notification);
+        } catch (e) {
+          print('Error fetching full invitation from realtime: $e');
+        }
+      },
+    )
         .subscribe();
 
     // 리마인더 알림 채널 생성 및 구독

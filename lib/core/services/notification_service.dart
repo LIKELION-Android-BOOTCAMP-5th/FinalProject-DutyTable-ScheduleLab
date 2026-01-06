@@ -34,8 +34,8 @@ class NotificationService {
     // Android 채널 생성
     await _localPlugin
         .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
+        AndroidFlutterLocalNotificationsPlugin
+    >()
         ?.createNotificationChannel(_channel);
 
     // Local Notifications 초기화
@@ -48,10 +48,10 @@ class NotificationService {
     // 포그라운드 알림 옵션 (iOS)
     await FirebaseMessaging.instance
         .setForegroundNotificationPresentationOptions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+      alert: true,
+      badge: true,
+      sound: true,
+    );
 
     // 리스너 연결
     _setupMessageListeners();

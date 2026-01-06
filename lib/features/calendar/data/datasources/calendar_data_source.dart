@@ -209,6 +209,24 @@ class CalendarDataSource {
     return calendar;
   }
 
+  /// 특정 ID의 캘린더 제목 가져오기
+  Future<String> getCalendarTitleById(int calendarId) async {
+    final response = await _dio.get(
+      '/rest/v1/calendars',
+      queryParameters: {
+        'select': 'title',
+        'id': 'eq.$calendarId',
+        'limit': 1,
+      },
+    );
+
+    if (response.data != null && (response.data as List).isNotEmpty) {
+      return (response.data as List).first['title'] as String;
+    } else {
+      throw Exception('Calendar not found');
+    }
+  }
+
   /// 멤버 목록 가져오기
   Future<List<CalendarMemberModel>> fetchCalendarMembers(int calendarId) async {
     final response = await _dio.get(
