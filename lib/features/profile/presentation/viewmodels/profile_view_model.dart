@@ -101,7 +101,7 @@ class ProfileViewmodel extends ChangeNotifier {
     nickname = data!['nickname'];
     nicknameController.text = nickname;
     email = data['email'];
-    image = (data['profileurl'] ?? "");
+    image = (data['profile_url'] ?? "");
     is_sync = data['is_google_calendar_connect'] ?? false;
     notifyListeners();
   }
@@ -172,7 +172,7 @@ class ProfileViewmodel extends ChangeNotifier {
   Future<void> updateImage(String userId, String? publicUrl) async {
     await ProfileDataSource.instance.updateUserProfile(
       userId: userId,
-      payload: {'profileurl': publicUrl},
+      payload: {'profile_url': publicUrl},
     );
     image = publicUrl;
     notifyListeners();

@@ -188,7 +188,7 @@ class SignupViewModel with ChangeNotifier {
         'nickname': nicknameController.text.trim(),
         'is_google_calendar_connect': false,
         'allowed_notification': true,
-        if (imageUrl != null) 'profileurl': imageUrl,
+        if (imageUrl != null) 'profileUrl': imageUrl,
       };
 
       // upsert: 데이터가 없으면 새로 만들고, 있으면 업데이트

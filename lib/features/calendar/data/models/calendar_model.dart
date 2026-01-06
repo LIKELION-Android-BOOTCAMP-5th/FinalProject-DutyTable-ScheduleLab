@@ -32,7 +32,7 @@ class CalendarModel {
         ownerJson?['nickname'] as String? ?? 'Unknown Owner';
 
     // 방장 프사
-    final String? ownerProfileUrl = ownerJson?['profileurl'] as String?;
+    final String? ownerProfileUrl = ownerJson?['profile_url'] as String?;
 
     // 멤버 데이터
     final List<dynamic> membersJson = json['calendar_members'] ?? [];

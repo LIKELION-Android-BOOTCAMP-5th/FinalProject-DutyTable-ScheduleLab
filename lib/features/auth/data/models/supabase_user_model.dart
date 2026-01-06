@@ -17,7 +17,7 @@ class SupabaseUserModel {
     return SupabaseUserModel(
       id: json["id"] as String,
       email: json["email"] as String,
-      profileURL: json["profileURL"] as String?,
+      profileURL: json["profile_url"] as String?,
       nickname: json["nickname"] as String,
       is_google_calendar_connect: json["is_google_calendar_connect"] as bool,
     );
