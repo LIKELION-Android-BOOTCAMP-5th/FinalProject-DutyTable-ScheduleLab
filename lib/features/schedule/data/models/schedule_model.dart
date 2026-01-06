@@ -25,8 +25,9 @@ class ScheduleModel {
 
   final String? memo;
   final DateTime createdAt;
+  List<Map<String, dynamic>>? schedules;
 
-  const ScheduleModel({
+  ScheduleModel({
     required this.id,
     required this.calendarId,
     this.repeatGroupId,
@@ -47,6 +48,7 @@ class ScheduleModel {
     this.longitude,
     this.latitude,
     this.memo,
+    this.schedules,
   });
 
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
@@ -71,6 +73,9 @@ class ScheduleModel {
       latitude: json['latitude'] as String?,
       memo: json['memo'] as String?,
       createdAt: DateTime.parse(json['created_at']).toLocal(),
+      schedules: json["schedules"] != null
+          ? List<Map<String, dynamic>>.from(json["schedules"])
+          : null,
     );
   }
 
@@ -96,6 +101,7 @@ class ScheduleModel {
       'latitude': latitude,
       'memo': memo,
       'created_at': createdAt.toUtc().toIso8601String(),
+      'schedules': schedules,
     };
   }
 
@@ -111,6 +117,7 @@ class ScheduleModel {
     int? repeatCount,
     String? memo,
     String? repeatGroupId,
+    List<Map<String, dynamic>>? schedules,
   }) {
     return ScheduleModel(
       id: id,
@@ -133,6 +140,7 @@ class ScheduleModel {
       latitude: latitude,
       memo: memo ?? this.memo,
       createdAt: createdAt,
+      schedules: schedules ?? this.schedules,
     );
   }
 }

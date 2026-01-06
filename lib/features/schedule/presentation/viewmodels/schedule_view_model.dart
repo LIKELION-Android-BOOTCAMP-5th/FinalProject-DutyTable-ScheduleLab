@@ -4,6 +4,7 @@ import 'package:dutytable/features/schedule/data/datasources/schedule_data_sourc
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:flutter/material.dart';
 
+import '../../../calendar/data/datasources/calendar_data_source.dart';
 import '../../../calendar/data/models/calendar_model.dart';
 import '../../../home_widget/data/datasources/widget_local_data_source.dart';
 
@@ -262,21 +263,67 @@ class ScheduleViewModel extends ChangeNotifier {
   Future<void> fetchSchedules() async {
     if (_calendar == null) {
       return;
-    } else {
-      try {
-        _schedules = await ScheduleDataSource.instance.fetchSchedules(
-          _calendar.id,
-        );
+    }
+    try {
+      _schedules = await ScheduleDataSource.instance.fetchSchedules(
+        _calendar.id,
+      );
 
-        _scheduleDate = _schedules
-            .map((e) => e.startedAt.toPureDate())
-            .toList();
+      final userId = SupabaseManager.shared.supabase.auth.currentUser?.id;
+      if (userId != null) {
+        final isGoogleConnected = await CalendarDataSource.instance
+            .fetchIsGoogleCalendarConnection();
 
-        await _widgetDataSource.syncAllCalendarsToWidget(); // 위젯 다시 싱크
-        applyFilter();
-      } catch (e) {
-        debugPrint("❌ fetchSchedules error: $e");
+        if (isGoogleConnected) {
+          final googleSchedules = await ScheduleDataSource.instance
+              .syncGoogleCalendarToSchedule();
+
+          if (googleSchedules.isNotEmpty) {
+            final convertedSchedules = <ScheduleModel>[];
+
+            for (var scheduleMap in googleSchedules) {
+              try {
+                final startedAtStr = scheduleMap['started_at'];
+                final endedAtStr = scheduleMap['ended_at'];
+
+                if (startedAtStr == null || endedAtStr == null) {
+                  continue;
+                }
+
+                final schedule = ScheduleModel(
+                  id:
+                      DateTime.now().millisecondsSinceEpoch +
+                      convertedSchedules.length,
+                  calendarId: _calendar!.id,
+                  title: scheduleMap['title'],
+                  colorValue:
+                      scheduleMap['color_value']?.toString() ?? '0xFF4285F4',
+                  isDone: false,
+                  startedAt: DateTime.parse(startedAtStr).toLocal(),
+                  endedAt: DateTime.parse(endedAtStr).toLocal(),
+                  isRepeat: false,
+                  createdAt: DateTime.now(),
+                  memo: scheduleMap['memo'],
+                );
+
+                convertedSchedules.add(schedule);
+              } catch (e) {
+                debugPrint("Google 일정 변환 실패: $e");
+                continue;
+              }
+            }
+
+            _schedules.addAll(convertedSchedules);
+          }
+        }
       }
+
+      _scheduleDate = _schedules.map((e) => e.startedAt.toPureDate()).toList();
+
+      await _widgetDataSource.syncAllCalendarsToWidget();
+      applyFilter();
+    } catch (e) {
+      debugPrint("❌ fetchSchedules error: $e");
     }
   }
 
@@ -323,5 +370,13 @@ class ScheduleViewModel extends ChangeNotifier {
     } catch (e) {
       rethrow;
     }
+  }
+
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }

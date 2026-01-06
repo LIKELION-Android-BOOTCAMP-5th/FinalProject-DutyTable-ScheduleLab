@@ -141,6 +141,20 @@ class CalendarDataSource {
     }
   }
 
+  /// 수파베이스에서 is_google_calendar_connection 정보 가져오기
+  Future<bool> fetchIsGoogleCalendarConnection() async {
+    final currentUserId = supabase.auth.currentUser?.id;
+    final response = await _dio.get(
+      '/rest/v1/users',
+      queryParameters: {
+        'select': 'is_google_calendar_connect',
+        'id': 'eq.$currentUserId',
+        'limit': 1,
+      },
+    );
+    return response.data[0]['is_google_calendar_connect'] as bool;
+  }
+
   /// 개인 캘린더를 생성하고, 생성자를 멤버로 추가한 뒤, 생성된 캘린더 정보를 반환
   Future<CalendarModel> _createAndFetchPersonalCalendar(String userId) async {
     // '내 캘린더'라는 이름으로 개인 캘린더 생성
