@@ -63,35 +63,47 @@ class SignupViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  // 닉네임 유효성을 검사하는 내부 함수 (2글자 이상)
   void _validateNickname() {
-    final newNickname = nicknameController.text;
-    final isValid = newNickname.length >= 2;
+    final raw = nicknameController.text;
+    final newNickname = raw.trim();
+
+    // 2~10자 규칙
+    final isValid = newNickname.length >= 2 && newNickname.length <= 10;
 
     if (_isNicknameValid != isValid) {
       _isNicknameValid = isValid;
     }
 
-    // 이전에 중복 확인을 통과한 닉네임과 현재 닉네임이 같다면, 중복 확인 상태를 유지
+    // 이전에 중복 확인한 닉네임과 같으면 중복 확인 상태 유지
     if (_lastCheckedNickname != null && newNickname == _lastCheckedNickname) {
       _isNicknameChecked = true;
       nicknameMessage = '사용 가능한 닉네임입니다.';
       isNicknameMessageError = false;
-    } else {
-      // 닉네임이 변경되었으므로 중복 확인 상태를 초기화
-      _isNicknameChecked = false;
-      if (newNickname.isNotEmpty && !isValid) {
-        nicknameMessage = '2글자 이상 입력해주세요.';
-        isNicknameMessageError = true;
-      } else if (isValid) {
-        nicknameMessage = '중복 체크를 해주세요.';
-        isNicknameMessageError = true;
-      } else {
-        nicknameMessage = null; // 비어있을 경우 메시지 없음
-      }
+      notifyListeners();
+      return;
     }
+
+    // 닉네임이 바뀌면 중복확인 상태 무조건 초기화
+    _isNicknameChecked = false;
+
+    if (newNickname.isEmpty) {
+      nicknameMessage = null;
+      isNicknameMessageError = false;
+    } else if (newNickname.length < 2) {
+      nicknameMessage = '닉네임은 2글자 이상 입력해주세요.';
+      isNicknameMessageError = true;
+    } else if (newNickname.length > 10) {
+      nicknameMessage = '닉네임은 최대 10자까지 가능합니다.';
+      isNicknameMessageError = true;
+    } else {
+      // 2~10자 범위인데 중복체크 전
+      nicknameMessage = '중복 체크를 해주세요.';
+      isNicknameMessageError = true;
+    }
+
     notifyListeners();
   }
+
 
   // 약관 동의 체크박스 상태를 변경하는 함수
   void toggleTermsAgreement(bool? newValue) {
@@ -107,19 +119,26 @@ class SignupViewModel with ChangeNotifier {
 
   // 닉네임 중복 확인 로직
   Future<void> checkNicknameDuplication() async {
-    if (!isNicknameValid) {
-      nicknameMessage = '2글자 이상 입력해주세요.';
+    final nicknameToTest = nicknameController.text.trim();
+
+    // 2~10자 체크
+    if (nicknameToTest.length < 2) {
+      nicknameMessage = '닉네임은 2글자 이상 입력해주세요.';
+      isNicknameMessageError = true;
+      notifyListeners();
+      return;
+    }
+    if (nicknameToTest.length > 10) {
+      nicknameMessage = '닉네임은 최대 10자까지 가능합니다.';
       isNicknameMessageError = true;
       notifyListeners();
       return;
     }
 
     _setLoading(true);
-    final nicknameToTest = nicknameController.text;
+
     try {
-      final duplicated = await _userDataSource.isNicknameDuplicated(
-        nicknameToTest,
-      );
+      final duplicated = await _userDataSource.isNicknameDuplicated(nicknameToTest);
 
       if (!duplicated) {
         // 중복된 닉네임이 없는 경우
