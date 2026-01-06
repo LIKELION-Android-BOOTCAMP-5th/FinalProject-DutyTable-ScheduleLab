@@ -44,7 +44,7 @@ class SchedulePreviewCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      item.emotionTag ?? "🙂",
+                      item.emotionTag ?? "😢",
                       style: const TextStyle(fontSize: 28),
                     ),
                     const SizedBox(width: 12),
