@@ -2,6 +2,7 @@ import 'package:dutytable/features/calendar/presentation/views/add/calendar_add_
 import 'package:dutytable/features/calendar/presentation/views/edit/calendar_edit_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/shared/shared_calendar_screen.dart';
+import 'package:dutytable/features/licenses/oss_licenses_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/add/schedule_add_screen.dart';
@@ -97,6 +98,13 @@ GoRouter createRouter(BuildContext context) {
             scheduleDetail: data['schedule'],
             isAdmin: data['isAdmin'],
           );
+        },
+      ),
+
+      GoRoute(
+        path: "/licenses",
+        builder: (_, __) {
+          return OssLicensesScreen();
         },
       ),
 

@@ -82,6 +82,24 @@ class _ProfileScreen extends StatelessWidget {
                       // 버튼 섹션(동기화, 테마, 알림, 앱소개 다시보기)
                       ProfileButtonSection(),
 
+                      // 오픈소스
+                      GestureDetector(
+                        onTap: () {
+                          context.push('/licenses');
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "오픈소스",
+                            style: TextStyle(
+                              color: AppColors.primary(context),
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.primary(context),
+                            ),
+                          ),
+                        ),
+                      ),
+
                       // 회원탈퇴
                       GestureDetector(
                         onTap: () {
