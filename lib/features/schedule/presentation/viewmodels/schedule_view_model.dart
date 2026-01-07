@@ -304,6 +304,7 @@ class ScheduleViewModel extends ChangeNotifier {
                   isRepeat: false,
                   createdAt: DateTime.now(),
                   memo: scheduleMap['memo'],
+                  emotionTag: "😐",
                 );
 
                 convertedSchedules.add(schedule);
@@ -370,13 +371,5 @@ class ScheduleViewModel extends ChangeNotifier {
     } catch (e) {
       rethrow;
     }
-  }
-
-  bool _isDisposed = false;
-
-  @override
-  void dispose() {
-    _isDisposed = true;
-    super.dispose();
   }
 }

@@ -15,7 +15,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
   ViewState get state => _state;
 
   /// 감정 선택
-  String? _emotionTag;
+  String _emotionTag = "😐";
 
   /// 컬러 선택
   String _colorValue = "0xFFFF3B30";
@@ -51,7 +51,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
   String _memo = "";
 
   /// getter
-  String? get emotionTag => _emotionTag;
+  String get emotionTag => _emotionTag;
   String get colorValue => _colorValue;
   String get title => _title;
 
@@ -76,7 +76,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
   String get memo => _memo;
 
   /// setter
-  set selectedEmotion(String? value) {
+  set selectedEmotion(String value) {
     _emotionTag = value;
     notifyListeners();
   }

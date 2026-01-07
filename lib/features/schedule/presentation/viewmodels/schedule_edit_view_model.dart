@@ -14,7 +14,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
   EditViewState get state => _state;
 
   late String _title;
-  late String? _emotionTag;
+  late String _emotionTag;
   late String _colorValue;
   late bool _isDone;
   late DateTime _startDate;
@@ -35,7 +35,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
   int get scheduleId => _scheduleFromEdit.id;
   String? get repeatGroupId => _scheduleFromEdit.repeatGroupId;
   String get title => _title;
-  String? get emotionTag => _emotionTag;
+  String get emotionTag => _emotionTag;
   String get colorValue => _colorValue;
   bool get isDone => _isDone;
   DateTime get startDate => _startDate;
@@ -56,7 +56,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
   ScheduleEditViewModel({required ScheduleModel schedule})
     : _scheduleFromEdit = schedule {
     _title = schedule.title;
-    _emotionTag = schedule.emotionTag;
+    _emotionTag = schedule.emotionTag!;
     _colorValue = schedule.colorValue;
     _isDone = schedule.isDone;
 
@@ -98,7 +98,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setEmotion(String? v) => _set(() => _emotionTag = v);
+  void setEmotion(String v) => _set(() => _emotionTag = v);
   void setColor(String v) => _set(() => _colorValue = v);
   void setTitle(String v) => _set(() => _title = v);
   void setMemo(String v) => _set(() => _memo = v);
