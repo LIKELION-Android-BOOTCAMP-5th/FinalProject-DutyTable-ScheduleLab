@@ -140,23 +140,20 @@ class CalendarCard extends StatelessWidget {
           const SizedBox(height: 6),
           Row(
             children: [
-              // 데이터가 있을 때만 날짜 표시
-              if (month.isNotEmpty && day.isNotEmpty)
-                Text(
-                  "다음 일정 : ${month}월 ${day}일",
+              Expanded(
+                child: Text(
+                  (month.isNotEmpty && day.isNotEmpty)
+                      ? "다음 일정 : ${month}월 ${day}일 ${scheduleTitle.isEmpty ? "예정된 일정 없음" : " / $scheduleTitle"}"
+                      : (scheduleTitle.isEmpty
+                            ? "예정된 일정 없음"
+                            : "일정 : $scheduleTitle"),
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textSub(context),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              Text(
-                scheduleTitle.isEmpty ? "예정된 일정 없음" : " / ${[scheduleTitle]}",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSub(context),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
