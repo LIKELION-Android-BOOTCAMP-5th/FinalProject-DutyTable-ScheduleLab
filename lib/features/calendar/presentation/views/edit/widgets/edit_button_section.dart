@@ -28,6 +28,8 @@ class EditButtonSection extends StatelessWidget {
     final bool isContentChange =
         isTitleChanged || isDescChanged || isImageChanged;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8.0, right: 8.0, left: 8.0),
@@ -52,11 +54,21 @@ class EditButtonSection extends StatelessWidget {
                       SnackBar(
                         content: Text(
                           result ? '수정이 완료 되었습니다' : '알 수 없는 에러가 발생하였습니다',
+                          style: TextStyle(color: AppColors.textMain(context)),
                         ),
                         backgroundColor: result
                             ? AppColors.pureSuccess
                             : AppColors.pureDanger,
-                        duration: const Duration(seconds: 3),
+                        duration: const Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.only(
+                          bottom: 20,
+                          left: 20,
+                          right: 20,
+                        ),
                       ),
                     );
                     context.pop();

@@ -69,9 +69,7 @@ class _NotificationScreenUI extends StatelessWidget {
             ),
         ],
       ),
-      body: SafeArea(
-        child: NotificationBody(viewModel: viewModel),
-      ),
+      body: SafeArea(child: NotificationBody(viewModel: viewModel)),
     );
   }
 }
@@ -79,10 +77,7 @@ class _NotificationScreenUI extends StatelessWidget {
 class NotificationBody extends StatelessWidget {
   final NotificationViewModel viewModel;
 
-  const NotificationBody({
-    super.key,
-    required this.viewModel,
-  });
+  const NotificationBody({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +111,23 @@ class NotificationBody extends StatelessWidget {
                 if (notification.is_accepted) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('이미 수락된 초대입니다.')),
+                    SnackBar(
+                      content: Text(
+                        '이미 수락된 초대입니다.',
+                        style: TextStyle(color: AppColors.textMain(context)),
+                      ),
+                      backgroundColor: AppColors.surface(context),
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      margin: const EdgeInsets.only(
+                        bottom: 20,
+                        left: 20,
+                        right: 20,
+                      ),
+                    ),
                   );
                   return;
                 }
@@ -134,8 +145,9 @@ class NotificationBody extends StatelessWidget {
                     context.read<SharedCalendarViewModel>().fetchCalendars();
                   } catch (_) {}
 
-                  final target =
-                  await viewModel.resolveCalendarTarget(notification.calendarId);
+                  final target = await viewModel.resolveCalendarTarget(
+                    notification.calendarId,
+                  );
 
                   if (!context.mounted) return;
                   context.go(target.route, extra: target.extra);
@@ -155,8 +167,9 @@ class NotificationBody extends StatelessWidget {
                   // 읽음 처리 실패는 다음 단계에서 UI 스낵바 처리로 확장 가능
                 }
 
-                final target =
-                await viewModel.resolveCalendarTarget(notification.calendarId);
+                final target = await viewModel.resolveCalendarTarget(
+                  notification.calendarId,
+                );
 
                 if (!context.mounted) return;
                 context.go(target.route, extra: target.extra);
@@ -165,7 +178,23 @@ class NotificationBody extends StatelessWidget {
             } catch (e) {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('처리 중 오류가 발생했습니다: $e')),
+                SnackBar(
+                  content: Text(
+                    '처리 중 오류가 발생했습니다: $e',
+                    style: TextStyle(color: AppColors.textMain(context)),
+                  ),
+                  backgroundColor: AppColors.danger(context),
+                  duration: const Duration(seconds: 2),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  margin: const EdgeInsets.only(
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
+                  ),
+                ),
               );
             }
           },

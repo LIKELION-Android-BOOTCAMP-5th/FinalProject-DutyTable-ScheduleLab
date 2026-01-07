@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -81,7 +82,8 @@ class NotificationDataSource {
       },
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -104,7 +106,8 @@ class NotificationDataSource {
       },
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -116,17 +119,15 @@ class NotificationDataSource {
 
   /// 특정 ID의 초대 알림 가져오기
   Future<InviteNotificationModel> getInviteNotificationById(
-      int notificationId) async {
+    int notificationId,
+  ) async {
     final response = await _dio.get(
       '/rest/v1/invite_notifications',
-      queryParameters: {
-        'select': '*',
-        'id': 'eq.$notificationId',
-        'limit': 1,
-      },
+      queryParameters: {'select': '*', 'id': 'eq.$notificationId', 'limit': 1},
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -148,7 +149,8 @@ class NotificationDataSource {
       queryParameters: {'user_id': 'eq.$userId'},
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -158,7 +160,8 @@ class NotificationDataSource {
       queryParameters: {'user_id': 'eq.$userId'},
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -175,7 +178,8 @@ class NotificationDataSource {
       data: {'is_read': true},
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -196,7 +200,8 @@ class NotificationDataSource {
       },
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -205,14 +210,11 @@ class NotificationDataSource {
     if ((existingMemberResponse.data as List).isEmpty) {
       await _dio.post(
         '/rest/v1/calendar_members',
-        data: {
-          'calendar_id': notification.calendarId,
-          'user_id': userId,
-        },
+        data: {'calendar_id': notification.calendarId, 'user_id': userId},
         options: Options(
           headers: {
             'Authorization':
-            'Bearer ${supabase.auth.currentSession?.accessToken}',
+                'Bearer ${supabase.auth.currentSession?.accessToken}',
           },
         ),
       );
@@ -225,7 +227,8 @@ class NotificationDataSource {
       data: {'is_accepted': true, 'is_read': true},
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -244,7 +247,8 @@ class NotificationDataSource {
       },
       options: Options(
         headers: {
-          'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}',
+          'Authorization':
+              'Bearer ${supabase.auth.currentSession?.accessToken}',
         },
       ),
     );
@@ -267,26 +271,27 @@ class NotificationDataSource {
     _inviteNotificationChannel = supabase
         .channel('invite-notifications-channel')
         .onPostgresChanges(
-      event: PostgresChangeEvent.insert,
-      schema: 'public',
-      table: 'invite_notifications',
-      filter: PostgresChangeFilter(
-        type: PostgresChangeFilterType.eq,
-        column: 'user_id',
-        value: userId,
-      ),
-      callback: (payload) async {
-        try {
-          final newRecord = payload.newRecord;
-          final notificationId = int.parse(newRecord['id'].toString());
-          final notification =
-          await getInviteNotificationById(notificationId);
-          _inviteNotificationController.sink.add(notification);
-        } catch (e) {
-          print('Error fetching full invitation from realtime: $e');
-        }
-      },
-    )
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'invite_notifications',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId,
+          ),
+          callback: (payload) async {
+            try {
+              final newRecord = payload.newRecord;
+              final notificationId = int.parse(newRecord['id'].toString());
+              final notification = await getInviteNotificationById(
+                notificationId,
+              );
+              _inviteNotificationController.sink.add(notification);
+            } catch (e) {
+              debugPrint('Error fetching full invitation from realtime: $e');
+            }
+          },
+        )
         .subscribe();
 
     // 리마인더 알림 채널 생성 및 구독

@@ -76,20 +76,20 @@ class SignupFormCard extends StatelessWidget {
                     ),
                     child: viewmodel.isLoading && !viewmodel.isNicknameChecked
                         ? SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary(context),
-                        strokeWidth: 2,
-                      ),
-                    )
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary(context),
+                              strokeWidth: 2,
+                            ),
+                          )
                         : const Text(
-                      '중복 체크',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.pureWhite,
-                      ),
-                    ),
+                            '중복 체크',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.pureWhite,
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -129,9 +129,22 @@ class SignupFormCard extends StatelessWidget {
                 await launchUrl(notionUrl);
               } else if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('URL을 열 수 없습니다.'),
-                    backgroundColor: Colors.red,
+                  SnackBar(
+                    content: Text(
+                      'URL을 열 수 없습니다.',
+                      style: TextStyle(color: AppColors.textMain(context)),
+                    ),
+                    backgroundColor: AppColors.danger(context),
+                    duration: const Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    margin: const EdgeInsets.only(
+                      bottom: 20,
+                      left: 20,
+                      right: 20,
+                    ),
                   ),
                 );
               }
