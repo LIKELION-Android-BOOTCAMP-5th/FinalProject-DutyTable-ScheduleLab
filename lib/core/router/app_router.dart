@@ -20,6 +20,7 @@ import '../../features/calendar/data/models/calendar_model.dart';
 import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
 import '../../features/calendar/presentation/views/setting/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/list/shared_calendar_list_screen.dart';
+import '../../oss_licenses.dart';
 import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
@@ -105,6 +106,16 @@ GoRouter createRouter(BuildContext context) {
         path: "/licenses",
         builder: (_, __) {
           return OssLicensesScreen();
+        },
+      ),
+
+      GoRoute(
+        path: "/oss-license",
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          final Package package = data['package'] as Package;
+
+          return MiscOssLicenseSingle(package: package);
         },
       ),
 

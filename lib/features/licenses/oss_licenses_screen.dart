@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../../core/configs/app_colors.dart';
 import '../../oss_licenses.dart';
 
 class OssLicensesScreen extends StatelessWidget {
@@ -57,12 +59,8 @@ class OssLicensesScreen extends StatelessWidget {
                       ? Text(package.description)
                       : null,
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          MiscOssLicenseSingle(package: package),
-                    ),
-                  ),
+                  onTap: () =>
+                      context.push('/oss-license', extra: {'package': package}),
                 );
               },
               separatorBuilder: (context, index) => const Divider(),
@@ -96,7 +94,7 @@ class MiscOssLicenseSingle extends StatelessWidget {
       appBar: AppBar(title: Text('${package.name} ${package.version}')),
       body: SafeArea(
         child: Container(
-          color: Theme.of(context).canvasColor,
+          color: AppColors.background(context),
           child: ListView(
             children: <Widget>[
               if (package.description.isNotEmpty)
@@ -108,8 +106,10 @@ class MiscOssLicenseSingle extends StatelessWidget {
                   ),
                   child: Text(
                     package.description,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textMain(context),
                     ),
                   ),
                 ),
@@ -123,9 +123,10 @@ class MiscOssLicenseSingle extends StatelessWidget {
                   child: InkWell(
                     child: Text(
                       package.homepage!,
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        decoration: TextDecoration.underline,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primary(context),
                       ),
                     ),
                     onTap: () => launchUrlString(package.homepage!),
@@ -141,7 +142,11 @@ class MiscOssLicenseSingle extends StatelessWidget {
                 ),
                 child: Text(
                   _bodyText(),
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textMain(context),
+                  ),
                 ),
               ),
             ],
