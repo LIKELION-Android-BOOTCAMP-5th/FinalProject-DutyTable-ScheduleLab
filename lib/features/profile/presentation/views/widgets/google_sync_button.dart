@@ -20,8 +20,8 @@ class GoogleSyncButton extends StatelessWidget {
       padding: 7.0,
       addWidget: GestureDetector(
         onTap: () async {
-          if (!viewModel.is_sync) {
-            try {
+          try {
+            if (!viewModel.is_sync) {
               await viewModel.googleSync();
               Fluttertoast.showToast(msg: "구글 캘린더 연동이 완료되었습니다.");
               final googleSchedules = await ScheduleDataSource.instance
@@ -29,16 +29,14 @@ class GoogleSyncButton extends StatelessWidget {
               await Fluttertoast.showToast(
                 msg: "${googleSchedules.length}개의 일정을 가져왔습니다.",
               );
-            } catch (e) {
-              Fluttertoast.showToast(msg: "구글 캘린더 연동에 실패했습니다.");
-            }
-          } else {
-            try {
+            } else {
               await viewModel.googleSync();
               Fluttertoast.showToast(msg: "구글 캘린더 연동이 해제되었습니다.");
-            } catch (e) {
-              Fluttertoast.showToast(msg: "연동 해제에 실패했습니다.");
             }
+          } catch (e) {
+            (!viewModel.is_sync)
+                ? Fluttertoast.showToast(msg: "구글 캘린더 연동에 실패했습니다.")
+                : Fluttertoast.showToast(msg: "연동 해제에 실패했습니다.");
           }
           await context.read<PersonalCalendarViewModel>().fetchCalendar();
         },
