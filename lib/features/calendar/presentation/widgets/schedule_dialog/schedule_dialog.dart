@@ -79,10 +79,15 @@ class ScheduleDialog extends StatelessWidget {
                         context.pop();
 
                         // 상세 페이지 이동 (isAdmin에 계산된 canEdit 전달)
-                        final bool? isDeleted = await context.push<bool>(
-                          "/schedule/detail",
-                          extra: {"schedule": item, "isAdmin": canEdit},
-                        );
+                        final is_google_schedule = viewModel.displaySchedules
+                            .where((s) => s.containsDay(day))
+                            .any((s) => s.title.contains("[구글]"));
+                        final bool? isDeleted = (!is_google_schedule)
+                            ? await context.push<bool>(
+                                "/schedule/detail",
+                                extra: {"schedule": item, "isAdmin": canEdit},
+                              )
+                            : null;
 
                         if (isDeleted == true) {
                           await viewModel.fetchSchedules();
