@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/main.dart';
+import 'package:flutter/material.dart';
 
 class ProfileDataSource {
   ProfileDataSource._();
@@ -35,9 +36,8 @@ class ProfileDataSource {
           .map((file) => '$userId/${file.name}')
           .toList(); // List<String> 형식으로 바꿔줌
       await supabase.storage.from(bucketName).remove(filePaths);
-      print('이미지 삭제 성공!!!!!!');
     } catch (e) {
-      print('이미지 삭제 중 오류 발생: $e');
+      debugPrint('이미지 삭제 중 오류 발생: $e');
     }
   }
 

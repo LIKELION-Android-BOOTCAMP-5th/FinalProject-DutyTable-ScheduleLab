@@ -123,8 +123,10 @@ class SharedCalendarViewModel extends ChangeNotifier {
         _inviteError = '이미 멤버인 사용자 입니다.';
       } else {
         // 초대 보류중인지 확인
-        final hasPending = await NotificationDataSource.shared
-            .hasPendingInvite(_calendar!.id, user['id']!);
+        final hasPending = await NotificationDataSource.shared.hasPendingInvite(
+          _calendar!.id,
+          user['id']!,
+        );
         if (hasPending) {
           _inviteError = '이미 초대된 닉네임 입니다.';
         } else {
@@ -152,7 +154,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
         _invitedUsers.keys.toList(),
       );
     } catch (e) {
-      print("에러 : $e");
+      debugPrint("에러 : $e");
     } finally {
       _invitedUsers.clear();
       notifyListeners();

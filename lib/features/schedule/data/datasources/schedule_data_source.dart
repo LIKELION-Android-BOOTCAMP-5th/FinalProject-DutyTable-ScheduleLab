@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/main.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart' as calendar;
@@ -46,10 +47,10 @@ class ScheduleDataSource {
       }
       return [];
     } on DioException catch (e) {
-      print("❌ 구글 API 상세 에러: ${e.response?.data}");
+      debugPrint("❌ 구글 API 상세 에러: ${e.response?.data}");
       return [];
     } catch (e) {
-      print("❌ 일반 에러: $e");
+      debugPrint("❌ 일반 에러: $e");
       return [];
     }
   }
@@ -119,7 +120,7 @@ class ScheduleDataSource {
       }
       return [];
     } catch (e) {
-      print("❌ fetchJoinedSharedSchedules 에러: $e");
+      debugPrint("❌ fetchJoinedSharedSchedules 에러: $e");
       return [];
     }
   }

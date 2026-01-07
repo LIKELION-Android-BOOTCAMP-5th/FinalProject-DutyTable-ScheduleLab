@@ -24,10 +24,7 @@ class AllDeleteDialog extends StatelessWidget {
             color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(
-                blurRadius: 20,
-                color: Colors.black.withOpacity(0.15),
-              ),
+              BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(0.15)),
             ],
           ),
           child: Column(
@@ -72,8 +69,8 @@ class AllDeleteDialog extends StatelessWidget {
                         try {
                           await viewModel.deleteAllNotifications();
 
-                          final hasUnread =
-                          await viewModel.hasUnreadNotifications();
+                          final hasUnread = await viewModel
+                              .hasUnreadNotifications();
 
                           if (!context.mounted) return;
                           context
@@ -83,8 +80,24 @@ class AllDeleteDialog extends StatelessWidget {
                           context.pop(true);
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('알림을 모두 삭제했습니다.'),
+                            SnackBar(
+                              content: Text(
+                                '알림을 모두 삭제했습니다.',
+                                style: TextStyle(
+                                  color: AppColors.textMain(context),
+                                ),
+                              ),
+                              backgroundColor: AppColors.danger(context),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              margin: const EdgeInsets.only(
+                                bottom: 20,
+                                left: 20,
+                                right: 20,
+                              ),
                             ),
                           );
                         } catch (e) {
@@ -92,8 +105,23 @@ class AllDeleteDialog extends StatelessWidget {
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content:
-                              Text('알림 삭제 중 오류가 발생했습니다: $e'),
+                              content: Text(
+                                '알림 삭제 중 오류가 발생했습니다: $e',
+                                style: TextStyle(
+                                  color: AppColors.textMain(context),
+                                ),
+                              ),
+                              backgroundColor: AppColors.danger(context),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              margin: const EdgeInsets.only(
+                                bottom: 20,
+                                left: 20,
+                                right: 20,
+                              ),
                             ),
                           );
                         }

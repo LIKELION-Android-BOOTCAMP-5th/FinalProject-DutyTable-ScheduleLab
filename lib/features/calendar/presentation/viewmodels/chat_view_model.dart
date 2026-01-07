@@ -155,7 +155,7 @@ class ChatViewModel extends ChangeNotifier {
       _state = ViewState.success;
     } catch (e) {
       _state = ViewState.error;
-      print('채팅 메시지 로딩 오류: $e');
+      debugPrint('채팅 메시지 로딩 오류: $e');
     } finally {
       notifyListeners();
       // 초기 로딩 후 스크롤을 맨 아래로 이동

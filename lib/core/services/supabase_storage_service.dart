@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../main.dart';
@@ -45,10 +46,8 @@ class SupabaseStorageService {
       final String filePath = imageUrl.substring(startIndex);
 
       await supabase.storage.from(bucketName).remove([filePath]);
-
-      print('이미지 삭제 성공');
     } catch (e) {
-      print('이미지 삭제 중 오류 발생: $e');
+      debugPrint('이미지 삭제 중 오류 발생: $e');
     }
   }
 
@@ -72,7 +71,7 @@ class SupabaseStorageService {
 
       return supabase.storage.from('profile-images').getPublicUrl(filePath);
     } catch (e) {
-      print('Storage Error: $e');
+      debugPrint('Storage Error: $e');
       return null;
     }
   }

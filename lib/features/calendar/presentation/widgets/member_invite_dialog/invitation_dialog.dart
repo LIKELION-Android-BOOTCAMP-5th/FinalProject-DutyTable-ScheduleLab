@@ -31,17 +31,31 @@ class _InvitationDialogState extends State<InvitationDialog> {
       // 에러 처리
       if (mounted) {
         context.pop(false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('초대 수락 중 오류가 발생했습니다: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '초대 수락 중 오류가 발생했습니다: $e',
+              style: TextStyle(color: AppColors.textMain(context)),
+            ),
+            backgroundColor: AppColors.danger(context),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+          ),
+        );
       }
     }
   }
 
   void _onHold() async {
     try {
-      await NotificationDataSource.shared
-          .markAsRead(widget.notification.id, 'invite');
+      await NotificationDataSource.shared.markAsRead(
+        widget.notification.id,
+        'invite',
+      );
     } catch (e) {
       // 에러 처리
       debugPrint('알림 읽음 처리 중 오류 발생: $e');
@@ -65,27 +79,29 @@ class _InvitationDialogState extends State<InvitationDialog> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Padding(
-              padding:
-              const EdgeInsets.symmetric(vertical: 40.0, horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                vertical: 40.0,
+                horizontal: 20,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _isLoading
                       ? Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary(context),
-                      strokeWidth: 2,
-                    ),
-                  )
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary(context),
+                            strokeWidth: 2,
+                          ),
+                        )
                       : Text(
-                    '"$calendarName" 그룹 캘린더 초대가 도착했습니다.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.textMain(context),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
+                          '"$calendarName" 그룹 캘린더 초대가 도착했습니다.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: AppColors.textMain(context),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
                   const SizedBox(height: 24),
                   Row(
                     children: [
@@ -115,7 +131,7 @@ class _InvitationDialogState extends State<InvitationDialog> {
                         ),
                       ),
 
-                  const SizedBox(width: 12),
+                      const SizedBox(width: 12),
 
                       /// 확인 버튼
                       Expanded(

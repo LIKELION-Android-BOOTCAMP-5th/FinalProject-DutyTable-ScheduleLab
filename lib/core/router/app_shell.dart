@@ -47,13 +47,17 @@ class _AppShellState extends State<AppShell> {
           // 토스트 메시지 형태의 스낵바 노출
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
+              content: Text(
                 '한 번 더 누르면 종료됩니다.',
-                style: TextStyle(color: AppColors.pureWhite),
+                style: TextStyle(color: AppColors.textMain(context)),
               ),
+              backgroundColor: AppColors.surface(context),
               duration: const Duration(seconds: 2),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: isDark ? AppColors.dBorder : AppColors.lBorder,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),

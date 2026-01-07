@@ -126,9 +126,18 @@ class LoginViewModel extends ChangeNotifier {
 
     if (result.route == PostLoginRoute.shared) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('로그인이 성공하였습니다.'),
+        SnackBar(
+          content: Text(
+            "로그인이 성공하였습니다.",
+            style: TextStyle(color: AppColors.textMain(context)),
+          ),
           backgroundColor: AppColors.pureSuccess,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
         ),
       );
       GoRouter.of(context).go('/shared');
@@ -143,9 +152,19 @@ class LoginViewModel extends ChangeNotifier {
 
   void _showError(BuildContext context, String msg) {
     if (!context.mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          msg,
+          style: TextStyle(color: AppColors.textMain(context)),
+        ),
+        backgroundColor: AppColors.danger(context),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+      ),
+    );
   }
 
   void _closeLoadingSafely(BuildContext context) {

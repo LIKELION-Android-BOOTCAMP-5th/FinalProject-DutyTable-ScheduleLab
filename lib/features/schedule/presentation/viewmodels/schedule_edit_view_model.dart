@@ -203,8 +203,6 @@ class ScheduleEditViewModel extends ChangeNotifier {
       );
     }
 
-    print(holidays);
-
     final scheduleDuration = DateTime(
       2000,
       1,
@@ -223,8 +221,6 @@ class ScheduleEditViewModel extends ChangeNotifier {
 
     while (createdCount < _repeatCount && safetyLoop < 3000) {
       safetyLoop++;
-
-      print(currentStart.weekday);
 
       if (currentStart.checkIsException(
         holidays: holidays,
