@@ -54,6 +54,8 @@ class CalendarEditBody extends StatelessWidget {
                   ),
                 ),
                 controller: viewModel.titleController,
+                maxLength: 20,
+                maxLines: 1,
               ),
 
               const SizedBox(height: 40),
@@ -73,6 +75,8 @@ class CalendarEditBody extends StatelessWidget {
                   ),
                 ),
                 controller: viewModel.descController,
+                maxLength: 500,
+                maxLines: null,
               ),
             ],
           ),
