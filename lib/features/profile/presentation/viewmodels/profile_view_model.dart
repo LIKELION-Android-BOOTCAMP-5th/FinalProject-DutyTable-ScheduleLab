@@ -12,10 +12,18 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/services/device_resource_service.dart';
 
+enum viewState { loading, success }
+
 class ProfileViewmodel extends ChangeNotifier {
   ProfileViewmodel() {
     _init();
   }
+
+  /// 데이터 로딩 상태(private)
+  viewState _state = viewState.success;
+
+  /// 데이터 로딩 상태(public)
+  viewState get state => _state;
 
   /// 현재 로그인 유저
   final user = supabase.auth.currentUser;
@@ -296,7 +304,6 @@ class ProfileViewmodel extends ChangeNotifier {
         await updateGoogleSync(user!.id, true);
         is_sync = true;
         notifyListeners();
-
         Fluttertoast.showToast(msg: "구글 캘린더 연동이 완료되었습니다.");
 
         // 일정 불러서 리스트로 만들기 호출
@@ -307,6 +314,9 @@ class ProfileViewmodel extends ChangeNotifier {
       }
     } else {
       // 연결 해제하기
+      _state = viewState.loading;
+      notifyListeners();
+
       try {
         final googleSignIn = GoogleSignIn.instance;
         await googleSignIn.signOut();
@@ -315,7 +325,7 @@ class ProfileViewmodel extends ChangeNotifier {
         await updateGoogleSync(user!.id, false);
         is_sync = false;
         notifyListeners();
-
+        _state = viewState.success;
         Fluttertoast.showToast(msg: "구글 캘린더 연동이 해제되었습니다.");
       } catch (e) {
         print('연동 해제 오류: $e');

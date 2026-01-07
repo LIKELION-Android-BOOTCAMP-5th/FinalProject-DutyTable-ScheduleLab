@@ -23,14 +23,23 @@ class GoogleSyncButton extends StatelessWidget {
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(
-            (viewModel.is_sync) ? "연결해제" : "연결",
-            style: const TextStyle(
-              color: AppColors.primaryBlue,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: (viewModel.state == viewState.loading)
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryBlue,
+                    strokeWidth: 2,
+                  ),
+                )
+              : Text(
+                  (viewModel.is_sync) ? "연결해제" : "연결",
+                  style: const TextStyle(
+                    color: AppColors.primaryBlue,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
       ),
     );

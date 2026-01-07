@@ -1,11 +1,12 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/utils/extensions.dart';
-import 'package:dutytable/features/calendar/presentation/widgets/schedule_dialog/schedule_dialog.dart';
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+
+import '../schedule_dialog/schedule_dialog.dart';
 
 /// 캘린더 메인 세션
 class SfCalendarSection extends StatelessWidget {
@@ -87,15 +88,22 @@ class SfCalendarSection extends StatelessWidget {
     final hasSchedule = viewModel.displaySchedules.any(
       (s) => s.containsDay(date),
     );
-    if (!hasSchedule) return;
-
-    await showDialog(
-      context: context,
-      builder: (_) => ChangeNotifierProvider.value(
-        value: viewModel,
-        child: ScheduleDialog(day: date),
-      ),
-    );
+    final is_google_schedule = viewModel.displaySchedules
+        .where((s) => s.containsDay(date))
+        .any((s) => s.title.contains("[구글]"));
+    if (!hasSchedule) {
+      return;
+    } else if (is_google_schedule) {
+      return;
+    } else {
+      await showDialog(
+        context: context,
+        builder: (_) => ChangeNotifierProvider.value(
+          value: viewModel,
+          child: ScheduleDialog(day: date),
+        ),
+      );
+    }
   }
 }
 
