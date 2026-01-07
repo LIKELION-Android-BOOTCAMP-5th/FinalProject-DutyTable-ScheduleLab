@@ -27,6 +27,8 @@ class LabeledTextField extends StatelessWidget {
 
   final ValueChanged<String>? onChanged;
 
+  final int? maxLength;
+
   /// 라벨 + 텍스트 필드
   const LabeledTextField({
     super.key,
@@ -38,6 +40,7 @@ class LabeledTextField extends StatelessWidget {
     this.readOnly = false,
     this.onTap,
     this.onChanged,
+    this.maxLength,
   });
 
   @override
@@ -60,6 +63,7 @@ class LabeledTextField extends StatelessWidget {
           controller: controller,
           validator: validator,
           maxLines: maxLines,
+          maxLength: maxLength,
           readOnly: readOnly,
           onTap: onTap,
           onChanged: onChanged,
