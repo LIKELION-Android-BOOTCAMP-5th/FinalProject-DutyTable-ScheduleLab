@@ -44,7 +44,6 @@ class ChatDataSource {
 
   // 프사,닉네임 가져오기
   Future<Map<String, dynamic>> fetchNewChatImageNickname(String userId) async {
-    // final currentUserId = supabase.auth.currentUser?.id;
     final response = await _dio.get(
       '/rest/v1/users',
       queryParameters: {

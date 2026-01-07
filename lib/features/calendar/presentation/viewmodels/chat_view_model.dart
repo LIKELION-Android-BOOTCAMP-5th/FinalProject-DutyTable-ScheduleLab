@@ -89,7 +89,6 @@ class ChatViewModel extends ChangeNotifier {
                 .fetchNewChatImageNickname(senderId);
             final userImage = data['profile_url'] ?? "";
             final nickname = data['nickname'];
-            print("🚨${data['nickname']}");
             final newChatMessage = ChatMessage(
               id: newMessage['id'] as int,
               image: (userImage.isNotEmpty) ? userImage as String? : null,
