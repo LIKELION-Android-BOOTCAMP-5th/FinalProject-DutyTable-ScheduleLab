@@ -143,7 +143,7 @@ class CalendarCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   (month.isNotEmpty && day.isNotEmpty)
-                      ? "다음 일정 : ${month}월 ${day}일 ${scheduleTitle.isEmpty ? "예정된 일정 없음" : " / $scheduleTitle"}"
+                      ? "다음 일정 : $month월 $day일 $scheduleTitle"
                       : (scheduleTitle.isEmpty
                             ? "예정된 일정 없음"
                             : "일정 : $scheduleTitle"),
