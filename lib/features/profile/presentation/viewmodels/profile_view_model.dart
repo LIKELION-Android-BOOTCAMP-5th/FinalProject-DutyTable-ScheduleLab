@@ -11,7 +11,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/services/device_resource_service.dart';
-import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
 
 enum viewState { loading, success }
 
@@ -19,7 +18,6 @@ class ProfileViewmodel extends ChangeNotifier {
   ProfileViewmodel() {
     _init();
   }
-  final ScheduleViewModel viewModel = ScheduleViewModel();
 
   /// 데이터 로딩 상태(private)
   viewState _state = viewState.success;
