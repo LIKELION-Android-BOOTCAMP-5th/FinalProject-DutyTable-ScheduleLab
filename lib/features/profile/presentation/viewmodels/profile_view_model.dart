@@ -11,6 +11,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/services/device_resource_service.dart';
+import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
 
 enum viewState { loading, success }
 
@@ -18,6 +19,7 @@ class ProfileViewmodel extends ChangeNotifier {
   ProfileViewmodel() {
     _init();
   }
+  final ScheduleViewModel viewModel = ScheduleViewModel();
 
   /// 데이터 로딩 상태(private)
   viewState _state = viewState.success;
@@ -308,6 +310,12 @@ class ProfileViewmodel extends ChangeNotifier {
 
         // 일정 불러서 리스트로 만들기 호출
         await ScheduleDataSource.instance.syncGoogleCalendarToSchedule();
+
+        final googleSchedules = await ScheduleDataSource.instance
+            .syncGoogleCalendarToSchedule();
+        await Fluttertoast.showToast(
+          msg: "${googleSchedules.length}개의 일정을 가져왔습니다.",
+        );
       } catch (e) {
         print('연동 오류: $e');
         Fluttertoast.showToast(msg: "구글 캘린더 연동에 실패했습니다.");
