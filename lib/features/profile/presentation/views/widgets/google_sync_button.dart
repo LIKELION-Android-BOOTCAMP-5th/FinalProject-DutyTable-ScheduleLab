@@ -2,9 +2,11 @@ import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/features/profile/presentation/viewmodels/profile_view_model.dart';
 import 'package:dutytable/features/profile/presentation/widgets/profile_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../calendar/presentation/viewmodels/personal_calendar_view_model.dart';
+import '../../../../schedule/data/datasources/schedule_data_source.dart';
 
 class GoogleSyncButton extends StatelessWidget {
   const GoogleSyncButton({super.key});
@@ -18,7 +20,26 @@ class GoogleSyncButton extends StatelessWidget {
       padding: 7.0,
       addWidget: GestureDetector(
         onTap: () async {
-          await viewModel.googleSync();
+          if (!viewModel.is_sync) {
+            try {
+              await viewModel.googleSync();
+              Fluttertoast.showToast(msg: "구글 캘린더 연동이 완료되었습니다.");
+              final googleSchedules = await ScheduleDataSource.instance
+                  .syncGoogleCalendarToSchedule();
+              await Fluttertoast.showToast(
+                msg: "${googleSchedules.length}개의 일정을 가져왔습니다.",
+              );
+            } catch (e) {
+              Fluttertoast.showToast(msg: "구글 캘린더 연동에 실패했습니다.");
+            }
+          } else {
+            try {
+              await viewModel.googleSync();
+              Fluttertoast.showToast(msg: "구글 캘린더 연동이 해제되었습니다.");
+            } catch (e) {
+              Fluttertoast.showToast(msg: "연동 해제에 실패했습니다.");
+            }
+          }
           await context.read<PersonalCalendarViewModel>().fetchCalendar();
         },
         child: Padding(

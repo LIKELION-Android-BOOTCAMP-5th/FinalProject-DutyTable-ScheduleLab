@@ -291,7 +291,6 @@ class ProfileViewmodel extends ChangeNotifier {
         ); // 로그인한 정보 schedule_data_source에 전달하기
 
         if (account == null) {
-          Fluttertoast.showToast(msg: "구글 로그인이 취소되었습니다.");
           return;
         }
 
@@ -304,19 +303,12 @@ class ProfileViewmodel extends ChangeNotifier {
         await updateGoogleSync(user!.id, true);
         is_sync = true;
         notifyListeners();
-        Fluttertoast.showToast(msg: "구글 캘린더 연동이 완료되었습니다.");
 
         // 일정 불러서 리스트로 만들기 호출
         await ScheduleDataSource.instance.syncGoogleCalendarToSchedule();
-
-        final googleSchedules = await ScheduleDataSource.instance
-            .syncGoogleCalendarToSchedule();
-        await Fluttertoast.showToast(
-          msg: "${googleSchedules.length}개의 일정을 가져왔습니다.",
-        );
       } catch (e) {
         print('연동 오류: $e');
-        Fluttertoast.showToast(msg: "구글 캘린더 연동에 실패했습니다.");
+        throw e;
       }
     } else {
       // 연결 해제하기
@@ -332,10 +324,9 @@ class ProfileViewmodel extends ChangeNotifier {
         is_sync = false;
         notifyListeners();
         _state = viewState.success;
-        Fluttertoast.showToast(msg: "구글 캘린더 연동이 해제되었습니다.");
       } catch (e) {
         print('연동 해제 오류: $e');
-        Fluttertoast.showToast(msg: "연동 해제에 실패했습니다.");
+        throw e;
       }
     }
   }
