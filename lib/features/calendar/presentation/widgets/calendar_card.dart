@@ -125,7 +125,8 @@ class CalendarCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
+              // _buildMemberChip을 무조건 밀어내지 않게 자식의 크기에 맞추는 Flexible 사용
+              Flexible(
                 child: Text(
                   title,
                   style: TextStyle(
@@ -147,7 +148,7 @@ class CalendarCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   (month.isNotEmpty && day.isNotEmpty)
-                      ? "다음 일정 : $month월 $day일 $scheduleTitle"
+                      ? "다음 일정 : $month월 $day일 / ${[scheduleTitle]}"
                       : (scheduleTitle.isEmpty
                             ? "예정된 일정 없음"
                             : "일정 : $scheduleTitle"),
