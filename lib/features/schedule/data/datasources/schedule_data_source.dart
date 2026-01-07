@@ -224,7 +224,6 @@ class ScheduleDataSource {
         Fluttertoast.showToast(msg: "가져올 일정이 없습니다.");
         return [];
       }
-      Fluttertoast.showToast(msg: "${events.items!.length}개의 일정을 가져왔습니다.");
       List<Map<String, dynamic>> googleSyncSchedule = [];
 
       for (var event in events.items!) {
