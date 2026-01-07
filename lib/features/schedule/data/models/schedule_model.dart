@@ -4,7 +4,7 @@ class ScheduleModel {
   final String? repeatGroupId;
 
   final String title;
-  final String? emotionTag;
+  final String emotionTag;
   final String colorValue;
 
   final bool isDone;
@@ -38,7 +38,7 @@ class ScheduleModel {
     required this.endedAt,
     required this.isRepeat,
     required this.createdAt,
-    this.emotionTag,
+    required this.emotionTag,
     this.repeatNum,
     this.repeatOption,
     this.weekendException,
@@ -56,7 +56,7 @@ class ScheduleModel {
       calendarId: json['calendar_id'] as int,
       repeatGroupId: json['repeat_group_id'] as String?,
       title: json['title'] as String,
-      emotionTag: json['emotion_tag'] as String?,
+      emotionTag: json['emotion_tag'] as String,
       colorValue: json['color_value'] as String,
       isDone: json['is_done'] as bool,
       startedAt: DateTime.parse(json['started_at']).toLocal(),

@@ -34,6 +34,7 @@ class CalendarAddBody extends StatelessWidget {
             validator: (value) =>
                 value == null || value.trim().isEmpty ? '캘린더 이름은 필수입니다' : null,
             onChanged: viewModel.setTitle,
+            maxLength: 20,
           ),
 
           const SizedBox(height: 12),
@@ -62,6 +63,7 @@ class CalendarAddBody extends StatelessWidget {
             hint: "캘린더 설명을 입력해주세요 (선택사항)",
             maxLines: 8,
             onChanged: viewModel.setDescription,
+            maxLength: 500,
           ),
         ],
       ),

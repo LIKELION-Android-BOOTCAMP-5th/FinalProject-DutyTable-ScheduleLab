@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
-enum DetailViewState { idle, loading, success, error, deleted }
+enum DetailViewState { loading, success, error, deleted }
 
 class ScheduleDetailViewModel extends ChangeNotifier {
   DetailViewState _state = DetailViewState.loading;

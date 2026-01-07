@@ -5,12 +5,16 @@ class CustomCalendarEditTextField extends StatelessWidget {
   /// 박스 위에 표시할 내용
   final Widget title;
   final TextEditingController controller;
+  final int? maxLines;
+  final int? maxLength;
 
   /// 커스텀 캘린더 수정 텍스트 필드
   const CustomCalendarEditTextField({
     super.key,
     required this.title,
     required this.controller,
+    this.maxLines,
+    this.maxLength,
   });
 
   @override
@@ -24,7 +28,8 @@ class CustomCalendarEditTextField extends StatelessWidget {
         const SizedBox(height: 8),
         TextField(
           minLines: 1,
-          maxLines: null, // 높이 제한 없음
+          maxLines: maxLines, // 높이 제한 없음
+          maxLength: maxLength,
           controller: controller,
           keyboardType: TextInputType.multiline,
           style: TextStyle(color: AppColors.textMain(context)),

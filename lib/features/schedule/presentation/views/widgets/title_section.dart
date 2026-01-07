@@ -28,6 +28,7 @@ class TitleSection extends StatelessWidget {
 
         TextFormField(
           initialValue: title,
+          maxLength: 18,
           onChanged: onTitle,
           style: TextStyle(color: AppColors.textMain(context)),
           decoration: InputDecoration(
