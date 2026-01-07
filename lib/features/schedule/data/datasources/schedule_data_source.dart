@@ -206,15 +206,24 @@ class ScheduleDataSource {
   GoogleSignInAccount? _connectedAccount;
   Future<List<Map<String, dynamic>>> syncGoogleCalendarToSchedule() async {
     try {
-      if (_connectedAccount == null) {
-        Fluttertoast.showToast(msg: "구글 로그인 정보가 없습니다.");
-        return [];
-      }
+      //TODO: 추후 개선의 여지가 있어보여 남겨놓습니다.
+      // const List<String> scopes = <String>[
+      //   'https://www.googleapis.com/auth/contacts.readonly',
+      // ];
+      // final GoogleSignInAccount? user =
+      // final GoogleSignInClientAuthorization? authorization = await user
+      //     ?.authorizationClient
+      //     .authorizationForScopes(scopes);
+      final googleSignIn = await GoogleSignIn.instance.authorizationClient;
+      // fianl GoogleSignInAccount acc = GoogleSignInAccount.
+      // if (googleSignIn == null) {
+      //   Fluttertoast.showToast(msg: "구글 로그인 정보가 없습니다.");
+      //   return [];
+      // }
 
-      final account = _connectedAccount!;
-
-      final authorization = await account.authorizationClient
-          .authorizationForScopes(['https://www.googleapis.com/auth/calendar']);
+      final authorization = await googleSignIn.authorizationForScopes([
+        'https://www.googleapis.com/auth/calendar',
+      ]);
       final client = _GoogleAuthClient(authorization!.accessToken);
 
       final calendarApi = calendar.CalendarApi(client);
