@@ -88,22 +88,15 @@ class SfCalendarSection extends StatelessWidget {
     final hasSchedule = viewModel.displaySchedules.any(
       (s) => s.containsDay(date),
     );
-    final is_google_schedule = viewModel.displaySchedules
-        .where((s) => s.containsDay(date))
-        .any((s) => s.title.contains("[구글]"));
-    if (!hasSchedule) {
-      return;
-    } else if (is_google_schedule) {
-      return;
-    } else {
-      await showDialog(
-        context: context,
-        builder: (_) => ChangeNotifierProvider.value(
-          value: viewModel,
-          child: ScheduleDialog(day: date),
-        ),
-      );
-    }
+    if (!hasSchedule) return;
+
+    await showDialog(
+      context: context,
+      builder: (_) => ChangeNotifierProvider.value(
+        value: viewModel,
+        child: ScheduleDialog(day: date),
+      ),
+    );
   }
 }
 

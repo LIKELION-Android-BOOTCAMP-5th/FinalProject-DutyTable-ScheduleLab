@@ -104,7 +104,6 @@ class SignupViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-
   // 약관 동의 체크박스 상태를 변경하는 함수
   void toggleTermsAgreement(bool? newValue) {
     _isTermsAgreed = newValue ?? false;
@@ -138,7 +137,9 @@ class SignupViewModel with ChangeNotifier {
     _setLoading(true);
 
     try {
-      final duplicated = await _userDataSource.isNicknameDuplicated(nicknameToTest);
+      final duplicated = await _userDataSource.isNicknameDuplicated(
+        nicknameToTest,
+      );
 
       if (!duplicated) {
         // 중복된 닉네임이 없는 경우
