@@ -121,7 +121,7 @@
 
 | 공유 캘린더(채팅) 화면 | 공유 캘린더(내 일정 불러오기) 화면 | 공유 캘린더(목록(내 일정 불러오기)) 화면 |
 | --- | --- | --- |
-| <img width="250" alt="Image" src=" https://github.com/user-attachments/assets/84fa3f6d-1b30-4cd4-b510-0ec8035a18cd" /> | <img width="250" alt="Image" src=" https://github.com/user-attachments/assets/d7ef0acd-f3e5-43a8-a3ed-4653ddad3781" /> | <img width="250" alt="Image" src=" https://github.com/user-attachments/assets/04f0b25d-0350-4ba6-967d-8ddf57262e16" /> |
+| <img width="250" alt="Image" src="https://github.com/user-attachments/assets/84fa3f6d-1b30-4cd4-b510-0ec8035a18cd" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/d7ef0acd-f3e5-43a8-a3ed-4653ddad3781" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/04f0b25d-0350-4ba6-967d-8ddf57262e16" /> |
 
 | 일정 추가 화면 | 캘린더 설정 화면 | 캘린더 수정 화면 |
 | --- | --- | --- |
