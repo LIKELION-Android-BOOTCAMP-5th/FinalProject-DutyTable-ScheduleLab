@@ -170,13 +170,13 @@ class LoginViewModel extends ChangeNotifier {
   void _closeLoadingSafely(BuildContext context) {
     if (!context.mounted) return;
 
-    try {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      if (!context.mounted) return;
       final router = GoRouter.of(context);
 
-      if (router.canPop()) {
-        router.pop();
-      }
-    } catch (_) {
-    }
+      if (!router.canPop()) return;
+      router.pop();
+    });
   }
 }
