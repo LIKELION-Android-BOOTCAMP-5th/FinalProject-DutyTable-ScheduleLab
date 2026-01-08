@@ -1,0 +1,81 @@
+import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../../../viewmodels/calendar_setting_view_model.dart';
+
+class DeleteButtonSection extends StatelessWidget {
+  const DeleteButtonSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<CalendarSettingViewModel>();
+    final isAdmin = viewModel.calendar.userId == viewModel.currentUser!.id;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: GestureDetector(
+          onTap: () {
+            isAdmin
+                ? CustomConfirmationDialog.show(
+                    context,
+                    content: "캘린더를 삭제하시겠습니까?",
+                    confirmColor: AppColors.danger(context),
+                    onConfirm: () async {
+                      CustomConfirmationDialog.show(
+                        context,
+                        content: "정말 삭제 하시겠습니까?",
+                        contentColor: AppColors.danger(context),
+                        confirmColor: AppColors.danger(context),
+                        onConfirm: () async {
+                          await viewModel.deleteCalendar();
+                          context.pop();
+                          context.pop();
+                        },
+                      );
+                    },
+                  )
+                : CustomConfirmationDialog.show(
+                    context,
+                    content: "캘린더를 나가시겠습니까?",
+                    confirmColor: AppColors.danger(context),
+                    onConfirm: () async {
+                      await viewModel.outCalendar();
+                      context.pop();
+                      context.pop();
+                    },
+                  );
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: BottomAppBar(
+              height: 52,
+              color: AppColors.danger(context),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  isAdmin
+                      ? const Icon(
+                          Icons.delete_outline,
+                          color: AppColors.pureWhite,
+                        )
+                      : SizedBox.shrink(),
+                  const SizedBox(width: 4),
+                  Text(
+                    isAdmin ? "캘린더 삭제" : "캘린더 나가기",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.pureWhite,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

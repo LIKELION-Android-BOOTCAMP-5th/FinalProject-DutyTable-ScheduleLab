@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <style name="Theme.Android.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault">
+    <item name="appWidgetRadius">16dp</item>
+    <item name="appWidgetInnerRadius">8dp</item>
+  </style>
+
+  <style name="Theme.Android.AppWidgetContainer" parent="Theme.Android.AppWidgetContainerParent">
+    <item name="appWidgetPadding">16dp</item>
+  </style>
+
+  <style name="WidgetDayContainer">
+    <item name="android:layout_width">0dp</item>
+    <item name="android:layout_height">40dp</item> <item name="android:layout_columnWeight">1</item>
+    <item name="android:gravity">center_horizontal</item>
+    <item name="android:orientation">vertical</item>
+  </style>
+
+  <style name="WidgetDayText">
+    <item name="android:layout_width">24dp</item> <item name="android:layout_height">24dp</item>
+    <item name="android:gravity">center</item>
+    <item name="android:textColor">#333333</item>
+    <item name="android:textSize">11sp</item>
+    <item name="android:textStyle">bold</item>
+  </style>
+
+  <style name="WidgetDutyText">
+    <item name="android:layout_width">wrap_content</item>
+    <item name="android:layout_height">wrap_content</item>
+    <item name="android:textSize">8sp</item>
+    <item name="android:maxLines">1</item>
+    <item name="android:ellipsize">end</item>
+  </style>
+
+</resources>

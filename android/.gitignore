@@ -12,3 +12,6 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Supabase/Firebase Secret Files
+supabase/functions/service-account.json

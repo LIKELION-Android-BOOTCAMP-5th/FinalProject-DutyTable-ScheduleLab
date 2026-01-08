@@ -1,0 +1,168 @@
+import 'package:dutytable/features/calendar/presentation/views/add/calendar_add_screen.dart';
+import 'package:dutytable/features/calendar/presentation/views/edit/calendar_edit_screen.dart';
+import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
+import 'package:dutytable/features/calendar/presentation/views/shared/shared_calendar_screen.dart';
+import 'package:dutytable/features/licenses/oss_licenses_screen.dart';
+import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
+import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
+import 'package:dutytable/features/schedule/presentation/views/add/schedule_add_screen.dart';
+import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_screen.dart';
+import 'package:dutytable/features/schedule/presentation/views/edit/schedule_detail_edit_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+// UI
+import '../../features/auth/presentation/views/login/login_screen.dart';
+import '../../features/auth/presentation/views/signup/signup_screen.dart';
+import '../../features/auth/presentation/views/splash_screen.dart';
+import '../../features/calendar/data/models/calendar_model.dart';
+import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
+import '../../features/calendar/presentation/views/setting/calendar_setting_screen.dart';
+import '../../features/calendar/presentation/views/shared/list/shared_calendar_list_screen.dart';
+import '../../oss_licenses.dart';
+import 'app_shell.dart';
+
+GoRouter createRouter(BuildContext context) {
+  return GoRouter(
+    initialLocation: '/splash',
+    routes: [
+      GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
+
+      // 로그인
+      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+
+      // 회원가입
+      GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
+
+      // 공유(개인)캘린더 - 캘린더 추가
+      GoRoute(
+        path: '/calendar/add',
+        builder: (_, __) => const CalendarAddScreen(),
+      ),
+
+      // 공유(개인)캘린더 - 캘린더 수정
+      GoRoute(
+        path: '/calendar/edit',
+        builder: (context, state) {
+          final CalendarModel? calendar = state.extra as CalendarModel?;
+          return CalendarEditScreen(calendar: calendar);
+        },
+      ),
+
+      // 공유(개인)캘린더 - 캘린더 설정
+      GoRoute(
+        path: '/calendar/setting',
+        builder: (context, state) {
+          final CalendarModel? calendar = state.extra as CalendarModel?;
+          return CalendarSettingScreen(calendar: calendar);
+        },
+      ),
+
+      // 공유(개인)캘린더 - 알림
+      GoRoute(
+        path: '/notification',
+        builder: (_, __) => const NotificationScreen(),
+      ),
+
+      // 공유(개인)캘린더 - 일정 - 추가
+      GoRoute(
+        path: "/schedule/add",
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          final calendarId = data["calendarId"] as int;
+          final date = data["date"] as DateTime?;
+
+          return ScheduleAddScreen(calendarId: calendarId, date: date);
+        },
+      ),
+
+      // 공유(개인)캘린더 - 일정 - 상세
+      GoRoute(
+        path: "/schedule/detail",
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+
+          return ScheduleDetailScreen(
+            scheduleDetail: data['schedule'],
+            isAdmin: data['isAdmin'],
+          );
+        },
+      ),
+
+      GoRoute(
+        path: "/schedule/detail/edit",
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+
+          return ScheduleDetailEditScreen(
+            scheduleDetail: data['schedule'],
+            isAdmin: data['isAdmin'],
+          );
+        },
+      ),
+
+      GoRoute(
+        path: "/licenses",
+        builder: (_, __) {
+          return OssLicensesScreen();
+        },
+      ),
+
+      GoRoute(
+        path: "/oss-license",
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          final Package package = data['package'] as Package;
+
+          return MiscOssLicenseSingle(package: package);
+        },
+      ),
+
+      // 바텀 네비게이션
+      ShellRoute(
+        builder: (context, state, child) {
+          return MultiProvider(
+            providers: [
+              // 개인 캘린더 새로고침용 뷰모델
+              ChangeNotifierProvider(
+                create: (context) => PersonalCalendarViewModel(),
+              ),
+            ],
+            child: AppShell(child: child),
+          );
+        },
+        routes: [
+          GoRoute(
+            path: '/shared',
+            builder: (context, state) {
+              return SharedCalendarListScreen();
+            },
+            routes: [
+              GoRoute(
+                path: "schedule",
+                builder: (context, state) {
+                  // 2단계 : 데이터랑 같이 라우팅
+                  final CalendarModel calendar = state.extra as CalendarModel;
+
+                  return SharedCalendarScreen(calendar: calendar);
+                },
+              ),
+            ],
+          ),
+
+          // 내 캘린더
+          GoRoute(
+            path: '/personal',
+            builder: (_, __) {
+              return PersonalCalendarScreen();
+            },
+          ),
+
+          // 프로필
+          GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+        ],
+      ),
+    ],
+  );
+}
