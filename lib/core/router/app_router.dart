@@ -2,6 +2,7 @@ import 'package:dutytable/features/calendar/presentation/views/add/calendar_add_
 import 'package:dutytable/features/calendar/presentation/views/edit/calendar_edit_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/shared/shared_calendar_screen.dart';
+import 'package:dutytable/features/licenses/oss_licenses_screen.dart';
 import 'package:dutytable/features/notification/presentation/views/notification_screen.dart';
 import 'package:dutytable/features/profile/presentation/views/profile_screen.dart';
 import 'package:dutytable/features/schedule/presentation/views/add/schedule_add_screen.dart';
@@ -19,6 +20,7 @@ import '../../features/calendar/data/models/calendar_model.dart';
 import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
 import '../../features/calendar/presentation/views/setting/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/list/shared_calendar_list_screen.dart';
+import '../../oss_licenses.dart';
 import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
@@ -97,6 +99,23 @@ GoRouter createRouter(BuildContext context) {
             scheduleDetail: data['schedule'],
             isAdmin: data['isAdmin'],
           );
+        },
+      ),
+
+      GoRoute(
+        path: "/licenses",
+        builder: (_, __) {
+          return OssLicensesScreen();
+        },
+      ),
+
+      GoRoute(
+        path: "/oss-license",
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          final Package package = data['package'] as Package;
+
+          return MiscOssLicenseSingle(package: package);
         },
       ),
 
