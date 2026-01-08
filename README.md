@@ -1,180 +1,157 @@
-# dutytable
-프로젝트 개요
+<img width="256" height="256" alt="Image" src="https://github.com/user-attachments/assets/ef66efbb-b422-49f8-bc96-640a14ce9713" />
 
-## 프로젝트 명
+# 프로젝트 개요
+
+### 1. 프로젝트 명
 
 - DutyTable – 일정·당번·역할 관리 캘린더 서비스
 
-## 프로젝트 목적
+### 2. 프로젝트 목적
 
 - 일반 캘린더로 관리하기 어려운 당번표, 반복 역할, 특정 날짜 제외 일정, 감정 태그 기반 일정 관리를누구나 쉽게 만들고 공유할 수 있는 고도화된 일정 관리 채팅 서비스 제공
 
-## 대상 사용자
+### 3. 대상 사용자
 
 - 정기적인 업무 분담 또는 복잡한 반복 일정을 관리하는 사용자 그룹
 - 여러 명이 돌아가며 업무를 분담하는 직장인/팀원
 - 본인이 담당하는 일정을 잊지 않고 관리하려는 사용자
 - 주말/공휴일 등 휴무일을 제외하고 일정을 설정하려는 사용자
 
-## 요구사항
+### 4. 개발 기간
+- 2025.11.24 ~ 2026.01.13
 
+# 사용 기술
+    Language/UI:
+        - Dart
+        - Flutter
+    
+    API:
+        - RESTful API
+
+    Architecture:
+        - MVVM
+    
+    Database:
+        - Supabase(RESTful API)
+    
+    Library:
+        - cupertino_icons
+        - google_sign_in
+        - sign_in_with_apple
+        - syncfusion_flutter_calendar
+        - syncfusion_flutter_core
+        - flutter_naver_map
+        - timezone
+        - provider
+        - go_router
+        - supabase_flutter
+        - intl
+        - url_launcher
+        - image_picker
+        - fluttertoast
+        - shared_preferences
+        - flutter_dotenv
+        - dio
+        - flutter_native_splash
+        - firebase_messaging
+        - firebase_core
+        - flutter_local_notifications
+        - googleapis
+        - googleapis_auth
+        - http
+        - app_links
+        - share_plus
+        - home_widget
+        - dart_pubspec_licenses
+
+
+
+# 주요 기능
 - **Firebase Auth 를 사용한 회원가입 및 로그인**
-    - 회원가입은 선택
-        - 회원가입 O
-            - 클라우드에도 일정 저장 지원 +{구글 캘린더 연동(동기화) 가능} 선택 사항
-            - 오프라인 모드
-            - 네트워크 없어도 확인/등록 가능, 다음 연결 시 동기화
-        - 회원가입 X
-            - 오프라인 모드만 지원 O
-            - 클라우드 저장 지원 X
-    - 회원가입
-        - SNS 간편 로그인 사용자, 추가 정보 입력
-    - 로그인
-        - SNS 간편 로그인(구글, 카카오,네이버)
+    - 구글
+    - 애플 - IOS 에서만 적용됨
+    - 회원가입 시 클라우드에도 일정 저장 지원
+- **공유캘린더**
+    - 공유 캘린더 목록
+    - 공유 캘린더 추가
+        - 캘린더 사진
+        - 캘린더 이름
+        - 캘린더 멤버 추가(초대)
+        - 캘린더 설명
+    - 공유 캘린더 삭제
+- **내 캘린더**
+    - 나만의 캘린더
 - **캘린더 탭**
-    - 달력
-        - 일정을 색상으로 구분
-        - 휴일 숫자는 빨간색 글씨
-        - 날짜를 선택하고 일정 추가 버튼을 누르면 해당 날짜를 기준으로 일정 추가 화면 출력
-        - 내 일정 불러오기를 통해 공유 캘린더에 내 일정 표시 가능
+    - 캘린더 화면에 일정 표시(색상 구분 가능)
+    - 일정 추가
+    - 내 일정 불러오기 가능
 - **리스트 탭**
-    - 월별 태그 및 종류 태그를 통한 필터링 기능 제공
-        - 전체, 1월, 2월, 3월, 4월 ~ 12월
-        - 카테고리(휴일, 업무, 개인....)
-    - 일정 완료 체크 버튼
+    - 카테고리 별 일정 표시
+    - 일정 완료 체크
+    - 태그 별 필터링(날짜, 카테고리)
 - **채팅 탭**
-    - 공유 캘린더 내 사용자 채팅 기능 제공
+    - 같은 캘린더를 공유하는 사용자끼리 채팅 가능
 - **일정 추가하기**
-    - 일정 등록 기능
-        - 일정마다 감정 태그(이모티콘)
-        - 일정 완료 체크(to do,  done) => 기본값: to do
-        - 종료일이 지나면 자동으로 완료(Done) 처리
-        - 특정 날짜 제외 버튼 기능(공휴일, 주말, 휴일, 평일 등)
-        - 날짜 지정 및 시간 지정 가능
-            - N월 N일부터 ~ N월 N일 까지 범위 지정 가능
-            - 하루 / 1시간 / 30분 / 이외 ⇒ “이외” 일때는 ~ 시 부터 ~ 시 까지 범위 지정 기능
-        - 주소추가
-            - 지도 + 마커 표시
-- **일정 상세 / 수정 스크린**
-    - 바로 수정 가능
-    - 제목 표시
-    - ~부터 ~까지 표시
-    - 완료 상태 표시
-    - 반복 상태 표시
-    - 취소 / 저장 버튼 기능
-- 회비 관리
-    - 계좌 내 금액 확인 가능
-    - 사용자의 입출금 내역을 확인하여 회비 관리
+    - 감정 태그
+    - 특정 날짜 제외 버튼 기능(공휴일, 주말, 휴일, 평일 등)
+    - 일정 상태 (to do / done)
+    - 날짜 시간 지정
+    - 알림 설정(알림 x, 일정 하루전, 1시간 전 등)
+    - 주소 추가 + 맵에 표시
+- **일정 상세 스크린**
+    - 일정 상세 정보 조회
+    - 삭제/수정/완료 체크
 - **프로필 스크린**
     - 회원 탈퇴
-    - 테마 선택(라이트 모드, 다크 모드, 시스템 모드)
-    - 구글 캘린더 연동 버튼 기능
-    - 알림 설정 기능
-- **위젯**
-    - 오늘날짜 일정 표시
-- **푸쉬 알림**
-    - 회원가입 필수
-    - 앱이 실행중이지 않은 상태에서도 일정에 맞는 시간이 되면 단말로 알림을 보냄
-    - 알림 받을지 말지 선택 가능
- 
+    - 라이트 모드 / 다크 모드 / 시스템 모드
+    - 구글 캘린더 연동 선택
+    - 로그아웃
+    - 프로필 수정
+- **Push 알림**
+    - 알림 on/off 선택
 
-## 🌿 브랜치 규칙
-PR 전 필수
-develop 브랜치에서 Pull 필수 (평소에도 develop 업데이트 시 가끔씩 Pull 받아 최신 상태 유지)
+# 화면
+| 로그인 화면 | 회원가입 화면 | 홈 화면 |
+| --- | --- | --- |
+| <img width="250" alt="Image" src="https://github.com/user-attachments/assets/06fb2328-2fee-4b05-a02a-1432f6a18113" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/68159564-b393-4371-a0d0-e3d9cff3989c" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/1c29bc68-13f1-4254-adb3-07c85ee46649" /> |
 
-PR 생성 시
-작업 완료 후 Push → PR은 develop 브랜치로 생성
+| 캘린더 추가 화면 | 공유 캘린더 화면 | 공유 캘린더(목록) 화면 |
+| --- | --- | --- |
+| <img width="250" alt="Image" src="https://github.com/user-attachments/assets/f579dd3d-cba9-4290-96a3-42e1fa98e7cf" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/3df52226-d308-462c-a6d9-875d46fc82b6" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/2b1f0f9e-5905-48c8-9d47-42433eee15db" /> |
 
+| 공유 캘린더(채팅) 화면 | 공유 캘린더(내 일정 불러오기) 화면 | 공유 캘린더(목록(내 일정 불러오기)) 화면 |
+| --- | --- | --- |
+| <img width="250" alt="Image" src=" https://github.com/user-attachments/assets/84fa3f6d-1b30-4cd4-b510-0ec8035a18cd" /> | <img width="250" alt="Image" src=" https://github.com/user-attachments/assets/d7ef0acd-f3e5-43a8-a3ed-4653ddad3781" /> | <img width="250" alt="Image" src=" https://github.com/user-attachments/assets/04f0b25d-0350-4ba6-967d-8ddf57262e16" /> |
 
-## 📌 팀 규칙
-1. 정기 회고 시간 - 강사님과 미팅
-- 평일 오전 9시 오전 미팅
-- 평일 오후 4시 오후 미팅
+| 일정 추가 화면 | 캘린더 설정 화면 | 캘린더 수정 화면 |
+| --- | --- | --- |
+| <img width="250" alt="Image" src="https://github.com/user-attachments/assets/02f9e94a-cfb7-45c4-847f-59286d299737" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/2ba3fd4a-38b7-440a-9a12-b97335016eb6" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/4702cab9-f192-49d8-a789-2fe42003f8f4" /> |
 
-2. 주요 결정 문서화
-    - 중요한 기술적 결정이나, 기능 변경 등은 노션에 작성 후 디스코드에 공유
+| 내 캘린더 화면 | 내 캘린더(목록) 화면 | 내 캘린더(채팅) 화면 |
+| --- | --- | --- |
+| <img width="250" alt="Image" src="https://github.com/user-attachments/assets/c0737045-5f62-4099-bb0f-7d1bf69adcf4" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/77935c55-3984-4431-8c5e-d22bf4d88995" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/7403c071-0e23-4437-9562-c14094dafdd5" /> |
 
-3. 문제 상시 공유
-    - 개인적으로 발생한 문제 또는 트러블슈팅이 생길 경우 팀 노션에 작성 후 즉각적으로 팀원들에게 공유
-    - 발전 없이 하나의 문제로 **2~3시간**을 잡고 있다면 그 즉시 공유해서 해결하기
-        - 최소 30분 문제에 대한 생각 및 해결
+| 내 캘린더(모든 일정 불러오기) 화면 | 내 캘린더(목록(모든 일정 불러오기)) 화면 | 프로필 화면 |
+| --- | --- | --- |
+| <img width="250" alt="Image" src="https://github.com/user-attachments/assets/7a36e445-ecc7-46d4-bbee-0814c9785964" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/d0b751a3-bbdf-4ce7-9df3-1c38e061f05c" /> | <img width="250" alt="Image" src="https://github.com/user-attachments/assets/7022850f-710c-4066-8c60-d89113b129e8" /> |
 
-4. 즉각적인 해결이 필요하지 않는 문제는 회의 시간이나 아무때나 버스터콜
+# 팀원 소개
 
-5. PR 코드 리뷰 문화
-    - PR이 올라올 시 가능하면 모두가 코드를 확인하기
-    - 추가로 이상한 부분이나 궁금한 점이 생기면 코드 리뷰 남기기
-    - 또한 급하지 않은 경우 2명 이상 코드 승인 후 병합 (급하거나 바쁜 기간은 1인으로 진행)
+| 팀장 | 부팀장 | 팀원 | 팀원 | 팀원 |
+| :-: | :--: | :-: | :-: | :-: |
+| <img width="140" height="140" alt="Image" src="https://github.com/user-attachments/assets/f464a2cf-2600-4237-a05c-9d5e4284ed56" /> | <img width="140" height="140" alt="Image" src="https://github.com/user-attachments/assets/4dd0121b-6250-4fb9-bf7f-b92e24839136" /> |  <img width="140" height="140" alt="Image" src="https://github.com/user-attachments/assets/71350d4d-8633-4860-ad8d-26dd82245165" /> | <img width="140" height="140" alt="Image" src="https://github.com/user-attachments/assets/0d842ed1-581f-49ba-91e9-78a67d50b768" /> | <img width="140" height="140" alt="Image" src="https://github.com/user-attachments/assets/0c06118c-6b31-4d91-93f1-ec88ae1344b6" /> |
+| [권영진](https://github.com/0jhin) | [오민석](https://github.com/oh930428) | [서연우](https://github.com/123-art-ctrl) | [이가은](https://github.com/ggaeunnn) | [권양하](https://github.com/didgk325)
 
-6. 코드에 개인 스타일은 묻을 수 있으나, 혼자만 알아볼 수 있는 코드 작성 금지.
-    - 필요하다면 팀원들이 알아볼 수 있도록 주석 작성
+## License & Open Source
 
-7. 또 필요한 규칙이 있다면 디코로 연락 바랍니다!
+Copyright (c) 2026 0jhin (LIKELION Android BOOTCAMP 5th)
 
-8. 지각, 결석, 개인 사정으로 인한 불참은 팀 노션에 개인별 일정표에 작성 후 팀원들에게 공유
+This project is licensed under the [MIT License](LICENSE).
 
+### Open Source Licenses
+This application is developed using Flutter and various open-source libraries. We strictly adhere to the licensing terms of all third-party software used.
 
-## 🧾 커밋 메시지 규칙
-### 📌 기본 구조
-type: 제목
-본문 (선택)
-이슈 번호 (선택)
+- **Third-party Licenses:** You can view the full list of open-source licenses used in this project within the app:
+  - **프로필 > 오픈소스** 메뉴에서 확인 가능합니다.
 
-
-### 🏷️ type 분류
-✨ feat - 새로운 기능 추가
-🐞fix 버그(기능 에러) 수정
-📝 docs - 문서 작성, 수정
-🎨 style - 코드 스타일 변경, 세미콜론 누락
-♻️ refactor - 코드 리팩토링 (기능 변화 없이 구조 개선)
-🔥 remove - 불필요한 코드 / 파일 삭제
-🚚 rename - 파일 / 폴더 이름 변경 또는 이동
-📦chore - 빌드 업무, 패키지 설정, 환경 세팅 등
-🚀 deploy - 배포 관련 작업
-🖌️design - UI/UX 디자인 변경 (색상, 레이아웃, CSS 등)
-🛠 config - 환경 설정 관련 변경 (env, config)
-🚨 hotfix - 긴급 오류 수정 (즉시 반영 필요)
-
-
-### ✍️ 커밋 메시지 7가지 규칙
-1. 제목과 본문을 빈 행(한 줄 띄워)으로 구분한다.
-2. 제목은 영문 기준 50글자 이내로 제한한다.
-3. 제목의 첫 글자는 대문자로 작성한다.
-4. 제목 끝에는 마침표를 넣지 않는다.
-5. 제목은 명령문으로 사용하며 과거형을 사용하지 않는다.
-6. 본문의 각 행은 72글자 내로 제한한다.
-7. 어떻게 보다는 무엇과 왜를 설명한다.
-
-
-## 기술 스택
-### 라이브러리
-- google_calendar
-- dio
-- image_picker
-- flutter_naver_map
-- shared_preference
-- url_launcher
-- flutter_launcher_icons
-
-
-### 프론트엔드
-- Flutter: 크로스 플랫폼 모바일 앱 개발 프레임워크
-- Provider: 상태 관리 및 의존성 주입 (Provider 기반)
-- GoRouter: 선언적 라우팅 및 Deep Link 지원
-
-
-### 백엔드
-- Supabase: 백엔드 서비스 (인증, 데이터베이스, Storage)
-- PostgreSQL: 관계형 데이터베이스
-- Supabase Storage: 이미지 및 파일 저장
-
-
-### 인증
-- Supabase Auth: OAuth 및 소셜 로그인 지원
-- 소셜 로그인: google_sign_in
-
-
-### 푸시 알림
-- Firebase Cloud Messaging: 푸시 알림 서비스
-- Supabase Edge Functions: 알림 전송 로직
-
+Built with the help of [flutter_oss_licenses](https://pub.dev/packages/flutter_oss_licenses).
