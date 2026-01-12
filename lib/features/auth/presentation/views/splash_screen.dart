@@ -1,11 +1,12 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../calendar/data/datasources/calendar_data_source.dart';
 import '../../../calendar/data/models/calendar_model.dart';
 
 // 앱 시작 시 사용자 인증 상태를 확인하고 적절한 화면으로 이동하는 스플래시 화면
@@ -54,8 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
         await NotificationDataSource.shared.setupNotificationListenersAndState(
           context,
         );
-        sharedCalendars = await CalendarDataSource.instance
-            .fetchCalendarFinalList("group");
+        context.read<SharedCalendarViewModel>().fetchCalendars();
       } else {
         // 로그인 상태가 아닌 경우, 로그인 화면으로 이동 플래그 설정
         shouldRedirectToLogin = true;
