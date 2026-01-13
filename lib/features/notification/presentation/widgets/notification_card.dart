@@ -70,14 +70,18 @@ class NotificationCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        type == "invite"
-                            ? '"$title" 그룹 캘린더 초대가 도착했습니다.'
-                            : title,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textMain(context),
+                      Expanded(
+                        child: Text(
+                          type == "invite"
+                              ? '"$title" 그룹 캘린더 초대가 도착했습니다.'
+                              : title,
+                          textAlign: TextAlign.start,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textMain(context),
+                          ),
                         ),
                       ),
                       if (type == "invite")
