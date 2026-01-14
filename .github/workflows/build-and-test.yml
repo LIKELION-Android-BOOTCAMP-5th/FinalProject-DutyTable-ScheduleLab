@@ -15,7 +15,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0' # 프로젝트에 사용 중인 버전으로 수정 가능
+          flutter-version: '3.24.0' # 프로젝트에 사용 중인 버전으로 수정 가능
           channel: 'stable'
           cache: true
 
