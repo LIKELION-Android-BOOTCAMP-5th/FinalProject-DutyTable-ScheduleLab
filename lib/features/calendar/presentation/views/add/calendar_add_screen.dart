@@ -19,7 +19,7 @@ class CalendarAddScreen extends StatelessWidget {
 }
 
 class _CalendarAddScreen extends StatelessWidget {
-  const _CalendarAddScreen({super.key});
+  const _CalendarAddScreen();
 
   static final _formKey = GlobalKey<FormState>();
 

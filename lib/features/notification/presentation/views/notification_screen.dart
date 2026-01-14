@@ -1,9 +1,7 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
-import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/invitation_dialog.dart';
-import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_view_model.dart';
 import 'package:dutytable/features/notification/presentation/widgets/all_delete_dialog.dart';
 import 'package:flutter/material.dart';

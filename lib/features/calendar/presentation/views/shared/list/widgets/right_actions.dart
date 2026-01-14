@@ -20,7 +20,7 @@ class RightActions extends StatelessWidget {
 
 class _DeleteModeActions extends StatelessWidget {
   /// 공유 캘린더 목록 - 앱바 : 삭제 모드
-  const _DeleteModeActions({super.key});
+  const _DeleteModeActions();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class _DeleteModeActions extends StatelessWidget {
 
 class _NormalActions extends StatelessWidget {
   /// 공유 캘린더 목록 - 앱바 : 일반 모드
-  const _NormalActions({super.key});
+  const _NormalActions();
 
   @override
   Widget build(BuildContext context) {

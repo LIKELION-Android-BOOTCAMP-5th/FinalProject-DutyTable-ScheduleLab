@@ -90,7 +90,7 @@ class CalendarDataSource {
       );
 
       return response.statusCode == 200 || response.statusCode == 204;
-    } on DioException catch (e) {
+    } on DioException {
       return false;
     }
   }
@@ -279,7 +279,7 @@ class CalendarDataSource {
       throw Exception('Failed to filter calendar IDs: ${e.message}');
     }
 
-    if (filterResponse.statusCode != 200 || !(filterResponse.data is List)) {
+    if (filterResponse.statusCode != 200 || filterResponse.data is! List) {
       throw Exception(
         'Failed to filter calendar IDs: Status ${filterResponse.statusCode}, Body: ${filterResponse.data}',
       );
@@ -317,7 +317,7 @@ class CalendarDataSource {
     }
 
     if (calendarResponse.statusCode != 200 ||
-        !(calendarResponse.data is List)) {
+        calendarResponse.data is! List) {
       throw Exception(
         'Failed to load calendars: Status ${calendarResponse.statusCode}',
       );

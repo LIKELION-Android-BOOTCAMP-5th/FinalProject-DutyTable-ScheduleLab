@@ -294,7 +294,7 @@ class ScheduleViewModel extends ChangeNotifier {
                   id:
                       DateTime.now().millisecondsSinceEpoch +
                       convertedSchedules.length,
-                  calendarId: _calendar!.id,
+                  calendarId: _calendar.id,
                   title: scheduleMap['title'],
                   colorValue:
                       scheduleMap['color_value']?.toString() ?? '0xFF4285F4',

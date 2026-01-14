@@ -20,7 +20,7 @@ class ChatDataSource {
       '/rest/v1/calendar_members',
       queryParameters: {
         'user_id': 'eq.$userId',
-        'calendar_id': 'eq.${calendarId}',
+        'calendar_id': 'eq.$calendarId',
       },
       data: payload,
     );

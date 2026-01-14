@@ -22,7 +22,7 @@ class CalendarTab extends StatelessWidget {
 }
 
 class _CalendarTab extends StatelessWidget {
-  const _CalendarTab({super.key});
+  const _CalendarTab();
 
   @override
   Widget build(BuildContext context) {

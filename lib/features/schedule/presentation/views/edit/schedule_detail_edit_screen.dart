@@ -38,7 +38,7 @@ class ScheduleDetailEditScreen extends StatelessWidget {
 }
 
 class _ScheduleDetailEditScreen extends StatelessWidget {
-  const _ScheduleDetailEditScreen({super.key});
+  const _ScheduleDetailEditScreen();
 
   @override
   Widget build(BuildContext context) {

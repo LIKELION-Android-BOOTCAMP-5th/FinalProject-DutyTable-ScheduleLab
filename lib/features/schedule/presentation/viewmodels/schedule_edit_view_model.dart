@@ -56,7 +56,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
   ScheduleEditViewModel({required ScheduleModel schedule})
     : _scheduleFromEdit = schedule {
     _title = schedule.title;
-    _emotionTag = schedule.emotionTag!;
+    _emotionTag = schedule.emotionTag;
     _colorValue = schedule.colorValue;
     _isDone = schedule.isDone;
 

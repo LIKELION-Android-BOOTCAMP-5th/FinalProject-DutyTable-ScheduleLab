@@ -28,7 +28,7 @@ class SharedCalendarScreen extends StatelessWidget {
 }
 
 class _SharedCalendarScreen extends StatelessWidget {
-  const _SharedCalendarScreen({super.key});
+  const _SharedCalendarScreen();
 
   @override
   Widget build(BuildContext context) {

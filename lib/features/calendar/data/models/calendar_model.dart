@@ -85,7 +85,7 @@ class CalendarModel {
     return CalendarModel(
       id: id ?? this.id,
       type: type ?? this.type,
-      userId: user_id ?? this.userId,
+      userId: user_id ?? userId,
       ownerNickname: ownerNickname ?? this.ownerNickname,
       ownerProfileUrl: ownerProfileUrl ?? this.ownerProfileUrl,
       title: title ?? this.title,

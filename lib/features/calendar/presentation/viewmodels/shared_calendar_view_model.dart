@@ -35,7 +35,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
   int get tabLength => _tabNames.length;
 
   /// 현재 선택 된 탭의 인덱스(private)
-  int _currentIndex = 0;
+  final int _currentIndex = 0;
 
   /// 현재 선택 된 탭의 인덱스(public)
   int get currentIndex => _currentIndex;
@@ -334,7 +334,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     }
   }
 
-  List<RealtimeChannel> _channels = [];
+  final List<RealtimeChannel> _channels = [];
 
   // 리얼타임구독
   void _subscribeToNewMessages() {
