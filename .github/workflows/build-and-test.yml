@@ -10,6 +10,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
+      - name: Create .env file
+      run: |
+        echo "${{ secrets.ENV_FILE }}" > .env
 
       # 1. Flutter SDK 설치 (최신 안정 버전 사용)
       - name: Install Flutter
