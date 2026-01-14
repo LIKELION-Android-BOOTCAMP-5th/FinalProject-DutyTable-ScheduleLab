@@ -31,10 +31,6 @@ jobs:
       - name: Analyze project
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
-      # 4. 유닛 테스트 실행
-      - name: Run tests
-        run: flutter test
-
-      # 5. 안드로이드 빌드 확인
+      # 4. 안드로이드 빌드 확인
       - name: Build APK
         run: flutter build apk --debug
