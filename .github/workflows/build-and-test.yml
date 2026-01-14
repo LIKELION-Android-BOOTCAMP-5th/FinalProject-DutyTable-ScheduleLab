@@ -11,19 +11,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. Flutter SDK 설치
+      # 1. Flutter SDK 설치 (최신 안정 버전 사용)
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0' # 프로젝트에 사용 중인 버전으로 수정 가능
-          channel: 'stable'
+          channel: 'stable' # '3.8.1' 대신 'stable'을 쓰면 Dart 3.8.1 요건을 자동으로 충족합니다.
           cache: true
 
-      # 2. 의존성 패키지 다운로드 (pub get)
+      # 2. 의존성 패키지 다운로드
       - name: Install dependencies
         run: flutter pub get
 
-      # 3. 정적 분석 (Lint 체크 - 선택 사항)
+      # 3. 정적 분석
       - name: Analyze project
         run: flutter analyze
 
@@ -31,6 +30,6 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      # 5. 안드로이드 빌드 확인 (APK 생성 테스트)
+      # 5. 안드로이드 빌드 확인
       - name: Build APK
         run: flutter build apk --debug
