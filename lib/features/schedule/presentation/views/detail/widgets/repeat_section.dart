@@ -115,7 +115,7 @@ class RepeatSection extends StatelessWidget {
                             flex: 2,
                             child: DropdownButtonFormField<String>(
                               dropdownColor: AppColors.surface(context),
-                              value: viewModel.repeatOption,
+                              initialValue: viewModel.repeatOption,
                               onChanged: (_) => viewModel.repeatOption,
                               style: TextStyle(
                                 color: AppColors.textMain(context),

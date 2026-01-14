@@ -24,7 +24,7 @@ class LoginScreen extends StatelessWidget {
 
 // UI 구조와 이벤트를 담당하는 위젯 (여기서도 최대한 "조립"만)
 class _LoginScreenUI extends StatelessWidget {
-  const _LoginScreenUI({super.key});
+  const _LoginScreenUI();
 
   @override
   Widget build(BuildContext context) {

@@ -22,7 +22,7 @@ class SignupScreen extends StatelessWidget {
 }
 
 class _SignupScreenUI extends StatelessWidget {
-  const _SignupScreenUI({super.key});
+  const _SignupScreenUI();
 
   @override
   Widget build(BuildContext context) {
