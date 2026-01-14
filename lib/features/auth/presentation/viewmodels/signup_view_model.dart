@@ -216,7 +216,7 @@ class SignupViewModel with ChangeNotifier {
 
       // 회원가입 성공 후 메인 화면으로 이동
       if (context.mounted) {
-        GoRouter.of(context).go('/shared');
+        GoRouter.of(context).go('/splash');
       }
     } on AuthException catch (e) {
       if (context.mounted) _showErrorDialog(context, '인증 오류: ${e.message}');
