@@ -3,14 +3,14 @@ class SupabaseUserModel {
   final String email;
   final String? profileUrl;
   final String nickname;
-  final bool is_google_calendar_connect;
+  final bool isGoogleCalendarConnect;
 
   SupabaseUserModel({
     required this.id,
     required this.email,
     required this.profileUrl,
     required this.nickname,
-    required this.is_google_calendar_connect,
+    required this.isGoogleCalendarConnect,
   });
 
   factory SupabaseUserModel.fromJson(Map<String, dynamic> json) {
@@ -19,7 +19,7 @@ class SupabaseUserModel {
       email: json["email"] as String,
       profileUrl: json["profile_url"] as String?,
       nickname: json["nickname"] as String,
-      is_google_calendar_connect: json["is_google_calendar_connect"] as bool,
+      isGoogleCalendarConnect: json["is_google_calendar_connect"] as bool,
     );
   }
 }

@@ -66,12 +66,6 @@ class WidgetDataSourceImpl implements WidgetDataSource {
       }
     }
 
-    // 3. 오늘과 내일의 일정 요약 (소형/중형 위젯용)
-    final todayStr = DateFormat('yyyy-MM-dd').format(now);
-    final tomorrowStr = DateFormat(
-      'yyyy-MM-dd',
-    ).format(now.add(const Duration(days: 1)));
-
     String getDutiesForDate(String dateStr) {
       return schedules
           .where((s) => DateFormat('yyyy-MM-dd').format(s.startedAt) == dateStr)

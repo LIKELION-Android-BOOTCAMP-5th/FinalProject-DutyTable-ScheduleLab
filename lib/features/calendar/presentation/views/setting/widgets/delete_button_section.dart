@@ -31,8 +31,8 @@ class DeleteButtonSection extends StatelessWidget {
                         confirmColor: AppColors.danger(context),
                         onConfirm: () async {
                           await viewModel.deleteCalendar();
-                          context.pop();
-                          context.pop();
+                          if (context.mounted) context.pop();
+                          if (context.mounted) context.pop();
                         },
                       );
                     },
@@ -43,8 +43,8 @@ class DeleteButtonSection extends StatelessWidget {
                     confirmColor: AppColors.danger(context),
                     onConfirm: () async {
                       await viewModel.outCalendar();
-                      context.pop();
-                      context.pop();
+                      if (context.mounted) context.pop();
+                      if (context.mounted) context.pop();
                     },
                   );
           },
