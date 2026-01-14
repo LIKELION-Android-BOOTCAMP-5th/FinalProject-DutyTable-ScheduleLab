@@ -74,7 +74,7 @@ class LoginViewModel extends ChangeNotifier {
           context,
         );
       }
-
+      if (!context.mounted) return;
       _applyLoginResult(context, result);
     } catch (e) {
       _showError(context, '로그인 처리 중 오류 발생: $e');
@@ -172,10 +172,10 @@ class LoginViewModel extends ChangeNotifier {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!context.mounted) return;
-      final router = GoRouter.of(context);
 
-      if (!router.canPop()) return;
-      router.pop();
+      if (GoRouter.of(context).canPop()) {
+        context.pop();
+      }
     });
   }
 }
