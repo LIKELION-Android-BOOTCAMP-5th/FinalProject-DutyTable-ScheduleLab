@@ -35,11 +35,14 @@ class SplashViewModel with ChangeNotifier {
       final isLoggedIn = isAutoLogin && session != null;
 
       if (isLoggedIn) {
-        // 백그라운드에서 알림 리스너 설정 (내비게이션을 막지 않음)
-        NotificationDataSource.shared.setupNotificationListenersAndState(context);
-        // 캘린더 데이터 사전 로드
-        sharedCalendars = await CalendarDataSource.instance.fetchCalendarFinalList("group");
+        sharedCalendars = await CalendarDataSource.instance
+            .fetchCalendarFinalList("group");
 
+        if (!context.mounted) return;
+
+        NotificationDataSource.shared.setupNotificationListenersAndState(
+          context,
+        );
       } else {
         shouldRedirectToLogin = true;
       }

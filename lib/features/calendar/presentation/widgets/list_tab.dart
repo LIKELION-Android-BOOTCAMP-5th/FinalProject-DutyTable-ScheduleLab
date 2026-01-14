@@ -27,7 +27,7 @@ class ListTab extends StatelessWidget {
 
 class _ListTab extends StatelessWidget {
   /// 리스트 탭(private)
-  const _ListTab({super.key});
+  const _ListTab();
 
   @override
   Widget build(BuildContext context) {

@@ -1,12 +1,11 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../../../calendar/data/datasources/calendar_data_source.dart';
-import '../../../calendar/data/models/calendar_model.dart';
 
 // 앱 시작 시 사용자 인증 상태를 확인하고 적절한 화면으로 이동하는 스플래시 화면
 // 로그인 여부 밒 자동 로그인 설정에 따라 사용자를 로그인 페이지 또는 메인 페이지로 안내
@@ -30,9 +29,6 @@ class _SplashScreenState extends State<SplashScreen> {
     // 마운트되지 않은 위젯에서 비동기 작업을 방지하기 위해 mounted 확인
     if (!mounted) return;
 
-    // 로드할 캘린더 데이터 변수
-    List<CalendarModel>? sharedCalendars;
-
     // 로그인 화면으로 이동해야 하는지 여부 플래그
     bool shouldRedirectToLogin = false;
 
@@ -54,8 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
         await NotificationDataSource.shared.setupNotificationListenersAndState(
           context,
         );
-        sharedCalendars = await CalendarDataSource.instance
-            .fetchCalendarFinalList("group");
+        context.read<SharedCalendarViewModel>().fetchCalendars();
       } else {
         // 로그인 상태가 아닌 경우, 로그인 화면으로 이동 플래그 설정
         shouldRedirectToLogin = true;
@@ -65,8 +60,6 @@ class _SplashScreenState extends State<SplashScreen> {
       debugPrint("Auth or Data prefetch failed: $e");
       shouldRedirectToLogin = true; // 오류 발생 시 로그인 화면으로 이동
     } finally {
-      if (!mounted) return;
-
       if (shouldRedirectToLogin) {
         // 자동 로그인 설정이 꺼졌거나, 인증/데이터 로드에 실패하면 로그인으로 이동
         context.go('/login');
@@ -75,6 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context.go('/shared');
       }
     }
+    if (!mounted) return;
   }
 
   @override

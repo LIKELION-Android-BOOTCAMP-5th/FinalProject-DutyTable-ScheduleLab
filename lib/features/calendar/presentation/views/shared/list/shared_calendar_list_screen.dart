@@ -16,7 +16,7 @@ class SharedCalendarListScreen extends StatelessWidget {
 
 class _SharedCalendarListScreen extends StatelessWidget {
   /// 공유 캘린더 목록 리스트 화면
-  const _SharedCalendarListScreen({super.key});
+  const _SharedCalendarListScreen();
 
   @override
   Widget build(BuildContext context) {

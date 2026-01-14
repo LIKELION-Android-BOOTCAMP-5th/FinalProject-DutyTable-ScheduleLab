@@ -77,7 +77,7 @@ class ProfileViewmodel extends ChangeNotifier {
 
   // 닉네임 텍스트 수정
   void editNickname() {
-    this.nickname = nicknameController.text.trim();
+    nickname = nicknameController.text.trim();
     notifyListeners();
   }
 
@@ -106,7 +106,7 @@ class ProfileViewmodel extends ChangeNotifier {
   // 닉네임,이메일, 프로필 사진 불러오기
   Future<void> fetchUser() async {
     final data = await ProfileDataSource.instance.fetchUserProfile();
-    nickname = data!['nickname'];
+    nickname = data['nickname'];
     nicknameController.text = nickname;
     email = data['email'];
     image = data['profile_url'] ?? "";
@@ -232,7 +232,7 @@ class ProfileViewmodel extends ChangeNotifier {
 
   // 버튼 텍스트
   String nicknameButtonText() {
-    final result;
+    final String result;
     (is_edit == false)
         ? result = "수정"
         : (nickname == nicknameController.text)
@@ -288,11 +288,7 @@ class ProfileViewmodel extends ChangeNotifier {
         final account = await googleSignIn.authenticate();
         ScheduleDataSource.instance.setGoogleAccount(
           account,
-        ); // 로그인한 정보 schedule_data_source에 전달하기
-
-        if (account == null) {
-          return;
-        }
+        );
 
         await account.authorizationClient.authorizeScopes([
           'https://www.googleapis.com/auth/calendar',
@@ -308,7 +304,7 @@ class ProfileViewmodel extends ChangeNotifier {
         await ScheduleDataSource.instance.syncGoogleCalendarToSchedule();
       } catch (e) {
         print('연동 오류: $e');
-        throw e;
+        rethrow;
       }
     } else {
       // 연결 해제하기
@@ -326,7 +322,7 @@ class ProfileViewmodel extends ChangeNotifier {
         _state = viewState.success;
       } catch (e) {
         print('연동 해제 오류: $e');
-        throw e;
+        rethrow;
       }
     }
   }

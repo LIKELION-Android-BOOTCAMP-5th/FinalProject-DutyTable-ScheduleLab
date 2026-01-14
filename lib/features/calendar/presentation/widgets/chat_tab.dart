@@ -23,7 +23,7 @@ class ChatTab extends StatelessWidget {
 
 class _ChatTab extends StatelessWidget {
   /// 채팅 탭(private)
-  const _ChatTab({super.key});
+  const _ChatTab();
 
   // 날짜가 같은지 확인하는 헬퍼 함수
   bool _isSameDay(DateTime d1, DateTime d2) {

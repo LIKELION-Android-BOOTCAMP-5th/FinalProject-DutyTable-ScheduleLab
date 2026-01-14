@@ -23,11 +23,11 @@ class ScheduleAddScreen extends StatelessWidget {
 
 class _ScheduleAddScreen extends StatelessWidget {
   final int calendarId;
-  const _ScheduleAddScreen({super.key, required this.calendarId});
+  const _ScheduleAddScreen({required this.calendarId});
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
@@ -42,9 +42,9 @@ class _ScheduleAddScreen extends StatelessWidget {
         ),
       ),
 
-      body: ScheduleAddBody(formKey: _formKey),
+      body: ScheduleAddBody(formKey: formKey),
       bottomNavigationBar: ScheduleAddButtonSection(
-        formKey: _formKey,
+        formKey: formKey,
         calendarId: calendarId,
       ),
     );

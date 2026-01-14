@@ -1,0 +1,36 @@
+name: Flutter Build and Test
+
+on:
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      # 중요: run은 step 이름과 같은 라인의 들여쓰기를 가져야 합니다.
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
+      # 1. Flutter SDK 설치
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      # 2. 의존성 패키지 다운로드
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 3. 정적 분석 (경고가 있어도 빌드를 중단하지 않도록 설정)
+      - name: Analyze project
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      # 4. 안드로이드 빌드 확인
+      - name: Build APK
+        run: flutter build apk --debug

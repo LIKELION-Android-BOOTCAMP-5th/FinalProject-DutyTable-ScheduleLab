@@ -23,7 +23,7 @@ class PersonalCalendarScreen extends StatelessWidget {
 
 class _PersonalCalendarScreen extends StatelessWidget {
   /// 개인 캘린더 화면(private)
-  const _PersonalCalendarScreen({super.key});
+  const _PersonalCalendarScreen();
 
   @override
   Widget build(BuildContext context) {

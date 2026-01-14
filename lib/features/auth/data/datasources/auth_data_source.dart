@@ -44,9 +44,6 @@ class AuthDataSource {
     );
 
     final user = await googleSignIn.authenticate();
-    if (user == null) {
-      throw const AuthException('Google sign-in cancelled.');
-    }
     _googleUser = user;
 
     final authorization = await _googleUser!.authorizationClient

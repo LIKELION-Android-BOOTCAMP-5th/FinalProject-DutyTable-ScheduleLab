@@ -28,7 +28,7 @@ class CalendarEditScreen extends StatelessWidget {
 
 class _CalendarEditScreen extends StatelessWidget {
   /// 캘린더 수정 화면(private)
-  const _CalendarEditScreen({super.key});
+  const _CalendarEditScreen();
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<CalendarEditViewModel>();

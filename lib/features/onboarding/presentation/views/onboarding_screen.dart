@@ -25,7 +25,7 @@ class OnboardingScreen extends StatelessWidget {
 }
 
 class _OnboardingView extends StatelessWidget {
-  const _OnboardingView({super.key});
+  const _OnboardingView();
 
   @override
   Widget build(BuildContext context) {

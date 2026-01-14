@@ -17,17 +17,13 @@ jobs:
         run: echo "ALLOWED_BRANCH=dev" >> $GITHUB_ENV
 
       - name: 🔍 Check Branch Compliance
-        # GITHUB_BASE_REF는 PR의 대상 브랜치 (main)
-        # GITHUB_HEAD_REF는 PR의 소스 브랜치 (feature/A 등)
         run: |
-          echo "PR Base Branch: ${{ github.base_ref }}"
-          echo "PR Head Branch: ${{ github.head_ref }}"
-          echo "Allowed Source Branch: ${{ env.ALLOWED_BRANCH }}"
-
-          # 대상이 'main'이고, 소스가 'dev'이 아닌 경우에만 실패 처리
-          if [[ "${{ github.base_ref }}" == "main" && "${{ github.head_ref }}" != "${{ env.ALLOWED_BRANCH }}" ]]; then
-            echo "::error title=Forbidden Merge::Merging from branch '${{ github.head_ref }}' into 'main' is strictly prohibited. Please merge into '${{ env.ALLOWED_BRANCH }}' first."
-            exit 1 # 워크플로우 실패 처리
+          HEAD_BRANCH="${{ github.head_ref }}"
+          
+          # 정규표현식으로 release/ 또는 hotfix/ 브랜치만 허용
+          if [[ "$HEAD_BRANCH" =~ ^release/ || "$HEAD_BRANCH" =~ ^hotfix/ ]]; then
+            echo "✅ Branch check passed: $HEAD_BRANCH is allowed to merge into main."
           else
-            echo "Branch check passed. Allowed to merge from ${{ github.head_ref }} to ${{ github.base_ref }}."
+            echo "::error title=Forbidden Merge::Only 'release/*' or 'hotfix/*' branches can be merged into 'main'. Your branch: '$HEAD_BRANCH'"
+            exit 1
           fi

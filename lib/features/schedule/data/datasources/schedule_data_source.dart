@@ -214,7 +214,7 @@ class ScheduleDataSource {
       // final GoogleSignInClientAuthorization? authorization = await user
       //     ?.authorizationClient
       //     .authorizationForScopes(scopes);
-      final googleSignIn = await GoogleSignIn.instance.authorizationClient;
+      final googleSignIn = GoogleSignIn.instance.authorizationClient;
       // fianl GoogleSignInAccount acc = GoogleSignInAccount.
       // if (googleSignIn == null) {
       //   Fluttertoast.showToast(msg: "구글 로그인 정보가 없습니다.");

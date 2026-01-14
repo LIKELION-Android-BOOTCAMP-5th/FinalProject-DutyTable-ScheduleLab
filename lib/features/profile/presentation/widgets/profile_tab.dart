@@ -1,7 +1,7 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
-// ///프로필스크린에 있는 각 설정 항목
+///프로필스크린에 있는 각 설정 항목
 class CustomTab extends StatelessWidget {
   /// 항목에 들어갈 아이콘
   final IconData icon;
@@ -13,9 +13,9 @@ class CustomTab extends StatelessWidget {
   final double padding;
 
   ///더 추가할 위젯
-  Widget? addWidget;
+  final Widget? addWidget;
 
-  CustomTab({
+  const CustomTab({
     super.key,
     required this.icon,
     required this.buttonText,
