@@ -11,7 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      # 중요: run은 step 이름과 같은 라인의 들여쓰기를 가져야 합니다.
       - name: Create .env file
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
@@ -23,14 +22,35 @@ jobs:
           channel: 'stable'
           cache: true
 
-      # 2. 의존성 패키지 다운로드
+      # --- 캐시 설정 추가 시작 ---
+      - name: Cache Pub packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Cache Gradle and NDK
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            /usr/local/lib/android/sdk/ndk
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      # --- 캐시 설정 추가 끝 ---
+
+      # 2. 의존성 패키지 다운로드 (캐시된게 있다면 훨씬 빨라집니다)
       - name: Install dependencies
         run: flutter pub get
 
-      # 3. 정적 분석 (경고가 있어도 빌드를 중단하지 않도록 설정)
+      # 3. 정적 분석
       - name: Analyze project
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
-      # 4. 안드로이드 빌드 확인
+      # 4. 안드로이드 빌드 확인 (캐시 덕분에 NDK 재설치 시간을 단축합니다)
       - name: Build APK
-        run: flutter build apk --debug
+        run: flutter build apk --debug --no-pub

@@ -12,13 +12,14 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as timezone;
 
+import 'core/di/injection.dart';
 import 'core/network/firebase_options.dart';
 import 'core/router/app_router.dart';
 import 'features/notification/presentation/viewmodels/notification_state.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  configureDependencies();
   // 환경 변수 및 날짜 로케일 초기화
   await dotenv.load(fileName: ".env");
   await initializeDateFormatting('ko_KR', null); // ko_KR 명시
