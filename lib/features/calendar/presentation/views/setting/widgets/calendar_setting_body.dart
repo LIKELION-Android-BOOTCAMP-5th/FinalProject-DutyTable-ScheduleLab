@@ -1,6 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/custom_confirm_dialog.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_member_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_member_entity.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/setting/widgets/custom_calendar_setting_content_box.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
@@ -25,7 +25,7 @@ class CalendarSettingBody extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            CustomCalendarImageBox(imageUrl: viewModel.calendar.imageURL),
+            CustomCalendarImageBox(imageUrl: viewModel.calendar.imageUrl),
             const SizedBox(height: 40),
             CustomCalendarSettingContentBox(
               title: Text(
@@ -75,7 +75,7 @@ class _CalendarMemberList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<CalendarSettingViewModel>(
       builder: (_, viewModel, __) {
-        final members = viewModel.calendar.calendarMemberModel;
+        final members = viewModel.calendar.members;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +153,7 @@ class _OwnerMemberTile extends StatelessWidget {
 }
 
 class _SharedMemberTile extends StatelessWidget {
-  final CalendarMemberModel member;
+  final CalendarMemberEntity member;
   final String calendarType;
 
   /// 캘린더 설정 - 바디 : 캘린더 멤버(멤버)
@@ -187,7 +187,7 @@ class _SharedMemberTile extends StatelessWidget {
               : member.isAdmin
               ? const Text("👑", style: TextStyle(fontSize: 24))
               : calendar.userId == currentUser!.id
-              ? _KickButton(member.userId)
+              ? _KickButton(member.id)
               : SizedBox.shrink(),
         ],
       ),

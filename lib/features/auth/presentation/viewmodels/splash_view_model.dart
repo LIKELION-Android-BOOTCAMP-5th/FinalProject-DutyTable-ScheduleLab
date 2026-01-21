@@ -1,5 +1,6 @@
-import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/core/di/injection.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
+import 'package:dutytable/features/calendar/domain/usecases/read_calendar_final_list_use_case.dart';
 import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// 스플래시 화면의 비즈니스 로직을 관리하는 ViewModel.
 class SplashViewModel with ChangeNotifier {
+  final ReadCalendarFinalListUseCase _readCalendarFinalListUseCase =
+      getIt<ReadCalendarFinalListUseCase>();
   // redirect 메서드가 중복 실행되는 것을 방지하기 위한 플래그
   bool _isRedirecting = false;
 
@@ -19,7 +22,7 @@ class SplashViewModel with ChangeNotifier {
     _isRedirecting = true;
 
     // 로드할 캘린더 데이터 변수
-    List<CalendarModel>? sharedCalendars;
+    List<CalendarEntity>? sharedCalendars;
     // 로그인 화면으로 이동해야 하는지 여부 플래그
     bool shouldRedirectToLogin = false;
 
@@ -35,8 +38,7 @@ class SplashViewModel with ChangeNotifier {
       final isLoggedIn = isAutoLogin && session != null;
 
       if (isLoggedIn) {
-        sharedCalendars = await CalendarDataSource.instance
-            .fetchCalendarFinalList("group");
+        sharedCalendars = await _readCalendarFinalListUseCase("group");
 
         if (!context.mounted) return;
 

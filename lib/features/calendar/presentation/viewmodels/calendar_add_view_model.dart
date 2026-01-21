@@ -1,68 +1,93 @@
 import 'dart:io';
 
-import 'package:dutytable/core/services/supabase_storage_service.dart';
-import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
+import 'package:dutytable/features/calendar/domain/entities/user_entity.dart';
+import 'package:dutytable/features/calendar/domain/usecases/find_user_by_nickname_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/di/injection.dart';
 import '../../../../core/services/device_resource_service.dart';
 import '../../../../main.dart';
-import '../../data/datasources/user_data_source.dart';
+import '../../domain/usecases/create_shared_calendar_use_case.dart';
 
 class CalendarAddViewModel extends ChangeNotifier {
+  final CreateSharedCalendarUseCase _createSharedCalendarUseCase =
+      getIt<CreateSharedCalendarUseCase>();
+  final FindUserByNicknameUseCase _findUserByNicknameUseCase =
+      getIt<FindUserByNicknameUseCase>();
+
   /// 디바이스 리소스 서비스(private)
   final DeviceResourceService _resourceService = DeviceResourceService();
+
+  /// 데이터 로딩 상태(private)
   bool _isLoading = false;
 
+  /// 캘린더 이미지(private)
   File? _imageFile;
-  final Map<String, String> _invitedUsers = {};
+
+  /// 초대 유저들(private)
+  final List<UserEntity> _invitedUsers = [];
+
+  /// 초대 에러(private)
   String? _inviteError;
+
+  /// 캘린더 제목(private)
   String _title = '';
+
+  /// 캘린더 설명(private)
   String? _description;
 
+  /// 데이터 로딩 상태(public)
   bool get isLoading => _isLoading;
 
+  /// 캘린더 이미지(public)
   File? get imageFile => _imageFile;
-  Map<String, String> get invitedUsers => _invitedUsers;
+
+  /// 초대 유저들(public)
+  List<UserEntity> get invitedUsers => _invitedUsers;
+
+  /// 초대 에러(public)
   String? get inviteError => _inviteError;
+
+  /// 캘린더 제목(public)
   String get title => _title;
+
+  /// 캘린더 설명(public)
   String? get description => _description;
 
   bool get isValid => _title.trim().isNotEmpty;
 
+  /// 에러 지우기
   void clearError() {
     _inviteError = null;
     notifyListeners();
   }
 
-  void addInvitedUser({required String userId, required String nickname}) {
-    if (_invitedUsers.containsKey(userId)) return;
-
-    _invitedUsers[userId] = nickname;
-    notifyListeners();
-  }
-
+  /// 초대 유저 지우기
   void removeInvitedUser(String userId) {
-    _invitedUsers.remove(userId);
+    _invitedUsers.removeWhere((user) => user.id == userId);
     notifyListeners();
   }
 
+  /// 초대 에러 표시
   void _setInviteError(String? value) {
     _inviteError = value;
     notifyListeners();
   }
 
+  /// 캘린더 제목 작성
   void setTitle(String value) {
     _title = value;
     notifyListeners();
   }
 
+  /// 캘린더 설명 작성
   void setDescription(String? value) {
     _description = value;
     notifyListeners();
   }
 
-  /// 이미지 선택
+  /// 캘린더 이미지 선택
   Future<void> pickCalendarImage(ImageSource source) async {
     final File? pickedFile = await _resourceService.pickImage(source);
     if (pickedFile != null) {
@@ -71,7 +96,7 @@ class CalendarAddViewModel extends ChangeNotifier {
     }
   }
 
-  /// 이미지 삭제
+  /// 캘린더 이미지 삭제
   Future<void> deleteImage() async {
     _imageFile = null;
     notifyListeners();
@@ -88,32 +113,29 @@ class CalendarAddViewModel extends ChangeNotifier {
       return;
     }
 
-    final user = await UserDataSource.shared.findUserByNickname(value);
+    final user = await _findUserByNicknameUseCase(value);
 
     if (user == null) {
       _setInviteError('존재하지 않는 사용자입니다.');
       return;
     }
 
-    final userId = user['id']!;
-    final userNickname = user['nickname']!;
-
-    if (_invitedUsers.containsKey(userId)) {
-      _setInviteError('이미 추가된 사용자입니다.');
-      return;
-    }
-
-    if (userId == currentUser!.id) {
+    if (user.id == currentUser!.id) {
       _setInviteError('자신은 추가 할 수 없습니다.');
       return;
     }
 
-    _invitedUsers[userId] = userNickname;
+    final isAlreadyAdded = _invitedUsers.any((u) => u.id == user.id);
+    if (isAlreadyAdded) {
+      _setInviteError('이미 추가된 사용자입니다.');
+      return;
+    }
+    _invitedUsers.add(user);
     _setInviteError(null); // 에러 제거
   }
 
   /// 캘린더 추가
-  Future<void> addSharedCalendar() async {
+  Future<void> createSharedCalendar() async {
     if (_isLoading) return;
     if (!isValid) throw Exception('캘린더 이름은 필수입니다.');
 
@@ -121,24 +143,19 @@ class CalendarAddViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 1. 이미지 없이 캘린더 생성 후 캘린더 id 받아오기
-      final calendarId = await CalendarDataSource.instance.addSharedCalendar(
+      final List<String> invitedIds = _invitedUsers
+          .map((user) => user.id)
+          .toList();
+
+      await _createSharedCalendarUseCase(
         title: _title,
         description: _description,
-        invitedUserIds: _invitedUsers.keys.toList(),
+        invitedUserIds: invitedIds,
+        imageFile: _imageFile,
       );
-
-      // 2. 받아온 캘린더 id로 storage에 이미지 저장
-      final imageUrl = await SupabaseStorageService().uploadCalendarImage(
-        _imageFile,
-        calendarId,
-      );
-
-      // 3. storage에 저장한 이미지 캘린더에 업데이트
-      await CalendarDataSource.instance.updateCalendarInfo(
-        imageURL: imageUrl,
-        calendarId: calendarId,
-      );
+    } catch (e) {
+      debugPrint("캘린더 추가 실패: $e");
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();

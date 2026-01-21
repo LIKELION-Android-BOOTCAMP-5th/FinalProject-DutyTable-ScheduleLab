@@ -12,15 +12,15 @@ class InviteUserTag extends StatelessWidget {
     return Wrap(
       spacing: 8,
       runSpacing: 4,
-      children: viewModel.invitedUsers.entries
+      children: viewModel.invitedUsers
           .map(
-            (e) => Chip(
+            (user) => Chip(
               backgroundColor: AppColors.background(context),
               label: Text(
-                e.value,
+                user.nickname,
                 style: TextStyle(color: AppColors.textMain(context)),
               ),
-              onDeleted: () => viewModel.removeInvitedUser(e.key),
+              onDeleted: () => viewModel.removeInvitedUser(user.id),
             ),
           )
           .toList(),

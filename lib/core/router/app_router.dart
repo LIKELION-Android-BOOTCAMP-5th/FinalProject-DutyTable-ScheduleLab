@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 import '../../features/auth/presentation/views/login/login_screen.dart';
 import '../../features/auth/presentation/views/signup/signup_screen.dart';
 import '../../features/auth/presentation/views/splash_screen.dart';
-import '../../features/calendar/data/models/calendar_model.dart';
+import '../../features/calendar/domain/entities/calendar_entity.dart';
 import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
 import '../../features/calendar/presentation/views/setting/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/list/shared_calendar_list_screen.dart';
@@ -45,7 +45,7 @@ GoRouter createRouter(BuildContext context) {
       GoRoute(
         path: '/calendar/edit',
         builder: (context, state) {
-          final CalendarModel? calendar = state.extra as CalendarModel?;
+          final CalendarEntity? calendar = state.extra as CalendarEntity?;
           return CalendarEditScreen(calendar: calendar);
         },
       ),
@@ -54,7 +54,7 @@ GoRouter createRouter(BuildContext context) {
       GoRoute(
         path: '/calendar/setting',
         builder: (context, state) {
-          final CalendarModel? calendar = state.extra as CalendarModel?;
+          final CalendarEntity? calendar = state.extra as CalendarEntity?;
           return CalendarSettingScreen(calendar: calendar);
         },
       ),
@@ -143,7 +143,7 @@ GoRouter createRouter(BuildContext context) {
                 path: "schedule",
                 builder: (context, state) {
                   // 2단계 : 데이터랑 같이 라우팅
-                  final CalendarModel calendar = state.extra as CalendarModel;
+                  final CalendarEntity calendar = state.extra as CalendarEntity;
 
                   return SharedCalendarScreen(calendar: calendar);
                 },

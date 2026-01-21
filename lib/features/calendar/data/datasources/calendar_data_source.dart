@@ -1,21 +1,21 @@
 import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
 import '../../../../core/utils/extensions.dart';
 import '../../../../main.dart';
 import '../models/calendar_member_model.dart';
 import '../models/calendar_model.dart';
 
+@lazySingleton
 class CalendarDataSource {
-  CalendarDataSource._();
-  static final CalendarDataSource instance = CalendarDataSource._();
-
+  CalendarDataSource();
   final Dio _dio = DioClient.shared.dio;
 
   /// CREATE
   /// 캘린더 추가
-  Future<int> addSharedCalendar({
+  Future<int> createSharedCalendar({
     required String title,
     String? imageURL,
     String? description,
@@ -51,17 +51,6 @@ class CalendarDataSource {
     return calendarId;
   }
 
-  /// 멤버 초대
-  Future<void> inviteUsers(int calendarId, List<String> invitedUserIds) async {
-    if (invitedUserIds.isNotEmpty) {
-      final members = invitedUserIds
-          .map((uid) => {'calendar_id': calendarId, 'user_id': uid})
-          .toList();
-
-      await _dio.post('/rest/v1/invite_notifications', data: members);
-    }
-  }
-
   /// UPDATE
   /// 캘린더 수정
   Future<bool> updateCalendarInfo({
@@ -95,24 +84,9 @@ class CalendarDataSource {
     }
   }
 
-  /// 방장 이전
-  Future<void> transferAdminRole(int calendarId, String newAdminId) async {
-    final currentUserId = supabase.auth.currentUser!.id;
-
-    // supabase function
-    await supabase.rpc(
-      'transfer_admin_role',
-      params: {
-        'p_calendar_id': calendarId,
-        'p_new_admin_id': newAdminId,
-        'p_old_admin_id': currentUserId,
-      },
-    );
-  }
-
   /// READ
   /// 개인 캘린더 가져오기 (없으면 생성)
-  Future<CalendarModel> fetchPersonalCalendar() async {
+  Future<CalendarModel> readPersonalCalendar() async {
     final userId = supabase.auth.currentUser?.id ?? "";
     if (userId.isEmpty) throw Exception('로그인 필요');
 
@@ -141,20 +115,6 @@ class CalendarDataSource {
     }
   }
 
-  /// 수파베이스에서 is_google_calendar_connection 정보 가져오기
-  Future<bool> fetchIsGoogleCalendarConnection() async {
-    final currentUserId = supabase.auth.currentUser?.id;
-    final response = await _dio.get(
-      '/rest/v1/users',
-      queryParameters: {
-        'select': 'is_google_calendar_connect',
-        'id': 'eq.$currentUserId',
-        'limit': 1,
-      },
-    );
-    return response.data[0]['is_google_calendar_connect'] as bool;
-  }
-
   /// 개인 캘린더를 생성하고, 생성자를 멤버로 추가한 뒤, 생성된 캘린더 정보를 반환
   Future<CalendarModel> _createAndFetchPersonalCalendar(String userId) async {
     // '내 캘린더'라는 이름으로 개인 캘린더 생성
@@ -176,7 +136,7 @@ class CalendarDataSource {
   }
 
   /// 단일 캘린더 조회
-  Future<CalendarModel> fetchSharedCalendarFromId(int calendarId) async {
+  Future<CalendarModel> readSharedCalendarFromId(int calendarId) async {
     final response = await _dio.get(
       '/rest/v1/calendars',
       queryParameters: {
@@ -184,33 +144,25 @@ class CalendarDataSource {
         'id': 'eq.$calendarId',
       },
     );
-    CalendarModel calendar;
-    if (response.statusCode == 200 && response.data is List) {
-      final List<dynamic> jsonData = response.data;
 
-      if (jsonData.isNotEmpty) {
-        calendar = CalendarModel.fromJson(
-          jsonData.first as Map<String, dynamic>,
-        );
-      } else {
-        throw Exception('Calendar not found.');
-      }
-    } else {
-      throw Exception('Failed to load calendar: Status ${response.statusCode}');
+    if (response.statusCode != 200 || (response.data as List).isEmpty) {
+      throw Exception('Calendar not found.');
     }
 
-    // 3단계: 각 캘린더의 멤버 목록을 비동기적으로 가져와 병합
-    final List<CalendarMemberModel> memberList = await fetchCalendarMembers(
-      calendar.id,
+    final json = response.data.first as Map<String, dynamic>;
+
+    // 1. 멤버 리스트를 먼저 가져옵니다.
+    final List<CalendarMemberModel> memberList = await readCalendarMembers(
+      calendarId,
     );
 
-    calendar.calendarMemberModel = memberList;
-
-    return calendar;
+    // 2. 'final' 에러를 피하기 위해, 객체 생성 시점에 멤버 리스트를 넣어줍니다.
+    // 이제 여기서 'members: memberList'를 인식할 수 있습니다.
+    return CalendarModel.fromJson(json, members: memberList);
   }
 
   /// 특정 ID의 캘린더 제목 가져오기
-  Future<String> getCalendarTitleById(int calendarId) async {
+  Future<String> readCalendarTitleById(int calendarId) async {
     final response = await _dio.get(
       '/rest/v1/calendars',
       queryParameters: {'select': 'title', 'id': 'eq.$calendarId', 'limit': 1},
@@ -224,7 +176,7 @@ class CalendarDataSource {
   }
 
   /// 멤버 목록 가져오기
-  Future<List<CalendarMemberModel>> fetchCalendarMembers(int calendarId) async {
+  Future<List<CalendarMemberModel>> readCalendarMembers(int calendarId) async {
     final response = await _dio.get(
       '/rest/v1/calendar_members',
       queryParameters: {
@@ -260,7 +212,7 @@ class CalendarDataSource {
   }
 
   /// 공유 캘린더 목록 가져오기
-  Future<List<CalendarModel>> fetchCalendarFinalList(String type) async {
+  Future<List<CalendarModel>> readCalendarFinalList(String type) async {
     final userId = supabase.auth.currentUser?.id ?? "";
 
     // 1단계: 현재 유저가 포함된 캘린더 ID 목록 가져오기
@@ -300,55 +252,36 @@ class CalendarDataSource {
     }
     final String idsQuery = calendarIds.join(',');
 
-    // 2단계: 필터링된 ID 목록으로 캘린더 기본 데이터 목록 가져오기
-    Response calendarResponse;
-    try {
-      calendarResponse = await _dio.get(
-        '/rest/v1/calendars',
-        queryParameters: {
-          'select': '*,calendars_user_id_fkey(nickname, profile_url)',
-          'id': 'in.($idsQuery)',
-          'type': 'eq.$type',
-        },
-      );
-    } on DioException catch (e) {
-      debugPrint('2단계 DioException: ${e.message}');
-      throw Exception('Failed to load calendars: ${e.message}');
-    }
-
-    if (calendarResponse.statusCode != 200 ||
-        calendarResponse.data is! List) {
-      throw Exception(
-        'Failed to load calendars: Status ${calendarResponse.statusCode}',
-      );
-    }
-
-    final List<dynamic> calendarJsonData = calendarResponse.data;
-    final List<CalendarModel> calendars = calendarJsonData
-        .map(
-          (jsonItem) =>
-              CalendarModel.fromJson(jsonItem as Map<String, dynamic>),
-        )
-        .toList();
-    // 3단계: 각 캘린더의 멤버 목록을 비동기적으로 가져와 병합
-    final List<Future<List<CalendarMemberModel>?>> memberFutures = calendars
-        .map((calendar) => fetchCalendarMembers(calendar.id))
-        .toList();
-
-    final List<List<CalendarMemberModel>?> allMembersLists = await Future.wait(
-      memberFutures,
+    // 2단계: 캘린더 기본 데이터(Raw JSON) 가져오기
+    final response = await _dio.get(
+      '/rest/v1/calendars',
+      queryParameters: {
+        'select': '*,calendars_user_id_fkey(nickname, profile_url)',
+        'id': 'in.($idsQuery)',
+        'type': 'eq.$type',
+      },
     );
 
-    // 캘린더 모델에 멤버 목록 결합
-    for (int i = 0; i < calendars.length; i++) {
-      calendars[i].calendarMemberModel = allMembersLists[i];
+    final List<dynamic> calendarJsonData = response.data;
+
+    final List<List<CalendarMemberModel>> allMembersLists = await Future.wait(
+      calendarJsonData.map((json) => readCalendarMembers(json['id'] as int)),
+    );
+
+    final List<CalendarModel> calendars = [];
+
+    for (int i = 0; i < calendarJsonData.length; i++) {
+      final Map<String, dynamic> json = calendarJsonData[i];
+      final List<CalendarMemberModel> members = allMembersLists[i];
+
+      calendars.add(CalendarModel.fromJson(json, members: members));
     }
 
     return calendars;
   }
 
   /// 특정 캘린더의 안 읽은 채팅 개수 가져오기
-  Future<int> fetchUnreadChatCount(int calendarId, String userId) async {
+  Future<int> readUnreadChatCount(int calendarId, String userId) async {
     // 1. 유저의 마지막 읽은 시간(last_read_at) 가져오기
     final memberResponse = await _dio.get(
       '/rest/v1/calendar_members',
@@ -381,7 +314,7 @@ class CalendarDataSource {
   }
 
   /// 다음 일정 가져오기
-  Future<Map<String, dynamic>?> fetchNextSchedule(int calendarId) async {
+  Future<Map<String, dynamic>?> readNextSchedule(int calendarId) async {
     final String now = DateTime.now().toUtc().toIso8601String();
 
     final response = await _dio.get(
@@ -410,32 +343,6 @@ class CalendarDataSource {
     await supabase.storage.from('calendar-images').remove([path]);
   }
 
-  /// 다수의 캘린더 선택하여 나가기(삭제)(내가 방장이 아닌 캘린더들만)
-  Future<void> outCalendars(List<int> calendarIds) async {
-    final currentUser = supabase.auth.currentUser;
-    await _dio.delete(
-      '/rest/v1/calendar_members',
-      queryParameters: {
-        'calendar_id': 'in.(${calendarIds.join(",")})',
-        'is_admin': 'eq.false',
-        'user_id': 'eq.${currentUser!.id}',
-      },
-    );
-  }
-
-  /// 단일 캘린더 나가기(내가 방장이 아닌 캘린더만)
-  Future<void> outCalendar(int calendarId) async {
-    final currentUser = supabase.auth.currentUser;
-    await _dio.delete(
-      '/rest/v1/calendar_members',
-      queryParameters: {
-        'calendar_id': 'eq.$calendarId',
-        'is_admin': 'eq.false',
-        'user_id': 'eq.${currentUser!.id}',
-      },
-    );
-  }
-
   /// 단일 캘린더 삭제 (방장만 가능)
   Future<void> deleteCalendar(int calendarId) async {
     final response = await _dio.get(
@@ -454,16 +361,5 @@ class CalendarDataSource {
 
     // 이미지 삭제
     await deleteCalendarImage(imageURL);
-  }
-
-  /// 멤버 추방
-  Future<void> exileMember(int calendarId, String userId) async {
-    await _dio.delete(
-      '/rest/v1/calendar_members',
-      queryParameters: {
-        'calendar_id': 'eq.$calendarId',
-        'user_id': 'eq.$userId',
-      },
-    );
   }
 }

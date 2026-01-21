@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../../core/utils/image_picker_utils.dart';
 import '../../../../../../core/widgets/custom_confirm_dialog.dart';
-import '../../../../data/models/calendar_member_model.dart';
+import '../../../../domain/entities/calendar_member_entity.dart';
 import '../../../widgets/chat_tab.dart';
 import '../../setting/widgets/custom_calendar_image_box.dart';
 
@@ -39,7 +39,7 @@ class CalendarEditBody extends StatelessWidget {
                 child: CustomCalendarImageBox(
                   imageUrl: viewModel.newImage != null
                       ? viewModel.newImage!.path
-                      : viewModel.calendar.imageURL,
+                      : viewModel.calendar.imageUrl,
                 ),
               ),
               const SizedBox(height: 40),
@@ -115,7 +115,7 @@ class _CalendarMemberList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<CalendarEditViewModel>(
       builder: (_, viewModel, __) {
-        final members = viewModel.calendar.calendarMemberModel;
+        final members = viewModel.calendar.members;
 
         final isPersonal = members == null || members.isEmpty;
 
@@ -178,7 +178,7 @@ class _PersonalOwnerTile extends StatelessWidget {
 }
 
 class _SharedMemberTile extends StatelessWidget {
-  final CalendarMemberModel member;
+  final CalendarMemberEntity member;
   final bool isPersonalCalendar;
 
   const _SharedMemberTile({
@@ -211,7 +211,7 @@ class _SharedMemberTile extends StatelessWidget {
               ? const SizedBox.shrink()
               : member.isAdmin
               ? const Text("👑", style: TextStyle(fontSize: 24))
-              : _RoleButton(member.userId),
+              : _RoleButton(member.id),
         ],
       ),
     );

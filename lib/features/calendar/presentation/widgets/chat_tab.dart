@@ -3,10 +3,10 @@ import 'package:dutytable/features/calendar/presentation/viewmodels/chat_view_mo
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/models/calendar_model.dart';
+import '../../domain/entities/calendar_entity.dart';
 
 class ChatTab extends StatelessWidget {
-  final CalendarModel? calendar;
+  final CalendarEntity? calendar;
 
   /// 채팅 탭(provider 주입)
   const ChatTab({super.key, this.calendar});

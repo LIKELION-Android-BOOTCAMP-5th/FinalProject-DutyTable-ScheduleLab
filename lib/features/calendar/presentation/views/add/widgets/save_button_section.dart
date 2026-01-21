@@ -34,10 +34,16 @@ class SaveButtonSection extends StatelessWidget {
               ? () async {
                   if (formKey.currentState?.validate() != true) return;
                   try {
-                    await viewModel.addSharedCalendar();
+                    await viewModel.createSharedCalendar();
                     if (context.mounted) context.pop(true);
                   } catch (e) {
-                    debugPrint(e.toString());
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("캘린더 생성에 실패했습니다: ${e.toString()}"),
+                        ),
+                      );
+                    }
                   }
                 }
               : null,

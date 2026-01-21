@@ -1,20 +1,28 @@
 import 'package:dutytable/core/services/supabase_manager.dart';
 import 'package:dutytable/core/utils/extensions.dart';
+import 'package:dutytable/features/home_widget/domain/usecases/sync_all_calendars_to_widget_use_case.dart';
 import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:flutter/material.dart';
 
-import '../../../calendar/data/datasources/calendar_data_source.dart';
-import '../../../calendar/data/models/calendar_model.dart';
-import '../../../home_widget/data/datasources/widget_local_data_source.dart';
+import '../../../../core/di/injection.dart';
+import '../../../calendar/domain/entities/calendar_entity.dart';
+import '../../../calendar/domain/usecases/read_google_calendar_connection_use_case.dart';
 
 /// 스케쥴 뷰모델
 class ScheduleViewModel extends ChangeNotifier {
+  final ReadGoogleCalendarConnectionUseCase
+  _readGoogleCalendarConnectionUseCase =
+      getIt<ReadGoogleCalendarConnectionUseCase>();
+
+  final SyncAllCalendarsToWidgetUseCase _syncAllCalendarsToWidgetUseCase =
+      getIt<SyncAllCalendarsToWidgetUseCase>();
+
   /// 현재 캘린더 데이터(private)
-  final CalendarModel? _calendar;
+  final CalendarEntity? _calendar;
 
   /// 현재 캘린더 데이터(puclic)
-  CalendarModel? get calendar => _calendar;
+  CalendarEntity? get calendar => _calendar;
 
   final String _currentUserId =
       SupabaseManager.shared.supabase.auth.currentUser?.id ?? "";
@@ -103,11 +111,9 @@ class ScheduleViewModel extends ChangeNotifier {
   bool _deleteMode = false;
   bool get deleteMode => _deleteMode;
 
-  final _widgetDataSource = WidgetDataSourceImpl();
-
   /// 앱 실행될 때
   /// 초기화 함수 실행
-  ScheduleViewModel({CalendarModel? calendar}) : _calendar = calendar {
+  ScheduleViewModel({CalendarEntity? calendar}) : _calendar = calendar {
     _init();
   }
 
@@ -271,8 +277,7 @@ class ScheduleViewModel extends ChangeNotifier {
 
       final userId = SupabaseManager.shared.supabase.auth.currentUser?.id;
       if (userId != null) {
-        final isGoogleConnected = await CalendarDataSource.instance
-            .fetchIsGoogleCalendarConnection();
+        final isGoogleConnected = await _readGoogleCalendarConnectionUseCase();
 
         if (isGoogleConnected) {
           final googleSchedules = await ScheduleDataSource.instance
@@ -321,7 +326,7 @@ class ScheduleViewModel extends ChangeNotifier {
 
       _scheduleDate = _schedules.map((e) => e.startedAt.toPureDate()).toList();
 
-      await _widgetDataSource.syncAllCalendarsToWidget();
+      await _syncAllCalendarsToWidgetUseCase();
       applyFilter();
     } catch (e) {
       debugPrint("❌ fetchSchedules error: $e");

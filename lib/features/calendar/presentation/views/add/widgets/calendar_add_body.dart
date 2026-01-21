@@ -44,7 +44,9 @@ class CalendarAddBody extends StatelessWidget {
             label: "멤버 추가",
             hint: viewModel.invitedUsers.isEmpty
                 ? "닉네임으로 검색하기"
-                : viewModel.invitedUsers.values.join(', '),
+                : viewModel.invitedUsers
+                      .map((user) => user.nickname)
+                      .join(', '),
             readOnly: true,
             onTap: () {
               showDialog(

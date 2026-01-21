@@ -1,6 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_edit_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/edit/widgets/calendar_edit_body.dart';
 import 'package:dutytable/features/calendar/presentation/views/edit/widgets/edit_button_section.dart';
@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 class CalendarEditScreen extends StatelessWidget {
   /// 캘린더 데이터
-  final CalendarModel? calendar;
+  final CalendarEntity? calendar;
 
   /// 캘린더 수정 화면(provider 주입)
   const CalendarEditScreen({super.key, this.calendar});

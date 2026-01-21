@@ -7,11 +7,11 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/custom_confirm_dialog.dart';
 import '../../../schedule/presentation/viewmodels/schedule_view_model.dart';
-import '../../data/models/calendar_model.dart';
+import '../../domain/entities/calendar_entity.dart';
 
 /// 리스트 탭(Provider 주입)
 class ListTab extends StatelessWidget {
-  final CalendarModel? calendar;
+  final CalendarEntity? calendar;
 
   const ListTab({super.key, this.calendar});
 

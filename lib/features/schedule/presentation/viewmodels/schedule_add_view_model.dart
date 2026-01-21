@@ -220,7 +220,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
 
       List<Map<String, dynamic>> payloads = [];
       int createdCount = 0;
-      int targetCount = _isRepeat ? (_repeatCount ?? 1) : 1;
+      int targetCount = _isRepeat ? (_repeatCount) : 1;
 
       final scheduleDuration = DateTime(
         2000,
