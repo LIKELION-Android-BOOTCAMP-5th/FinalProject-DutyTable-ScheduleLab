@@ -22,7 +22,7 @@ class EditButtonSection extends StatelessWidget {
     // 이미지 변경 여부
     final bool isImageChanged =
         viewModel.newImage != null ||
-        viewModel.calendar.imageURL != viewModel.initialCalendar.imageURL;
+        viewModel.calendar.imageUrl != viewModel.initialCalendar.imageUrl;
 
     // 최종 변경 여부
     final bool isContentChange =

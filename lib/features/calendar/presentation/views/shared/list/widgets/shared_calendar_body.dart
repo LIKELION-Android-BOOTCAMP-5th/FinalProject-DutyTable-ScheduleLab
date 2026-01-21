@@ -1,5 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calendar_card.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +61,7 @@ class SharedCalendarBody extends StatelessWidget {
 }
 
 class _CalendarListItem extends StatelessWidget {
-  final CalendarModel calendar;
+  final CalendarEntity calendar;
 
   /// 공유 캘린더 목록 - 바디 : - 공유 캘린더 목록
   const _CalendarListItem({required this.calendar});
@@ -103,11 +103,11 @@ class _CalendarListItem extends StatelessWidget {
         viewModel.fetchCalendars();
       },
       child: CalendarCard(
-        imageUrl: calendar.imageURL,
+        imageUrl: calendar.imageUrl,
         title: calendar.title,
         deleteMode: deleteMode,
         isAdmin: isAdmin,
-        members: calendar.calendarMemberModel?.length ?? 0,
+        members: calendar.members?.length ?? 0,
         isSelected: isSelected,
         calendarId: calendar.id,
         onChangeSelected: () => context

@@ -1,6 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/calendar_tab.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/chat_tab.dart';
@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 import '../../widgets/custom_appbar_icon.dart';
 
 class SharedCalendarScreen extends StatelessWidget {
-  final CalendarModel calendar;
+  final CalendarEntity calendar;
 
   const SharedCalendarScreen({super.key, required this.calendar});
 

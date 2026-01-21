@@ -1,6 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/custom_floating_action_button.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/my_schedule_check_box.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/sf_calendar_section.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CalendarTab extends StatelessWidget {
-  final CalendarModel? calendar;
+  final CalendarEntity? calendar;
 
   const CalendarTab({super.key, required this.calendar});
 

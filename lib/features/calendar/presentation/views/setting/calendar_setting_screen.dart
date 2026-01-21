@@ -1,6 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/calendar_setting_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/views/setting/widgets/calendar_setting_body.dart';
 import 'package:dutytable/features/calendar/presentation/views/setting/widgets/delete_button_section.dart';
@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class CalendarSettingScreen extends StatelessWidget {
-  final CalendarModel? calendar;
+  final CalendarEntity? calendar;
 
   const CalendarSettingScreen({super.key, this.calendar});
 

@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:dutytable/core/di/injection.dart';
+import 'package:dutytable/features/calendar/domain/usecases/read_calendar_title_by_id_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/read_shared_calendar_from_id_use_case.dart';
 import 'package:flutter/material.dart';
 
-import '../../../calendar/data/datasources/calendar_data_source.dart';
 import '../../data/datasources/notification_data_source.dart';
 import '../../data/models/invite_notification_model.dart';
 import '../../data/models/reminder_notification_model.dart';
@@ -14,6 +16,10 @@ class NavigationTarget {
 }
 
 class NotificationViewModel with ChangeNotifier {
+  final ReadCalendarTitleByIdUseCase _readCalendarTitleByIdUseCase =
+      getIt<ReadCalendarTitleByIdUseCase>();
+  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase =
+      getIt<ReadSharedCalendarFromIdUseCase>();
   bool _isLoading = true;
   List<dynamic> _notifications = [];
 
@@ -33,8 +39,10 @@ class NotificationViewModel with ChangeNotifier {
 
   Future<void> loadInitialNotifications() async {
     try {
-      final inviteFuture = NotificationDataSource.shared.getInviteNotifications();
-      final reminderFuture = NotificationDataSource.shared.getReminderNotifications();
+      final inviteFuture = NotificationDataSource.shared
+          .getInviteNotifications();
+      final reminderFuture = NotificationDataSource.shared
+          .getReminderNotifications();
 
       final results = await Future.wait([inviteFuture, reminderFuture]);
       final List<dynamic> combinedList = [...results[0], ...results[1]];
@@ -44,8 +52,7 @@ class NotificationViewModel with ChangeNotifier {
       for (final n in combinedList) {
         if (n is InviteNotificationModel) {
           titleFutures.add(
-            CalendarDataSource.instance
-                .getCalendarTitleById(n.calendarId)
+            _readCalendarTitleByIdUseCase(n.calendarId)
                 .then((title) => calendarTitles[n.calendarId] = title)
                 .catchError((_) {}),
           );
@@ -68,14 +75,16 @@ class NotificationViewModel with ChangeNotifier {
   }
 
   void setupRealtimeListeners() {
-    _inviteSubscription =
-        NotificationDataSource.shared.newInviteNotifications.listen((notification) {
+    _inviteSubscription = NotificationDataSource.shared.newInviteNotifications
+        .listen((notification) {
           _notifications.insert(0, notification);
           notifyListeners();
         });
 
-    _reminderSubscription =
-        NotificationDataSource.shared.newReminderNotifications.listen((notification) {
+    _reminderSubscription = NotificationDataSource
+        .shared
+        .newReminderNotifications
+        .listen((notification) {
           _notifications.insert(0, notification);
           notifyListeners();
         });
@@ -91,7 +100,8 @@ class NotificationViewModel with ChangeNotifier {
   /// 안 읽은 알림 존재 여부 계산
   Future<bool> hasUnreadNotifications() async {
     final inviteFuture = NotificationDataSource.shared.getInviteNotifications();
-    final reminderFuture = NotificationDataSource.shared.getReminderNotifications();
+    final reminderFuture = NotificationDataSource.shared
+        .getReminderNotifications();
     final results = await Future.wait([inviteFuture, reminderFuture]);
 
     return [...results[0], ...results[1]].any((n) {
@@ -102,8 +112,7 @@ class NotificationViewModel with ChangeNotifier {
   }
 
   Future<NavigationTarget> resolveCalendarTarget(int calendarId) async {
-    final targetCalendar =
-    await CalendarDataSource.instance.fetchSharedCalendarFromId(calendarId);
+    final targetCalendar = await _readSharedCalendarFromIdUseCase(calendarId);
 
     if (targetCalendar.type == 'group') {
       return NavigationTarget('/shared/schedule', extra: targetCalendar);
@@ -112,7 +121,9 @@ class NotificationViewModel with ChangeNotifier {
   }
 
   /// 리마인더 읽음 처리
-  Future<void> markReminderAsRead(ReminderNotificationModel notification) async {
+  Future<void> markReminderAsRead(
+    ReminderNotificationModel notification,
+  ) async {
     if (notification.isRead) return;
 
     await NotificationDataSource.shared.markAsRead(notification.id, 'reminder');

@@ -1,16 +1,25 @@
 import 'dart:io';
 
-import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
+import 'package:dutytable/features/calendar/domain/usecases/transfer_admin_role_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/update_calendar_info_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/di/injection.dart';
 import '../../../../core/services/device_resource_service.dart';
 import '../../../../core/services/supabase_storage_service.dart';
 
 enum ViewState { loading, success, error }
 
 class CalendarEditViewModel extends ChangeNotifier {
+  // UseCases
+  final TransferAdminRoleUseCase _transferAdminRoleUseCase =
+      getIt<TransferAdminRoleUseCase>();
+
+  final UpdateCalendarInfoUseCase _updateCalendarInfoUseCase =
+      getIt<UpdateCalendarInfoUseCase>();
+
   /// 데이터 로딩 상태(private)
   ViewState _state = ViewState.success;
 
@@ -40,12 +49,12 @@ class CalendarEditViewModel extends ChangeNotifier {
   TextEditingController get descController => _descController;
 
   /// 캘린더 데이터(private)
-  late final CalendarModel _initialCalendar; // 초기 데이터 값
-  late CalendarModel _calendar;
+  late final CalendarEntity _initialCalendar; // 초기 데이터 값
+  late CalendarEntity _calendar;
 
   /// 캘린더 데이터(public)
-  CalendarModel get initialCalendar => _initialCalendar; // 초기 데이터 값
-  CalendarModel get calendar => _calendar;
+  CalendarEntity get initialCalendar => _initialCalendar; // 초기 데이터 값
+  CalendarEntity get calendar => _calendar;
 
   // 이미지 피커로 갤러리에서 사진 가져오기
   File? _newImage;
@@ -58,7 +67,7 @@ class CalendarEditViewModel extends ChangeNotifier {
   final DeviceResourceService _resourceService = DeviceResourceService();
 
   /// 캘린더 수정 뷰모델
-  CalendarEditViewModel({CalendarModel? initialCalendarData}) {
+  CalendarEditViewModel({CalendarEntity? initialCalendarData}) {
     if (initialCalendarData != null) {
       _calendar = initialCalendarData;
       _initialCalendar = initialCalendarData; // 초기 상태 저장
@@ -67,10 +76,7 @@ class CalendarEditViewModel extends ChangeNotifier {
 
   /// 방장 권한 넘김
   Future<void> transferAdminRole(String newAdminId) async {
-    await CalendarDataSource.instance.transferAdminRole(
-      _calendar.id,
-      newAdminId,
-    );
+    await _transferAdminRoleUseCase(_calendar.id, newAdminId);
   }
 
   /// 이미지 선택
@@ -97,8 +103,8 @@ class CalendarEditViewModel extends ChangeNotifier {
   /// 이미지 삭제
   Future<void> deleteImage() async {
     _newImage = null;
-    _deleteImageURL = _calendar.imageURL;
-    _calendar = _calendar.copyWith(imageURL: null);
+    _deleteImageURL = _calendar.imageUrl;
+    _calendar = _calendar.copyWith(clearImageUrl: true);
     notifyListeners();
   }
 
@@ -117,7 +123,7 @@ class CalendarEditViewModel extends ChangeNotifier {
           calendar.id,
         );
       } else {
-        finalImageUrl = _calendar.imageURL;
+        finalImageUrl = _calendar.imageUrl;
       }
 
       if (_deleteImageURL != null) {
@@ -126,7 +132,7 @@ class CalendarEditViewModel extends ChangeNotifier {
         );
       }
 
-      result = await CalendarDataSource.instance.updateCalendarInfo(
+      result = await _updateCalendarInfoUseCase(
         title: _titleController.text,
         description: _descController.text,
         imageURL: finalImageUrl,

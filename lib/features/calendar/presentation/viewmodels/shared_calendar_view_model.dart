@@ -1,21 +1,48 @@
 import 'package:dutytable/core/services/supabase_manager.dart';
-import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
+import 'package:dutytable/features/calendar/domain/usecases/find_user_by_nickname_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/invite_users_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/out_calendars_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/read_calendar_final_list_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/read_shared_calendar_from_id_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/di/injection.dart';
 import '../../../../features/notification/data/datasources/notification_data_source.dart';
 import '../../../../main.dart';
-import '../../data/datasources/user_data_source.dart';
+import '../../domain/entities/user_entity.dart';
+import '../../domain/usecases/read_next_schedule_use_case.dart';
+import '../../domain/usecases/read_unread_chat_count_use_case.dart';
 
 enum ViewState { loading, success, error }
 
 class SharedCalendarViewModel extends ChangeNotifier {
-  final Map<String, String> _invitedUsers = {};
+  // UseCases
+  final FindUserByNicknameUseCase _findUserByNicknameUseCase =
+      getIt<FindUserByNicknameUseCase>();
+
+  final InviteUsersUseCase _inviteUsersUseCase = getIt<InviteUsersUseCase>();
+
+  final ReadCalendarFinalListUseCase _readCalendarFinalListUseCase =
+      getIt<ReadCalendarFinalListUseCase>();
+
+  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase =
+      getIt<ReadSharedCalendarFromIdUseCase>();
+
+  final OutCalendarsUseCase _outCalendarsUseCase = getIt<OutCalendarsUseCase>();
+
+  final ReadUnreadChatCountUseCase _readUnreadChatCountUseCase =
+      getIt<ReadUnreadChatCountUseCase>();
+
+  final ReadNextScheduleUseCase _readNextScheduleUseCase =
+      getIt<ReadNextScheduleUseCase>();
+
+  final List<UserEntity> _invitedUsers = [];
 
   String? _inviteError;
 
-  Map<String, String> get invitedUsers => _invitedUsers;
+  List<UserEntity> get invitedUsers => _invitedUsers;
 
   String? get inviteError => _inviteError;
 
@@ -52,13 +79,13 @@ class SharedCalendarViewModel extends ChangeNotifier {
   final Set<String> selectedIds = {};
 
   /// 공유 캘린더 데이터 목록(private)
-  List<CalendarModel>? _calendarList;
+  List<CalendarEntity>? _calendarList;
 
   /// 공유 캘린더 데이터 목록(public)
-  List<CalendarModel>? get calendarList => _calendarList;
+  List<CalendarEntity>? get calendarList => _calendarList;
 
-  CalendarModel? _calendar;
-  CalendarModel? get calendar => _calendar;
+  CalendarEntity? _calendar;
+  CalendarEntity? get calendar => _calendar;
 
   final String currentUserId =
       SupabaseManager.shared.supabase.auth.currentUser?.id ?? "";
@@ -88,8 +115,8 @@ class SharedCalendarViewModel extends ChangeNotifier {
 
   /// 공유 캘린더 목록 뷰모델
   SharedCalendarViewModel({
-    List<CalendarModel>? calendarList,
-    CalendarModel? calendar,
+    List<CalendarEntity>? calendarList,
+    CalendarEntity? calendar,
   }) {
     if (calendar != null) {
       // 5단계 : 데이터 받아서 입력
@@ -107,30 +134,30 @@ class SharedCalendarViewModel extends ChangeNotifier {
     }
 
     try {
-      final user = await UserDataSource.shared.findUserByNickname(value);
+      final user = await _findUserByNicknameUseCase(value);
       final memberIds =
-          _calendar!.calendarMemberModel?.map((e) {
-            return e.userId;
+          _calendar!.members?.map((e) {
+            return e.id;
           }).toList() ??
           [];
       if (user == null) {
         _inviteError = '존재하지 않는 사용자입니다.';
-      } else if (_invitedUsers.containsKey(user['id'])) {
+      } else if (_invitedUsers.any((u) => u.id == user.id)) {
         _inviteError = '이미 추가된 사용자입니다.';
-      } else if (user['id'] == currentUserId) {
+      } else if (user.id == currentUserId) {
         _inviteError = '자신은 추가 할 수 없습니다.';
-      } else if (memberIds.contains(user['id'])) {
+      } else if (memberIds.contains(user.id)) {
         _inviteError = '이미 멤버인 사용자 입니다.';
       } else {
         // 초대 보류중인지 확인
         final hasPending = await NotificationDataSource.shared.hasPendingInvite(
           _calendar!.id,
-          user['id']!,
+          user.id,
         );
         if (hasPending) {
           _inviteError = '이미 초대된 닉네임 입니다.';
         } else {
-          _invitedUsers[user['id']!] = user['nickname']!;
+          _invitedUsers.add(user);
           _inviteError = null;
         }
       }
@@ -141,7 +168,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
   }
 
   void removeInvitedUser(String userId) {
-    _invitedUsers.remove(userId);
+    _invitedUsers.removeWhere((user) => user.id == userId);
     notifyListeners();
   }
 
@@ -149,9 +176,9 @@ class SharedCalendarViewModel extends ChangeNotifier {
     if (_invitedUsers.isEmpty) return;
 
     try {
-      await CalendarDataSource.instance.inviteUsers(
+      await _inviteUsersUseCase(
         _calendar!.id,
-        _invitedUsers.keys.toList(),
+        _invitedUsers.map((e) => e.id).toList(),
       );
     } catch (e) {
       debugPrint("에러 : $e");
@@ -218,8 +245,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
 
     try {
       // 1. 기본 목록 가져오기
-      final calendars = await CalendarDataSource.instance
-          .fetchCalendarFinalList("group");
+      final calendars = await _readCalendarFinalListUseCase("group");
       _calendarList = calendars;
 
       if (_isDisposed) return;
@@ -256,9 +282,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     _state = ViewState.loading;
     notifyListeners();
     try {
-      _calendar = await CalendarDataSource.instance.fetchSharedCalendarFromId(
-        _calendar!.id,
-      );
+      _calendar = await _readSharedCalendarFromIdUseCase(_calendar!.id);
       _state = ViewState.success;
     } catch (e) {
       _state = ViewState.error;
@@ -278,7 +302,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await CalendarDataSource.instance.outCalendars(ids);
+      await _outCalendarsUseCase(ids);
       await fetchCalendars();
       cancelDeleteMode();
     } catch (e) {
@@ -323,7 +347,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     bool shouldNotify = true,
   }) async {
     try {
-      final int count = await CalendarDataSource.instance.fetchUnreadChatCount(
+      final int count = await _readUnreadChatCountUseCase(
         calendarId,
         currentUserId,
       );
@@ -394,9 +418,7 @@ class SharedCalendarViewModel extends ChangeNotifier {
     if (calendarId == null) return;
 
     try {
-      final data = await CalendarDataSource.instance.fetchNextSchedule(
-        calendarId,
-      );
+      final data = await _readNextScheduleUseCase(calendarId);
 
       if (data != null) {
         final DateTime date = DateTime.parse(data['started_at']).toLocal();

@@ -1,32 +1,28 @@
-class CalendarMemberModel {
-  final int calendarId;
-  final String userId;
-  final bool isAdmin;
-  final DateTime? lastReadAt;
-  final String nickname;
-  final String? profileUrl;
+import '../../domain/entities/calendar_member_entity.dart';
 
+class CalendarMemberModel extends CalendarMemberEntity {
   CalendarMemberModel({
-    required this.calendarId,
-    required this.userId,
-    required this.isAdmin,
-    required this.lastReadAt,
-    required this.nickname,
-    required this.profileUrl,
+    required super.calendarId,
+    required super.id,
+    required super.isAdmin,
+    super.lastReadAt,
+    required super.nickname,
+    super.profileUrl,
   });
 
   factory CalendarMemberModel.fromJson(Map<String, dynamic> json) {
     final Map<String, dynamic>? userJson =
         json['users'] as Map<String, dynamic>?;
-
     final String memberNickname = userJson?['nickname'] as String? ?? 'Unknown';
-
     final String? profileUrl = userJson?['profile_url'] as String?;
+
     return CalendarMemberModel(
       calendarId: json["calendar_id"] as int,
-      userId: json["user_id"] as String,
-      isAdmin: json["is_admin"] as bool,
-      lastReadAt: DateTime.parse(json["last_read_at"] as String),
+      id: json["user_id"] as String,
+      isAdmin: json["is_admin"] as bool? ?? false,
+      lastReadAt: json["last_read_at"] != null
+          ? DateTime.parse(json["last_read_at"] as String)
+          : null,
       nickname: memberNickname,
       profileUrl: profileUrl,
     );
@@ -35,29 +31,11 @@ class CalendarMemberModel {
   Map<String, dynamic> toJson() {
     return {
       'calendar_id': calendarId,
-      'user_id': userId,
+      'user_id': id,
       'is_admin': isAdmin,
       'last_read_at': lastReadAt,
       'nickname': nickname,
       'profileUrl': profileUrl,
     };
-  }
-
-  CalendarMemberModel copyWith({
-    int? calendarId,
-    String? userId,
-    bool? isAdmin,
-    DateTime? lastReadAt,
-    String? nickname,
-    String? profileUrl,
-  }) {
-    return CalendarMemberModel(
-      calendarId: calendarId ?? this.calendarId,
-      userId: userId ?? this.userId,
-      isAdmin: isAdmin ?? this.isAdmin,
-      lastReadAt: lastReadAt ?? this.lastReadAt,
-      nickname: nickname ?? this.nickname,
-      profileUrl: profileUrl,
-    );
   }
 }

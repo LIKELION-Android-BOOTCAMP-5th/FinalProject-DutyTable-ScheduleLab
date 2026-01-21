@@ -1,19 +1,35 @@
-import 'package:dutytable/features/calendar/data/datasources/calendar_data_source.dart';
-import 'package:dutytable/features/calendar/data/models/calendar_model.dart';
+import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
+import 'package:dutytable/features/calendar/domain/usecases/delete_calendar_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/exile_member_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/read_personal_calendar_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/read_shared_calendar_from_id_use_case.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../../core/di/injection.dart';
+import '../../domain/usecases/out_calendar_use_case.dart';
+
 class CalendarSettingViewModel extends ChangeNotifier {
+  //UseCases
+  final ReadPersonalCalendarUseCase _readPersonalCalendarUseCase =
+      getIt<ReadPersonalCalendarUseCase>();
+  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase =
+      getIt<ReadSharedCalendarFromIdUseCase>();
+  final ExileMemberUseCase _exileMemberUseCase = getIt<ExileMemberUseCase>();
+  final OutCalendarUseCase _outCalendarUseCase = getIt<OutCalendarUseCase>();
+  final DeleteCalendarUseCase _deleteCalendarUseCase =
+      getIt<DeleteCalendarUseCase>();
+
   /// 캘린더 데이터(private)
-  late CalendarModel _calendar;
+  late CalendarEntity _calendar;
 
   /// 캘린더 데이터(public)
-  CalendarModel get calendar => _calendar;
+  CalendarEntity get calendar => _calendar;
 
   final currentUser = supabase.auth.currentUser;
 
   /// 캘린더 세팅 뷰모델
-  CalendarSettingViewModel({CalendarModel? calendar}) {
+  CalendarSettingViewModel({CalendarEntity? calendar}) {
     if (calendar != null) {
       _calendar = calendar;
     }
@@ -22,27 +38,25 @@ class CalendarSettingViewModel extends ChangeNotifier {
   /// 단일 캘린더 불러오기
   Future<void> fetchCalendar() async {
     if (_calendar.type == 'personal') {
-      _calendar = await CalendarDataSource.instance.fetchPersonalCalendar();
+      _calendar = await _readPersonalCalendarUseCase();
     } else {
-      _calendar = await CalendarDataSource.instance.fetchSharedCalendarFromId(
-        _calendar.id,
-      );
+      _calendar = await _readSharedCalendarFromIdUseCase(_calendar.id);
     }
     notifyListeners();
   }
 
   /// 멤버 추방
   Future<void> exileMember(String userId) async {
-    await CalendarDataSource.instance.exileMember(_calendar.id, userId);
+    await _exileMemberUseCase(_calendar.id, userId);
   }
 
   /// 캘린더 나가기(멤버만)
   Future<void> outCalendar() async {
-    await CalendarDataSource.instance.outCalendar(_calendar.id);
+    await _outCalendarUseCase(_calendar.id);
   }
 
   /// 캘린더 삭제(방장만)
   Future<void> deleteCalendar() async {
-    await CalendarDataSource.instance.deleteCalendar(_calendar.id);
+    await _deleteCalendarUseCase(_calendar.id);
   }
 }
