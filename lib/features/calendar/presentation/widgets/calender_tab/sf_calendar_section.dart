@@ -1,6 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/utils/extensions.dart';
-import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -107,7 +107,7 @@ class CalendarTabScheduleDataSource extends CalendarDataSource {
   }
 
   factory CalendarTabScheduleDataSource.fromSchedules(
-    List<ScheduleModel> schedules,
+    List<ScheduleEntity> schedules,
   ) {
     return CalendarTabScheduleDataSource(
       schedules

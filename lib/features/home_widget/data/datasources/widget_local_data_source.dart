@@ -1,13 +1,12 @@
 import 'dart:convert';
 
+import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 
-import '../../../schedule/data/models/schedule_model.dart';
-
 abstract class WidgetLocalDataSource {
   Future<void> updateWidget(Map<String, String> data);
-  Future<void> updateCalendarWidget(List<ScheduleModel> schedules);
+  Future<void> updateCalendarWidget(List<ScheduleEntity> schedules);
 }
 
 class WidgetLocalDataSourceImpl implements WidgetLocalDataSource {
@@ -30,7 +29,7 @@ class WidgetLocalDataSourceImpl implements WidgetLocalDataSource {
   }
 
   @override
-  Future<void> updateCalendarWidget(List<ScheduleModel> schedules) async {
+  Future<void> updateCalendarWidget(List<ScheduleEntity> schedules) async {
     final now = DateTime.now();
     final firstDayOfMonth = DateTime(now.year, now.month, 1);
     final lastDayOfMonth = DateTime(now.year, now.month + 1, 0);

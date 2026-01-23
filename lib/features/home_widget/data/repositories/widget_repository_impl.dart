@@ -1,4 +1,5 @@
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 
@@ -27,7 +28,7 @@ class WidgetRepositoryImpl implements WidgetRepository {
       final lastDay = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
 
       // 1. 모든 일정 데이터를 담을 리스트 (Entity 사용)
-      List<ScheduleModel> allSchedules = [];
+      List<ScheduleEntity> allSchedules = [];
 
       // 2. 개인 캘린더 일정 가져오기
       final personalCalendar = await _calendarRepository.readPersonalCalendar();
@@ -64,7 +65,7 @@ class WidgetRepositoryImpl implements WidgetRepository {
 
       // 6. DataSource에 전달 (여기서 Model로 캐스팅하거나 DataSource가 Entity를 받도록 설계)
       await _widgetDataSource.updateCalendarWidget(
-        distinctSchedules.cast<ScheduleModel>(),
+        distinctSchedules.cast<ScheduleEntity>(),
       );
     } catch (e) {
       debugPrint("❌ Widget Sync Error: $e");

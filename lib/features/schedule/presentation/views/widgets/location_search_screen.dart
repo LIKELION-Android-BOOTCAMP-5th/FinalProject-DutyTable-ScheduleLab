@@ -1,4 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/di/injection.dart';
 import 'package:dutytable/features/schedule/data/models/location_search_result_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/location_search_view_model.dart';
 import 'package:dutytable/main.dart';
@@ -12,7 +13,7 @@ Future<LocationSearchResultModel?> showLocationDialog(BuildContext context) {
     barrierDismissible: true,
     builder: (_) {
       return ChangeNotifierProvider(
-        create: (_) => LocationSearchViewModel(supabase),
+        create: (_) => getIt<LocationSearchViewModel>(),
         child: const _LocationSearchDialog(),
       );
     },

@@ -1,4 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/di/injection.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
@@ -20,9 +21,9 @@ class ScheduleDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ScheduleDetailViewModel(
-        scheduleId: scheduleDetail.id,
-        isAdmin: isAdmin,
+      create: (_) => getIt<ScheduleDetailViewModel>(
+        param1: scheduleDetail.id,
+        param2: isAdmin,
       ),
       child: const _ScheduleDetailScreen(),
     );

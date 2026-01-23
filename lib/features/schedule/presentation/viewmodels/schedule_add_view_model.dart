@@ -1,18 +1,27 @@
 import 'package:dutytable/core/utils/extensions.dart';
-import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
-import 'package:dutytable/main.dart';
+import 'package:dutytable/features/schedule/domain/usecases/add_schedule_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/fetch_holidays_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/geocode_address_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
 enum ViewState { idle, loading, success, error }
 
+@injectable
 class ScheduleAddViewModel extends ChangeNotifier {
+  //-------------------- UseCase --------------------
+
+  final AddScheduleUseCase _addScheduleUseCase;
+  final FetchHolidaysUseCase _fetchHolidaysUseCase;
+  final GeocodeAddressUseCase _geocodeAddressUseCase;
+
+  //-------------------- UI --------------------
+
   final TextEditingController addressController = TextEditingController();
 
-  /// 데이터 로딩 상태(private)
   ViewState _state = ViewState.idle;
 
-  /// 데이터 로딩 상태(public)
-  ViewState get state => _state;
+  //-------------------- Fields --------------------
 
   /// 감정 선택
   String _emotionTag = "😐";
@@ -50,7 +59,9 @@ class ScheduleAddViewModel extends ChangeNotifier {
   /// 메모
   String _memo = "";
 
-  /// getter
+  //-------------------- Getters --------------------
+  ViewState get state => _state;
+
   String get emotionTag => _emotionTag;
   String get colorValue => _colorValue;
   String get title => _title;
@@ -75,7 +86,25 @@ class ScheduleAddViewModel extends ChangeNotifier {
 
   String get memo => _memo;
 
-  /// setter
+  //-------------------- Constructor --------------------
+
+  ScheduleAddViewModel(
+    this._addScheduleUseCase,
+    this._fetchHolidaysUseCase,
+    this._geocodeAddressUseCase,
+    @factoryParam DateTime? date,
+  ) {
+    if (date != null) {
+      _startDate = date;
+      _endDate = date;
+    } else {
+      _startDate = DateTime.now();
+      _endDate = DateTime.now();
+    }
+  }
+
+  //-------------------- Setters --------------------
+
   set selectedEmotion(String value) {
     _emotionTag = value;
     notifyListeners();
@@ -146,60 +175,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  ScheduleAddViewModel(DateTime? date) {
-    if (date != null) {
-      _startDate = date;
-      _endDate = date;
-    } else {
-      _startDate = DateTime.now();
-      _endDate = DateTime.now();
-    }
-  }
-
-  void setLocation({
-    required String address,
-    required String latitude,
-    required String longitude,
-  }) {
-    _address = address;
-    _latitude = latitude;
-    _longitude = longitude;
-
-    // 컨트롤러 텍스트 동기화
-    addressController.text = address;
-    notifyListeners();
-  }
-
-  void clearAddress() {
-    _address = null;
-    _latitude = null;
-    _longitude = null;
-
-    addressController.clear();
-    notifyListeners();
-  }
-
-  void setMemo(String value) {
-    if (value.length <= 300) {
-      _memo = value;
-      notifyListeners();
-    }
-  }
-
-  Future<void> updateLocationAction(String newAddress) async {
-    try {
-      final geo = await geocodeAddress(newAddress);
-      if (geo == null) return;
-
-      setLocation(
-        address: newAddress,
-        latitude: geo['latitude']!.toString(),
-        longitude: geo['longitude']!.toString(),
-      );
-    } catch (e) {
-      debugPrint("❌ updateLocationAction error: $e");
-    }
-  }
+  //-------------------- Create --------------------
 
   /// 일정 - 추가
   Future<void> addSchedule(int calendarId) async {
@@ -209,9 +185,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
     try {
       List<DateTime> holidays = [];
       if (_isRepeat && _holidayException) {
-        holidays = await ScheduleDataSource.instance.fetchHolidays(
-          targetYear: _startDate.year,
-        );
+        holidays = await _fetchHolidaysUseCase(_startDate.year);
       }
 
       final String? groupId = _isRepeat
@@ -294,7 +268,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
       }
 
       if (payloads.isNotEmpty) {
-        await ScheduleDataSource.instance.addSchedule(payloads);
+        await _addScheduleUseCase(payloads);
       }
       _state = ViewState.success;
     } catch (e) {
@@ -305,19 +279,51 @@ class ScheduleAddViewModel extends ChangeNotifier {
     }
   }
 
-  /// 주소 입력 -> 네이버 gecode -> 위도 경도로 변환
-  Future<Map<String, double>?> geocodeAddress(String address) async {
-    final response = await supabase.functions.invoke(
-      'hyper-endpoint',
-      body: {'type': 'geocode', 'address': address},
-    );
+  void setMemo(String value) {
+    if (value.length <= 300) {
+      _memo = value;
+      notifyListeners();
+    }
+  }
 
-    if (response.data == null) return null;
+  //-------------------- Update --------------------
 
-    return {
-      'latitude': (response.data['latitude'] as num).toDouble(),
-      'longitude': (response.data['longitude'] as num).toDouble(),
-    };
+  /// 위치 수정 ->
+  Future<void> updateLocationAction(String newAddress) async {
+    try {
+      final geo = await _geocodeAddressUseCase(newAddress);
+
+      setLocation(
+        address: newAddress,
+        latitude: geo.latitude,
+        longitude: geo.longitude,
+      );
+    } catch (e) {
+      debugPrint("❌ updateLocationAction error: $e");
+    }
+  }
+
+  void setLocation({
+    required String address,
+    required String latitude,
+    required String longitude,
+  }) {
+    _address = address;
+    _latitude = latitude;
+    _longitude = longitude;
+
+    // 컨트롤러 텍스트 동기화
+    addressController.text = address;
+    notifyListeners();
+  }
+
+  void clearAddress() {
+    _address = null;
+    _latitude = null;
+    _longitude = null;
+
+    addressController.clear();
+    notifyListeners();
   }
 
   @override

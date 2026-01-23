@@ -1,4 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/di/injection.dart';
+
 import 'package:dutytable/core/widgets/custom_floating_action_button.dart';
 import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/calender_tab/my_schedule_check_box.dart';
@@ -15,7 +17,7 @@ class CalendarTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ScheduleViewModel(calendar: calendar),
+      create: (_) => getIt<ScheduleViewModel>(param1: calendar),
       child: _CalendarTab(),
     );
   }

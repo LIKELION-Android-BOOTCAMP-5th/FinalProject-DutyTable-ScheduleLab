@@ -1,31 +1,43 @@
-import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
-import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
+import 'package:dutytable/features/schedule/domain/usecases/delete_schedules_by_group_id_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/delete_schedules_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/fetch_schedule_by_id_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 enum DetailViewState { loading, success, error, deleted }
 
+@injectable
 class ScheduleDetailViewModel extends ChangeNotifier {
+  //-------------------- UseCase --------------------
+
+  final FetchScheduleByIdUseCase _fetchScheduleByIdUseCase;
+  final DeleteSchedulesUseCase _deleteSchedulesUseCase;
+  final DeleteSchedulesByGroupIdUseCase _deleteSchedulesByGroupIdUseCase;
+
+  //-------------------- Entity --------------------
+
+  ScheduleEntity? _schedule;
+
+  //-------------------- UI --------------------
+
   DetailViewState _state = DetailViewState.loading;
+
+  //-------------------- Fields --------------------
 
   final int _scheduleId;
   final bool _isAdmin;
 
-  ScheduleModel? _schedule;
-
-  ScheduleDetailViewModel({required int scheduleId, required bool isAdmin})
-    : _scheduleId = scheduleId,
-      _isAdmin = isAdmin {
-    fetchUpdatedSchedule();
-  }
+  //-------------------- Getter --------------------
 
   DetailViewState get state => _state;
 
-  bool get isAdmin => _isAdmin;
   int get scheduleId => _scheduleId;
+  bool get isAdmin => _isAdmin;
 
-  ScheduleModel? get schedule => _schedule;
+  ScheduleEntity? get schedule => _schedule;
 
   bool get hasData => _schedule != null;
 
@@ -51,6 +63,19 @@ class ScheduleDetailViewModel extends ChangeNotifier {
 
   String get memo => _schedule?.memo ?? '';
 
+  //-------------------- Constructor --------------------
+
+  ScheduleDetailViewModel(
+    this._fetchScheduleByIdUseCase,
+    this._deleteSchedulesUseCase,
+    this._deleteSchedulesByGroupIdUseCase,
+    @factoryParam int scheduleId,
+    @factoryParam bool isAdmin,
+  ) : _scheduleId = scheduleId,
+      _isAdmin = isAdmin {
+    fetchUpdatedSchedule();
+  }
+
   Future<void> fetchUpdatedSchedule() async {
     _state = DetailViewState.loading;
     notifyListeners();
@@ -58,9 +83,7 @@ class ScheduleDetailViewModel extends ChangeNotifier {
     try {
       await Future.delayed(const Duration(milliseconds: 500));
 
-      _schedule = await ScheduleDataSource.instance.fetchScheduleById(
-        _scheduleId,
-      );
+      _schedule = await _fetchScheduleByIdUseCase(_scheduleId);
 
       _state = DetailViewState.success;
     } catch (e) {
@@ -72,7 +95,7 @@ class ScheduleDetailViewModel extends ChangeNotifier {
   }
 
   Future<void> deleteSchedule() async {
-    await ScheduleDataSource.instance.deleteSchedules(_scheduleId);
+    await _deleteSchedulesUseCase(_scheduleId);
     _state = DetailViewState.deleted;
     notifyListeners();
   }
@@ -82,7 +105,7 @@ class ScheduleDetailViewModel extends ChangeNotifier {
     if (groupId == null) return;
 
     try {
-      await ScheduleDataSource.instance.deleteSchedulesByGroupId(groupId);
+      await _deleteSchedulesByGroupIdUseCase(groupId);
 
       _schedule = null;
       _state = DetailViewState.deleted;

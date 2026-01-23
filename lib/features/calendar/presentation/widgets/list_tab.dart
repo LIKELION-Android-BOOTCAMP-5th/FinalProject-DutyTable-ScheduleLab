@@ -1,4 +1,6 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/di/injection.dart';
+
 import 'package:dutytable/core/widgets/custom_floating_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +21,7 @@ class ListTab extends StatelessWidget {
   Widget build(BuildContext context) {
     // 스케쥴 뷰모델 주입
     return ChangeNotifierProvider(
-      create: (context) => ScheduleViewModel(calendar: calendar),
+      create: (_) => getIt<ScheduleViewModel>(param1: calendar),
       child: _ListTab(),
     );
   }

@@ -1,17 +1,36 @@
 import 'package:dutytable/core/utils/extensions.dart';
-import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
-import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
-import 'package:dutytable/main.dart';
+import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
+import 'package:dutytable/features/schedule/domain/usecases/add_schedule_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/delete_schedules_by_group_id_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/fetch_holidays_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/geocode_address_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/update_schedule_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
 enum EditViewState { idle, loading, success, error }
 
+@injectable
 class ScheduleEditViewModel extends ChangeNotifier {
-  final ScheduleModel _scheduleFromEdit;
+  //-------------------- UseCase --------------------
+
+  final AddScheduleUseCase _addScheduleUseCase;
+  final FetchHolidaysUseCase _fetchHolidaysUseCase;
+  final UpdateScheduleUseCase _updateSchedule;
+  final DeleteSchedulesByGroupIdUseCase _deleteSchedulesByGroupIdUseCase;
+  final GeocodeAddressUseCase _geocodeAddress;
+
+  //-------------------- Entity --------------------
+
+  final ScheduleEntity _scheduleFromEdit;
+
+  //-------------------- UI --------------------
+
   final TextEditingController addressController = TextEditingController();
 
   EditViewState _state = EditViewState.idle;
-  EditViewState get state => _state;
+
+  //-------------------- Fields --------------------
 
   late String _title;
   late String _emotionTag;
@@ -32,6 +51,9 @@ class ScheduleEditViewModel extends ChangeNotifier {
   String? _longitude;
   String _memo = "";
 
+  //-------------------- Getters --------------------
+
+  EditViewState get state => _state;
   int get scheduleId => _scheduleFromEdit.id;
   String? get repeatGroupId => _scheduleFromEdit.repeatGroupId;
   String get title => _title;
@@ -53,8 +75,16 @@ class ScheduleEditViewModel extends ChangeNotifier {
   String? get longitude => _longitude;
   String get memo => _memo;
 
-  ScheduleEditViewModel({required ScheduleModel schedule})
-    : _scheduleFromEdit = schedule {
+  //-------------------- Constructor --------------------
+
+  ScheduleEditViewModel(
+    this._addScheduleUseCase,
+    this._fetchHolidaysUseCase,
+    this._updateSchedule,
+    this._deleteSchedulesByGroupIdUseCase,
+    this._geocodeAddress,
+    @factoryParam ScheduleEntity schedule,
+  ) : _scheduleFromEdit = schedule {
     _title = schedule.title;
     _emotionTag = schedule.emotionTag;
     _colorValue = schedule.colorValue;
@@ -93,6 +123,8 @@ class ScheduleEditViewModel extends ChangeNotifier {
     addressController.text = _address ?? "";
   }
 
+  //-------------------- Setters --------------------
+
   void _set(VoidCallback fn) {
     fn();
     notifyListeners();
@@ -113,6 +145,8 @@ class ScheduleEditViewModel extends ChangeNotifier {
   void setWeekendException(bool v) => _set(() => _weekendException = v);
   void setHolidayException(bool v) => _set(() => _holidayException = v);
   void setRepeatCount(int v) => _set(() => _repeatCount = v);
+
+  //-------------------- Update --------------------
 
   Future<void> updateSingleSchedule() async =>
       await _performUpdate(isAll: false);
@@ -159,13 +193,11 @@ class ScheduleEditViewModel extends ChangeNotifier {
       };
 
       if (isAll && repeatGroupId != null) {
-        await ScheduleDataSource.instance.deleteSchedulesByGroupId(
-          repeatGroupId!,
-        );
+        await _deleteSchedulesByGroupIdUseCase(repeatGroupId!);
 
         final newSchedules = await _generateNewSchedules(repeatGroupId!);
 
-        await ScheduleDataSource.instance.addSchedule(newSchedules);
+        await _addScheduleUseCase(newSchedules);
       } else {
         final singlePayload = {
           ...commonPayload,
@@ -176,10 +208,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
           'repeat_num': _isRepeat ? _repeatNum : null,
           'repeat_count': _isRepeat ? _repeatCount : null,
         };
-        await ScheduleDataSource.instance.updateSchedule(
-          scheduleId: scheduleId,
-          payload: singlePayload,
-        );
+        await _updateSchedule(scheduleId, singlePayload);
       }
 
       _state = EditViewState.success;
@@ -198,9 +227,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
 
     List<DateTime> holidays = [];
     if (_holidayException) {
-      holidays = await ScheduleDataSource.instance.fetchHolidays(
-        targetYear: _startDate.year,
-      );
+      holidays = await _fetchHolidaysUseCase(_startDate.year);
     }
 
     final scheduleDuration = DateTime(
@@ -277,17 +304,15 @@ class ScheduleEditViewModel extends ChangeNotifier {
     return payloads;
   }
 
+  //------------------------ Location ------------------------
+
   /// 주소 관련 로직
   Future<void> updateLocationAction(String newAddress) async {
     try {
-      final response = await supabase.functions.invoke(
-        'hyper-endpoint',
-        body: {'type': 'geocode', 'address': newAddress},
-      );
-      if (response.data == null) return;
+      final response = await _geocodeAddress(newAddress);
       _address = newAddress;
-      _latitude = response.data['latitude'].toString();
-      _longitude = response.data['longitude'].toString();
+      _latitude = response.latitude;
+      _longitude = response.longitude;
       addressController.text = newAddress;
       notifyListeners();
     } catch (e) {
