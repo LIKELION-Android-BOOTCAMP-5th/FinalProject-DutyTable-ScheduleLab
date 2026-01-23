@@ -2,7 +2,9 @@ import 'package:dutytable/features/schedule/data/datasources/location_data_sourc
 import 'package:dutytable/features/schedule/data/models/geocode_result_model.dart';
 import 'package:dutytable/features/schedule/data/models/location_search_result_model.dart';
 import 'package:dutytable/main.dart';
+import 'package:injectable/injectable.dart';
 
+@LazySingleton(as: LocationDataSource)
 class LocationDataSourceImpl implements LocationDataSource {
   @override
   Future<List<LocationSearchResultModel>> searchAddress(String keyword) async {

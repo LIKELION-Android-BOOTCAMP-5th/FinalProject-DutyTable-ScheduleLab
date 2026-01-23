@@ -9,6 +9,7 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
@@ -22,6 +23,7 @@ import '../../features/calendar/data/repositories/storage_repository_impl.dart'
     as _i458;
 import '../../features/calendar/data/repositories/user_repository_impl.dart'
     as _i167;
+import '../../features/calendar/domain/entities/calendar_entity.dart' as _i125;
 import '../../features/calendar/domain/repositories/calendar_repository.dart'
     as _i241;
 import '../../features/calendar/domain/repositories/chat_repository.dart'
@@ -70,8 +72,70 @@ import '../../features/home_widget/domain/repositories/widget_repository.dart'
     as _i131;
 import '../../features/home_widget/domain/usecases/sync_all_calendars_to_widget_use_case.dart'
     as _i605;
+import '../../features/schedule/data/datasources/google_calendar_data_source.dart'
+    as _i595;
+import '../../features/schedule/data/datasources/google_calendar_data_source_impl.dart'
+    as _i1011;
+import '../../features/schedule/data/datasources/location_data_source.dart'
+    as _i985;
+import '../../features/schedule/data/datasources/location_data_source_impl.dart'
+    as _i360;
+import '../../features/schedule/data/datasources/schedule_remote_data_source.dart'
+    as _i738;
+import '../../features/schedule/data/datasources/schedule_remote_data_source_impl.dart'
+    as _i455;
+import '../../features/schedule/data/repositories/google_calnedar_repository_impl.dart'
+    as _i424;
+import '../../features/schedule/data/repositories/location_repository_impl.dart'
+    as _i683;
+import '../../features/schedule/data/repositories/schedule_repository_impl.dart'
+    as _i688;
+import '../../features/schedule/domain/entities/schedule_entity.dart' as _i798;
+import '../../features/schedule/domain/repositories/google_calendar_repository.dart'
+    as _i511;
+import '../../features/schedule/domain/repositories/location_repository.dart'
+    as _i527;
 import '../../features/schedule/domain/repositories/schedule_repository.dart'
     as _i736;
+import '../../features/schedule/domain/usecases/add_schedule_use_case.dart'
+    as _i585;
+import '../../features/schedule/domain/usecases/delete_all_schedules_use_case.dart'
+    as _i762;
+import '../../features/schedule/domain/usecases/delete_schedules_by_group_id_use_case.dart'
+    as _i871;
+import '../../features/schedule/domain/usecases/delete_schedules_use_case.dart'
+    as _i315;
+import '../../features/schedule/domain/usecases/fetch_all_shared_schedules_use_case.dart'
+    as _i1028;
+import '../../features/schedule/domain/usecases/fetch_holidays_use_case.dart'
+    as _i352;
+import '../../features/schedule/domain/usecases/fetch_my_schedules_use_case.dart'
+    as _i994;
+import '../../features/schedule/domain/usecases/fetch_schedule_by_id_use_case.dart'
+    as _i29;
+import '../../features/schedule/domain/usecases/fetch_schedules_by_range_use_case.dart'
+    as _i435;
+import '../../features/schedule/domain/usecases/fetch_schedules_use_case.dart'
+    as _i1061;
+import '../../features/schedule/domain/usecases/geocode_address_use_case.dart'
+    as _i570;
+import '../../features/schedule/domain/usecases/search_address_use_case.dart'
+    as _i65;
+import '../../features/schedule/domain/usecases/sync_google_calendar_to_schedule_use_case.dart'
+    as _i34;
+import '../../features/schedule/domain/usecases/update_schedule_use_case.dart'
+    as _i595;
+import '../../features/schedule/domain/usecases/update_schedules_by_group_id_use_case.dart'
+    as _i830;
+import '../../features/schedule/presentation/viewmodels/schedule_add_view_model.dart'
+    as _i227;
+import '../../features/schedule/presentation/viewmodels/schedule_detail_view_model.dart'
+    as _i986;
+import '../../features/schedule/presentation/viewmodels/schedule_edit_view_model.dart'
+    as _i103;
+import '../../features/schedule/presentation/viewmodels/schedule_view_model.dart'
+    as _i60;
+import 'network_module.dart' as _i567;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -80,21 +144,35 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    final networkModule = _$NetworkModule();
+    gh.lazySingleton<_i361.Dio>(() => networkModule.dio());
     gh.lazySingleton<_i751.CalendarDataSource>(
       () => _i751.CalendarDataSource(),
     );
     gh.lazySingleton<_i943.UserDataSource>(() => _i943.UserDataSource());
+    gh.lazySingleton<_i985.LocationDataSource>(
+      () => _i360.LocationDataSourceImpl(),
+    );
+    gh.lazySingleton<_i595.GoogleCalendarDataSource>(
+      () => _i1011.GoogleCalendarDataSourceImpl(gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i1041.StorageRepository>(
       () => _i458.StorageRepositoryImpl(),
     );
     gh.lazySingleton<_i489.UserRepository>(
       () => _i167.UserRepositoryImpl(gh<_i943.UserDataSource>()),
     );
+    gh.lazySingleton<_i738.ScheduleRemoteDataSource>(
+      () => _i455.ScheduleRemoteDataSourceImpl(gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i684.ReadUnreadChatCountUseCase>(
       () => _i684.ReadUnreadChatCountUseCase(gh<_i413.ChatRepository>()),
     );
     gh.lazySingleton<_i241.CalendarRepository>(
       () => _i712.CalendarRepositoryImpl(gh<_i751.CalendarDataSource>()),
+    );
+    gh.lazySingleton<_i736.ScheduleRepository>(
+      () => _i688.ScheduleRepositoryImpl(gh<_i738.ScheduleRemoteDataSource>()),
     );
     gh.lazySingleton<_i131.WidgetRepository>(
       () => _i326.WidgetRepositoryImpl(
@@ -105,6 +183,42 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i743.TransferAdminRoleUseCase>(
       () => _i743.TransferAdminRoleUseCase(gh<_i489.UserRepository>()),
+    );
+    gh.factory<_i585.AddScheduleUseCase>(
+      () => _i585.AddScheduleUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i762.DeleteAllSchedulesUseCase>(
+      () => _i762.DeleteAllSchedulesUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i871.DeleteSchedulesByGroupIdUseCase>(
+      () =>
+          _i871.DeleteSchedulesByGroupIdUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i315.DeleteSchedulesUseCase>(
+      () => _i315.DeleteSchedulesUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i1028.FetchAllSharedSchedulesUseCase>(
+      () =>
+          _i1028.FetchAllSharedSchedulesUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i994.FetchMySchedulesUseCase>(
+      () => _i994.FetchMySchedulesUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i29.FetchScheduleByIdUseCase>(
+      () => _i29.FetchScheduleByIdUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i435.FetchSchedulesByRangeUseCase>(
+      () => _i435.FetchSchedulesByRangeUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i1061.FetchSchedulesUseCase>(
+      () => _i1061.FetchSchedulesUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i595.UpdateScheduleUseCase>(
+      () => _i595.UpdateScheduleUseCase(gh<_i736.ScheduleRepository>()),
+    );
+    gh.factory<_i830.UpdateSchedulesByGroupIdUseCase>(
+      () =>
+          _i830.UpdateSchedulesByGroupIdUseCase(gh<_i736.ScheduleRepository>()),
     );
     gh.lazySingleton<_i706.ExileMemberUseCase>(
       () => _i706.ExileMemberUseCase(gh<_i489.UserRepository>()),
@@ -131,8 +245,25 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1041.StorageRepository>(),
       ),
     );
+    gh.lazySingleton<_i527.LocationRepository>(
+      () => _i683.LocationRepositoryImpl(gh<_i985.LocationDataSource>()),
+    );
+    gh.lazySingleton<_i511.GoogleCalendarRepository>(
+      () => _i424.GoogleCalendarRepositoryImpl(
+        gh<_i595.GoogleCalendarDataSource>(),
+      ),
+    );
     gh.lazySingleton<_i605.SyncAllCalendarsToWidgetUseCase>(
       () => _i605.SyncAllCalendarsToWidgetUseCase(gh<_i131.WidgetRepository>()),
+    );
+    gh.factoryParam<_i986.ScheduleDetailViewModel, int, bool>(
+      (scheduleId, isAdmin) => _i986.ScheduleDetailViewModel(
+        gh<_i29.FetchScheduleByIdUseCase>(),
+        gh<_i315.DeleteSchedulesUseCase>(),
+        gh<_i871.DeleteSchedulesByGroupIdUseCase>(),
+        scheduleId,
+        isAdmin,
+      ),
     );
     gh.lazySingleton<_i605.DeleteCalendarUseCase>(
       () => _i605.DeleteCalendarUseCase(gh<_i241.CalendarRepository>()),
@@ -156,6 +287,50 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i796.UpdateCalendarInfoUseCase>(
       () => _i796.UpdateCalendarInfoUseCase(gh<_i241.CalendarRepository>()),
     );
+    gh.factory<_i352.FetchHolidaysUseCase>(
+      () => _i352.FetchHolidaysUseCase(gh<_i511.GoogleCalendarRepository>()),
+    );
+    gh.factory<_i34.SyncGoogleCalendarToScheduleUseCase>(
+      () => _i34.SyncGoogleCalendarToScheduleUseCase(
+        gh<_i511.GoogleCalendarRepository>(),
+      ),
+    );
+    gh.factory<_i570.GeocodeAddressUseCase>(
+      () => _i570.GeocodeAddressUseCase(gh<_i527.LocationRepository>()),
+    );
+    gh.factory<_i65.SearchAddressUseCase>(
+      () => _i65.SearchAddressUseCase(gh<_i527.LocationRepository>()),
+    );
+    gh.factoryParam<_i60.ScheduleViewModel, _i125.CalendarEntity, dynamic>(
+      (calendar, _) => _i60.ScheduleViewModel(
+        gh<_i1061.FetchSchedulesUseCase>(),
+        gh<_i994.FetchMySchedulesUseCase>(),
+        gh<_i1028.FetchAllSharedSchedulesUseCase>(),
+        gh<_i762.DeleteAllSchedulesUseCase>(),
+        gh<_i34.SyncGoogleCalendarToScheduleUseCase>(),
+        calendar,
+      ),
+    );
+    gh.factoryParam<_i103.ScheduleEditViewModel, _i798.ScheduleEntity, dynamic>(
+      (schedule, _) => _i103.ScheduleEditViewModel(
+        gh<_i585.AddScheduleUseCase>(),
+        gh<_i352.FetchHolidaysUseCase>(),
+        gh<_i595.UpdateScheduleUseCase>(),
+        gh<_i871.DeleteSchedulesByGroupIdUseCase>(),
+        gh<_i570.GeocodeAddressUseCase>(),
+        schedule,
+      ),
+    );
+    gh.factoryParam<_i227.ScheduleAddViewModel, DateTime?, dynamic>(
+      (date, _) => _i227.ScheduleAddViewModel(
+        gh<_i585.AddScheduleUseCase>(),
+        gh<_i352.FetchHolidaysUseCase>(),
+        gh<_i570.GeocodeAddressUseCase>(),
+        date,
+      ),
+    );
     return this;
   }
 }
+
+class _$NetworkModule extends _i567.NetworkModule {}
