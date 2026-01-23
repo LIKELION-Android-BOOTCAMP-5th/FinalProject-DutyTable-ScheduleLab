@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'package:dutytable/features/schedule/data/models/location_search_result_model.dart';
+import 'package:dutytable/features/schedule/domain/entities/location_search_result_entity.dart';
+import 'package:dutytable/features/schedule/domain/usecases/search_address_use_case.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LocationSearchViewModel extends ChangeNotifier {
-  final SupabaseClient supabase;
+  final SearchAddressUseCase _searchAddressUseCase;
 
-  LocationSearchViewModel(this.supabase);
+  LocationSearchViewModel(this._searchAddressUseCase);
 
   Timer? _debounce;
   bool isLoading = false;
-  List<LocationSearchResultModel> results = [];
+  List<LocationSearchResultEntity> results = [];
 
   void onKeywordChanged(String keyword) {
     _debounce?.cancel();
@@ -25,14 +25,7 @@ class LocationSearchViewModel extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      final res = await supabase.functions.invoke(
-        'hyper-endpoint',
-        body: {'type': 'search', 'query': keyword},
-      );
-
-      results = (res.data as List)
-          .map((e) => LocationSearchResultModel.fromJson(e))
-          .toList();
+      results = await _searchAddressUseCase(keyword);
 
       isLoading = false;
       notifyListeners();

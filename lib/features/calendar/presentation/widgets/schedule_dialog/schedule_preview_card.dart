@@ -1,11 +1,11 @@
 import 'package:dutytable/core/configs/app_colors.dart';
-import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SchedulePreviewCard extends StatelessWidget {
-  final ScheduleModel item;
+  final ScheduleEntity item;
 
   /// 일정 더보기 - 바디 : 일정(요약 카드)
   const SchedulePreviewCard({super.key, required this.item});

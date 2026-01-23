@@ -10,4 +10,8 @@ class LocationSearchResultModel {
       address: json['address'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {'title': title, 'address': address};
+  }
 }

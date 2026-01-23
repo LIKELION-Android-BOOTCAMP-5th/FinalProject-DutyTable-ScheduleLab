@@ -14,6 +14,7 @@ class GoogleSyncButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ProfileViewmodel>();
+
     return CustomTab(
       icon: Icons.settings_outlined,
       buttonText: "구글 캘린더 동기화",

@@ -1,18 +1,21 @@
-import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
+import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 
-abstract class ScheduleRepository {
+abstract class ScheduleRemoteDataSource {
+  /// CREATE
   Future<void> addSchedule(List<Map<String, dynamic>> payloads);
 
-  Future<List<ScheduleEntity>> fetchSchedules(int calendarId);
-  Future<ScheduleEntity> fetchScheduleById(int scheduleId);
-  Future<List<ScheduleEntity>> fetchMySchedules({DateTime? from, DateTime? to});
-  Future<List<ScheduleEntity>> fetchAllSharedSchedules();
-  Future<List<ScheduleEntity>> fetchSchedulesByRange({
+  /// READ
+  Future<List<ScheduleModel>> fetchSchedules(int calendarId);
+  Future<ScheduleModel> fetchScheduleById(int scheduleId);
+  Future<List<ScheduleModel>> fetchMySchedules({DateTime? from, DateTime? to});
+  Future<List<ScheduleModel>> fetchAllSharedSchedules();
+  Future<List<ScheduleModel>> fetchSchedulesByRange({
     required int calendarId,
     required DateTime from,
     required DateTime to,
   });
 
+  /// UPDATE
   Future<void> updateSchedule({
     required int scheduleId,
     required Map<String, dynamic> payload,
@@ -22,6 +25,7 @@ abstract class ScheduleRepository {
     required Map<String, dynamic> payload,
   });
 
+  /// DELETE
   Future<void> deleteSchedules(int scheduleId);
   Future<void> deleteSchedulesByGroupId(String groupId);
   Future<void> deleteAllSchedules(Set<String> scheduleIds);
