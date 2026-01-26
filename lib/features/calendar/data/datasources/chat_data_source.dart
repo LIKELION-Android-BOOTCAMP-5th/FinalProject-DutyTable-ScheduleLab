@@ -1,12 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/main.dart';
+import 'package:injectable/injectable.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../../core/services/supabase_manager.dart';
+
+@lazySingleton
 class ChatDataSource {
-  ChatDataSource._();
-
-  static final ChatDataSource instance = ChatDataSource._();
-
+  ChatDataSource();
   final Dio _dio = DioClient.shared.dio;
 
   /// UPDATE
@@ -27,6 +29,28 @@ class ChatDataSource {
   }
 
   /// READ
+  RealtimeChannel subscribeToMessages(
+    int calendarId,
+    Function(Map<String, dynamic>) onMessage,
+  ) {
+    return SupabaseManager.shared.supabase
+        .channel('chatting')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.insert,
+          schema: 'public',
+          table: 'chat_messages',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'calendar_id',
+            value: calendarId,
+          ),
+          callback: (payload) {
+            onMessage(payload.newRecord);
+          },
+        )
+        .subscribe();
+  }
+
   // 모든 데이터를 한 번에 가져오는 함수로 통합
   Future<List<Map<String, dynamic>>> fetchChatMessages(int calendarId) async {
     final response = await _dio.get(
@@ -53,6 +77,48 @@ class ChatDataSource {
       },
     );
     return response.data[0] as Map<String, dynamic>;
+  }
+
+  // 안읽은 채팅 수
+  Future<int> readUnreadChatCount(int calendarId, String userId) async {
+    try {
+      final memberResponse = await _dio.get(
+        '/rest/v1/calendar_members',
+        queryParameters: {
+          'select': 'last_read_at',
+          'calendar_id': 'eq.$calendarId',
+          'user_id': 'eq.$userId',
+        },
+      );
+
+      if (memberResponse.data == null || memberResponse.data.isEmpty) {
+        return 0;
+      }
+
+      final lastReadAt = memberResponse.data[0]['last_read_at'] as String?;
+
+      if (lastReadAt == null) {
+        return 0;
+      }
+
+      final messagesResponse = await _dio.get(
+        '/rest/v1/chat_messages',
+        queryParameters: {
+          'calendar_id': 'eq.$calendarId',
+          'created_at': 'gt.$lastReadAt',
+          'select': 'count',
+        },
+      );
+
+      if (messagesResponse.data is List && messagesResponse.data.isNotEmpty) {
+        return messagesResponse.data[0]['count'] as int? ?? 0;
+      }
+
+      return 0;
+    } catch (e) {
+      print('Error loading unread count: $e');
+      return 0;
+    }
   }
 
   /// CREATE

@@ -2,13 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
+@lazySingleton
 class ProfileDataSource {
-  ProfileDataSource._();
-
-  static final ProfileDataSource instance = ProfileDataSource._();
-
   final Dio _dio = DioClient.shared.dio;
+  ProfileDataSource();
 
   /// UPDATE
   // 닉네임, 구글연동, 알림, 수파베이스에 이미지 저장
@@ -43,7 +42,7 @@ class ProfileDataSource {
 
   /// READ
   // 닉네임, 이메일, 프사 가져오기
-  Future<Map<String, dynamic>> fetchUserProfile() async {
+  Future<Map<String, dynamic>> fetchUser() async {
     final currentUserId = supabase.auth.currentUser?.id;
     final response = await _dio.get(
       '/rest/v1/users',
@@ -58,7 +57,7 @@ class ProfileDataSource {
   }
 
   // 닉네임 중복 검사
-  Future<bool> isDuplicateNickname(editingNickname) async {
+  Future<bool> nicknameOverlapping(editingNickname) async {
     final currentUserId = supabase.auth.currentUser?.id;
 
     final response = await _dio.get(

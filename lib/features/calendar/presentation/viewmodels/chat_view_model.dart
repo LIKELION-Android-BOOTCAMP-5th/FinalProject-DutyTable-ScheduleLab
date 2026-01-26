@@ -1,10 +1,14 @@
 import 'package:dutytable/core/utils/extensions.dart';
-import 'package:dutytable/features/calendar/data/datasources/chat_data_source.dart';
+import 'package:dutytable/features/calendar/domain/usecases/fetch_chat_messages_use_case.dart';
+import 'package:dutytable/features/calendar/domain/usecases/update_last_read_at_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/services/supabase_manager.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../main.dart';
+import '../../domain/usecases/chat_insert_use_case.dart';
+import '../../domain/usecases/fetch_user_info_use_case.dart';
+import '../../domain/usecases/subscribe_messages_use_case.dart';
 
 enum ViewState { loading, success, error }
 
@@ -30,6 +34,15 @@ class ChatMessage {
 
 /// 챗 뷰모델
 class ChatViewModel extends ChangeNotifier {
+  final ChatInsertUseCase _chatInsertUseCase = getIt<ChatInsertUseCase>();
+  final FetchChatMessagesUseCase _fetchChatMessagesUseCase =
+      getIt<FetchChatMessagesUseCase>();
+  final UpdateLastReadAtUseCase _updateLastReadAtUseCase =
+      getIt<UpdateLastReadAtUseCase>();
+  final FetchUserInfoUseCase _fetchUserInfoUseCase =
+      getIt<FetchUserInfoUseCase>();
+  final SubscribeMessagesUseCase _subscribeMessagesUseCase =
+      getIt<SubscribeMessagesUseCase>();
   ViewState _state = ViewState.loading;
 
   ViewState get state => _state;
@@ -69,51 +82,41 @@ class ChatViewModel extends ChangeNotifier {
 
   // 리얼타임 구독하기
   RealtimeChannel _subscribeMessageEvent() {
-    return SupabaseManager.shared.supabase
-        .channel('chatting')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
-          schema: 'public',
-          table: 'chat_messages',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'calendar_id',
-            value: calendarId,
-          ),
-          callback: (payload) async {
-            final newMessage = payload.newRecord;
-            final createdAtString = newMessage['created_at'] as String;
-            final createdAt = DateTime.parse(createdAtString).toLocal();
-            final senderId = newMessage['user_id'] as String;
-            final data = await ChatDataSource.instance
-                .fetchNewChatImageNickname(senderId);
-            final userImage = data['profile_url'] ?? "";
-            final nickname = data['nickname'];
-            final newChatMessage = ChatMessage(
-              id: newMessage['id'] as int,
-              image: (userImage.isNotEmpty) ? userImage as String? : null,
-              message: newMessage['message'] as String,
-              time: createdAtString.toChatTime(),
-              createdAt: createdAt,
-              isMe: newMessage['user_id'] == user!.id,
-              nickname: nickname,
-            );
+    return _subscribeMessagesUseCase(calendarId, (newMessage) async {
+      // 인라인 콜백
+      final createdAtString = newMessage['created_at'] as String;
+      final createdAt = DateTime.parse(createdAtString).toLocal();
+      final senderId = newMessage['user_id'] as String;
 
-            chatMessages.add(newChatMessage);
-            notifyListeners();
+      // UseCase로 사용자 정보 가져오기
+      final data = await _fetchUserInfoUseCase(senderId);
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (scrollController.hasClients) {
-                scrollController.animateTo(
-                  scrollController.position.maxScrollExtent,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.fastEaseInToSlowEaseOut,
-                );
-              }
-            });
-          },
-        )
-        .subscribe();
+      final userImage = data['profile_url'] ?? "";
+      final nickname = data['nickname'];
+
+      final newChatMessage = ChatMessage(
+        id: newMessage['id'] as int,
+        image: (userImage.isNotEmpty) ? userImage as String? : null,
+        message: newMessage['message'] as String,
+        time: createdAtString.toChatTime(),
+        createdAt: createdAt,
+        isMe: newMessage['user_id'] == user!.id,
+        nickname: nickname,
+      );
+
+      chatMessages.add(newChatMessage);
+      notifyListeners();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.fastEaseInToSlowEaseOut,
+          );
+        }
+      });
+    });
   }
 
   ChatViewModel(this.calendarId) {
@@ -125,7 +128,7 @@ class ChatViewModel extends ChangeNotifier {
     final chatMessage = chatController.text;
     // 메시지가 비어있으면 전송하지 않음
     if (chatController.text.trim().isEmpty) return;
-    await ChatDataSource.instance.chatInsert(chatMessage, calendarId);
+    await _chatInsertUseCase(chatMessage, calendarId);
     chatController.clear();
   }
 
@@ -133,7 +136,7 @@ class ChatViewModel extends ChangeNotifier {
   Future<void> fetchChatMessages() async {
     _state = ViewState.loading;
     try {
-      final data = await ChatDataSource.instance.fetchChatMessages(calendarId);
+      final data = await _fetchChatMessagesUseCase(calendarId);
       chatMessages = data.map((row) {
         final createdAtString = row['created_at'] as String;
         final createdAt = DateTime.parse(createdAtString).toLocal();
@@ -168,17 +171,17 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   // last_read_at 업데이트 하기
-  Future<void> updateLastReadAt(String userId, int calendarId) async {
-    await ChatDataSource.instance.updateLastReadAt(
-      userId: userId,
-      calendarId: calendarId,
-      payload: {'last_read_at': DateTime.now().toUtc().toIso8601String()},
-    );
+  Future<void> updateLastReadAt(
+    String userId,
+    int calendarId,
+    DateTime last_read_at,
+  ) async {
+    await _updateLastReadAtUseCase(userId, calendarId, last_read_at);
   }
 
   @override
   Future<void> dispose() async {
-    await updateLastReadAt(user!.id, calendarId);
+    await updateLastReadAt(user!.id, calendarId, DateTime.now().toUtc());
     channel?.unsubscribe();
     chatController.dispose();
     scrollController.dispose();

@@ -15,10 +15,14 @@ import 'package:injectable/injectable.dart' as _i526;
 
 import '../../features/calendar/data/datasources/calendar_data_source.dart'
     as _i751;
+import '../../features/calendar/data/datasources/chat_data_source.dart'
+    as _i632;
 import '../../features/calendar/data/datasources/user_data_source.dart'
     as _i943;
 import '../../features/calendar/data/repositories/calendar_repository_impl.dart'
     as _i712;
+import '../../features/calendar/data/repositories/chat_repository_impl.dart'
+    as _i219;
 import '../../features/calendar/data/repositories/storage_repository_impl.dart'
     as _i458;
 import '../../features/calendar/data/repositories/user_repository_impl.dart'
@@ -32,12 +36,18 @@ import '../../features/calendar/domain/repositories/storage_repository.dart'
     as _i1041;
 import '../../features/calendar/domain/repositories/user_repository.dart'
     as _i489;
+import '../../features/calendar/domain/usecases/chat_insert_use_case.dart'
+    as _i408;
 import '../../features/calendar/domain/usecases/create_shared_calendar_use_case.dart'
     as _i954;
 import '../../features/calendar/domain/usecases/delete_calendar_use_case.dart'
     as _i605;
 import '../../features/calendar/domain/usecases/exile_member_use_case.dart'
     as _i706;
+import '../../features/calendar/domain/usecases/fetch_chat_messages_use_case.dart'
+    as _i711;
+import '../../features/calendar/domain/usecases/fetch_user_info_use_case.dart'
+    as _i903;
 import '../../features/calendar/domain/usecases/find_user_by_nickname_use_case.dart'
     as _i583;
 import '../../features/calendar/domain/usecases/invite_users_use_case.dart'
@@ -60,10 +70,14 @@ import '../../features/calendar/domain/usecases/read_shared_calendar_from_id_use
     as _i920;
 import '../../features/calendar/domain/usecases/read_unread_chat_count_use_case.dart'
     as _i684;
+import '../../features/calendar/domain/usecases/subscribe_messages_use_case.dart'
+    as _i208;
 import '../../features/calendar/domain/usecases/transfer_admin_role_use_case.dart'
     as _i743;
 import '../../features/calendar/domain/usecases/update_calendar_info_use_case.dart'
     as _i796;
+import '../../features/calendar/domain/usecases/update_last_read_at_use_case.dart'
+    as _i655;
 import '../../features/home_widget/data/datasources/widget_local_data_source.dart'
     as _i763;
 import '../../features/home_widget/data/repositories/widget_repository_impl.dart'
@@ -72,6 +86,30 @@ import '../../features/home_widget/domain/repositories/widget_repository.dart'
     as _i131;
 import '../../features/home_widget/domain/usecases/sync_all_calendars_to_widget_use_case.dart'
     as _i605;
+import '../../features/profile/data/datasources/profile_data_source.dart'
+    as _i406;
+import '../../features/profile/data/repositories/profile_repository_impl.dart'
+    as _i334;
+import '../../features/profile/domain/repositories/profile_repository.dart'
+    as _i894;
+import '../../features/profile/domain/usecases/delete_user_use_case.dart'
+    as _i41;
+import '../../features/profile/domain/usecases/fetch_user_use_case.dart'
+    as _i353;
+import '../../features/profile/domain/usecases/nickname_overlapping_use_case.dart'
+    as _i309;
+import '../../features/profile/domain/usecases/set_google_account_use_case.dart'
+    as _i1020;
+import '../../features/profile/domain/usecases/sync_google_calendar_to_schedule_use_case.dart'
+    as _i807;
+import '../../features/profile/domain/usecases/update_google_sync_use_case.dart'
+    as _i618;
+import '../../features/profile/domain/usecases/update_image_use_case.dart'
+    as _i825;
+import '../../features/profile/domain/usecases/update_nickname_use_case.dart'
+    as _i837;
+import '../../features/profile/domain/usecases/update_notification_use_case.dart'
+    as _i73;
 import '../../features/schedule/data/datasources/google_calendar_data_source.dart'
     as _i595;
 import '../../features/schedule/data/datasources/google_calendar_data_source_impl.dart'
@@ -149,12 +187,23 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i751.CalendarDataSource>(
       () => _i751.CalendarDataSource(),
     );
+    gh.lazySingleton<_i632.ChatDataSource>(() => _i632.ChatDataSource());
     gh.lazySingleton<_i943.UserDataSource>(() => _i943.UserDataSource());
+    gh.lazySingleton<_i406.ProfileDataSource>(() => _i406.ProfileDataSource());
+    gh.lazySingleton<_i413.ChatRepository>(
+      () => _i219.ChatRepositoryImpl(gh<_i632.ChatDataSource>()),
+    );
     gh.lazySingleton<_i985.LocationDataSource>(
       () => _i360.LocationDataSourceImpl(),
     );
+    gh.lazySingleton<_i894.ProfileRepository>(
+      () => _i334.ProfileRepositoryImpl(gh<_i406.ProfileDataSource>()),
+    );
     gh.lazySingleton<_i595.GoogleCalendarDataSource>(
       () => _i1011.GoogleCalendarDataSourceImpl(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i763.WidgetLocalDataSource>(
+      () => _i763.WidgetLocalDataSourceImpl(),
     );
     gh.lazySingleton<_i1041.StorageRepository>(
       () => _i458.StorageRepositoryImpl(),
@@ -171,6 +220,21 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i241.CalendarRepository>(
       () => _i712.CalendarRepositoryImpl(gh<_i751.CalendarDataSource>()),
     );
+    gh.factory<_i408.ChatInsertUseCase>(
+      () => _i408.ChatInsertUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i711.FetchChatMessagesUseCase>(
+      () => _i711.FetchChatMessagesUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i903.FetchUserInfoUseCase>(
+      () => _i903.FetchUserInfoUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i208.SubscribeMessagesUseCase>(
+      () => _i208.SubscribeMessagesUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i655.UpdateLastReadAtUseCase>(
+      () => _i655.UpdateLastReadAtUseCase(gh<_i413.ChatRepository>()),
+    );
     gh.lazySingleton<_i736.ScheduleRepository>(
       () => _i688.ScheduleRepositoryImpl(gh<_i738.ScheduleRemoteDataSource>()),
     );
@@ -180,6 +244,27 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i736.ScheduleRepository>(),
         gh<_i241.CalendarRepository>(),
       ),
+    );
+    gh.factory<_i41.DeleteUserUseCase>(
+      () => _i41.DeleteUserUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i353.FetchUserUseCase>(
+      () => _i353.FetchUserUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i309.NicknameOverlappingUseCase>(
+      () => _i309.NicknameOverlappingUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i618.UpdateGoogleSyncUseCase>(
+      () => _i618.UpdateGoogleSyncUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i825.UpdateimageUseCase>(
+      () => _i825.UpdateimageUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i837.UpdateNicknameUseCase>(
+      () => _i837.UpdateNicknameUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i73.UpdateNotificationUseCase>(
+      () => _i73.UpdateNotificationUseCase(gh<_i894.ProfileRepository>()),
     );
     gh.lazySingleton<_i743.TransferAdminRoleUseCase>(
       () => _i743.TransferAdminRoleUseCase(gh<_i489.UserRepository>()),
@@ -286,6 +371,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i796.UpdateCalendarInfoUseCase>(
       () => _i796.UpdateCalendarInfoUseCase(gh<_i241.CalendarRepository>()),
+    );
+    gh.factory<_i1020.SetGoogleAccountUseCase>(
+      () =>
+          _i1020.SetGoogleAccountUseCase(gh<_i511.GoogleCalendarRepository>()),
+    );
+    gh.factory<_i807.SyncGoogleCalendarToScheduleUseCase>(
+      () => _i807.SyncGoogleCalendarToScheduleUseCase(
+        gh<_i511.GoogleCalendarRepository>(),
+      ),
     );
     gh.factory<_i352.FetchHolidaysUseCase>(
       () => _i352.FetchHolidaysUseCase(gh<_i511.GoogleCalendarRepository>()),
