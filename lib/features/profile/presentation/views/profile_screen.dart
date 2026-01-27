@@ -143,7 +143,7 @@ class _ProfileScreen extends StatelessWidget {
                                 ),
                               ),
                               onChangeSelected: () {
-                                viewModel.deleteUser();
+                                viewModel.deleteUser(viewModel.user!.id);
                                 context.pop();
                                 context.go('/login');
                               },

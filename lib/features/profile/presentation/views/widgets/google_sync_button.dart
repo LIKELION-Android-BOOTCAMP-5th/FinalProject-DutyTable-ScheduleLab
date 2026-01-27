@@ -6,7 +6,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../calendar/presentation/viewmodels/personal_calendar_view_model.dart';
-import '../../../../schedule/data/datasources/schedule_data_source.dart';
 
 class GoogleSyncButton extends StatelessWidget {
   const GoogleSyncButton({super.key});
@@ -25,8 +24,7 @@ class GoogleSyncButton extends StatelessWidget {
             if (!viewModel.is_sync) {
               await viewModel.googleSync();
               Fluttertoast.showToast(msg: "구글 캘린더 연동이 완료되었습니다.");
-              final googleSchedules = await ScheduleDataSource.instance
-                  .syncGoogleCalendarToSchedule();
+              final googleSchedules = viewModel.googleSchedules;
               await Fluttertoast.showToast(
                 msg: "${googleSchedules.length}개의 일정을 가져왔습니다.",
               );

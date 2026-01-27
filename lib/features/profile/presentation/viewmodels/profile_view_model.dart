@@ -2,19 +2,44 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dutytable/core/services/supabase_storage_service.dart';
-import 'package:dutytable/features/profile/data/datasources/profile_data_source.dart';
-import 'package:dutytable/features/schedule/data/datasources/schedule_data_source.dart';
+import 'package:dutytable/features/profile/domain/usecases/delete_user_use_case.dart';
+import 'package:dutytable/features/profile/domain/usecases/fetch_user_use_case.dart';
+import 'package:dutytable/features/profile/domain/usecases/nickname_overlapping_use_case.dart';
+import 'package:dutytable/features/profile/domain/usecases/set_google_account_use_case.dart';
+import 'package:dutytable/features/profile/domain/usecases/sync_google_calendar_to_schedule_use_case.dart';
+import 'package:dutytable/features/profile/domain/usecases/update_google_sync_use_case.dart';
+import 'package:dutytable/features/profile/domain/usecases/update_image_use_case.dart';
+import 'package:dutytable/features/profile/domain/usecases/update_nickname_use_case.dart';
+import 'package:dutytable/features/profile/domain/usecases/update_notification_use_case.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/di/injection.dart';
 import '../../../../core/services/device_resource_service.dart';
 
 enum viewState { loading, success }
 
 class ProfileViewmodel extends ChangeNotifier {
+  final UpdateNicknameUseCase _updateNicknameUseCase =
+      getIt<UpdateNicknameUseCase>();
+  final UpdateNotificationUseCase _updateNotificationUseCase =
+      getIt<UpdateNotificationUseCase>();
+  final UpdateimageUseCase _updateimageUseCase = getIt<UpdateimageUseCase>();
+  final UpdateGoogleSyncUseCase _updateGoogleSyncUseCase =
+      getIt<UpdateGoogleSyncUseCase>();
+  final FetchUserUseCase _fetchUserUseCase = getIt<FetchUserUseCase>();
+  final NicknameOverlappingUseCase _nicknameOverlappingUseCase =
+      getIt<NicknameOverlappingUseCase>();
+  final DeleteUserUseCase _deleteUserUseCase = getIt<DeleteUserUseCase>();
+  final SetGoogleAccountUseCase _setGoogleAccountUseCase =
+      getIt<SetGoogleAccountUseCase>();
+  final SyncGoogleCalendarToScheduleUseCase
+  _syncGoogleCalendarToScheduleUseCase =
+      getIt<SyncGoogleCalendarToScheduleUseCase>();
+
   ProfileViewmodel() {
     _init();
   }
@@ -95,17 +120,14 @@ class ProfileViewmodel extends ChangeNotifier {
 
   //닉네임 수정한거 수파베이스에 반영하기
   Future<void> updateNickname(String userId) async {
-    await ProfileDataSource.instance.updateUserProfile(
-      userId: userId,
-      payload: {'nickname': nicknameController.text.trim()},
-    );
+    await _updateNicknameUseCase(userId, nicknameController.text.trim());
     nickname = nicknameController.text.trim();
     notifyListeners();
   }
 
   // 닉네임,이메일, 프로필 사진 불러오기
   Future<void> fetchUser() async {
-    final data = await ProfileDataSource.instance.fetchUserProfile();
+    final data = await _fetchUserUseCase();
     nickname = data['nickname'];
     nicknameController.text = nickname;
     email = data['email'];
@@ -117,20 +139,14 @@ class ProfileViewmodel extends ChangeNotifier {
 
   // 구글 연동하기
   Future<void> updateGoogleSync(String userId, bool syncStatus) async {
-    await ProfileDataSource.instance.updateUserProfile(
-      userId: userId,
-      payload: {'is_google_calendar_connect': syncStatus},
-    );
+    await _updateGoogleSyncUseCase(userId, syncStatus);
     is_sync = syncStatus;
     notifyListeners();
   }
 
   //알림 on/off하기
   Future<void> updateNotification(String userId) async {
-    await ProfileDataSource.instance.updateUserProfile(
-      userId: userId,
-      payload: {'allowed_notification': is_active_notification},
-    );
+    await _updateNotificationUseCase(userId, is_active_notification);
     is_active_notification = is_active_notification;
     notifyListeners();
   }
@@ -179,10 +195,7 @@ class ProfileViewmodel extends ChangeNotifier {
 
   // 수파베이스에 저장
   Future<void> updateImage(String userId, String? publicUrl) async {
-    await ProfileDataSource.instance.updateUserProfile(
-      userId: userId,
-      payload: {'profile_url': publicUrl},
-    );
+    await _updateimageUseCase(userId, publicUrl);
     image = publicUrl;
     notifyListeners();
   }
@@ -201,9 +214,7 @@ class ProfileViewmodel extends ChangeNotifier {
   //  닉네임 중복
   Future<void> nicknameOverlapping() async {
     final editingNickname = nicknameController.text;
-    final count = await ProfileDataSource.instance.isDuplicateNickname(
-      editingNickname,
-    );
+    final count = await _nicknameOverlappingUseCase(editingNickname);
     if (count == false) {
       // 중복임
       is_overlapping = true;
@@ -226,8 +237,8 @@ class ProfileViewmodel extends ChangeNotifier {
   }
 
   // 회원탈퇴
-  Future<void> deleteUser() async {
-    await ProfileDataSource.instance.deleteUser(user!.id);
+  Future<void> deleteUser(String userId) async {
+    await _deleteUserUseCase(userId);
   }
 
   // 버튼 텍스트
@@ -273,6 +284,8 @@ class ProfileViewmodel extends ChangeNotifier {
     });
   }
 
+  List<dynamic> googleSchedules = [];
+
   // 동기화 연결,연결해제
   Future<void> googleSync() async {
     if (!is_sync) {
@@ -286,9 +299,7 @@ class ProfileViewmodel extends ChangeNotifier {
         );
 
         final account = await googleSignIn.authenticate();
-        ScheduleDataSource.instance.setGoogleAccount(
-          account,
-        );
+        _setGoogleAccountUseCase(account);
 
         await account.authorizationClient.authorizeScopes([
           'https://www.googleapis.com/auth/calendar',
@@ -301,7 +312,8 @@ class ProfileViewmodel extends ChangeNotifier {
         notifyListeners();
 
         // 일정 불러서 리스트로 만들기 호출
-        await ScheduleDataSource.instance.syncGoogleCalendarToSchedule();
+        googleSchedules = await _syncGoogleCalendarToScheduleUseCase();
+        notifyListeners();
       } catch (e) {
         print('연동 오류: $e');
         rethrow;

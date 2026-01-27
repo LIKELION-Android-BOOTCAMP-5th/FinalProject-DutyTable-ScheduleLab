@@ -135,7 +135,7 @@ class ScheduleViewModel extends ChangeNotifier {
     if (_calendar == null) return;
 
     try {
-      _schedules = await _fetchSchedules(_calendar.id);
+      await fetchSchedules();
       _mySchedules = await _fetchMySchedules();
       _allSharedSchedules = await _fetchAllSharedSchedules();
       _scheduleDates = _schedules
@@ -351,5 +351,13 @@ class ScheduleViewModel extends ChangeNotifier {
     _deleteMode = false;
     selectedIds.clear();
     notifyListeners();
+  }
+
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }
