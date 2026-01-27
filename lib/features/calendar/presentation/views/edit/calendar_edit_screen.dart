@@ -7,6 +7,8 @@ import 'package:dutytable/features/calendar/presentation/views/edit/widgets/edit
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../core/di/injection.dart';
+
 class CalendarEditScreen extends StatelessWidget {
   /// 캘린더 데이터
   final CalendarEntity? calendar;
@@ -18,9 +20,9 @@ class CalendarEditScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       // 캘린더 수정 뷰모델 주입
-      create: (context) =>
-          // 캘린더 데이터 함께 주입
-          CalendarEditViewModel(initialCalendarData: calendar),
+      create: (context) => getIt<CalendarEditViewModel>(param1: calendar),
+      // 캘린더 데이터 함께 주입
+      // CalendarEditViewModel(initialCalendarData: calendar),
       child: _CalendarEditScreen(),
     );
   }

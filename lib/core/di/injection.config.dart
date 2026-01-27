@@ -80,6 +80,14 @@ import '../../features/calendar/domain/usecases/update_calendar_info_use_case.da
     as _i796;
 import '../../features/calendar/domain/usecases/update_last_read_at_use_case.dart'
     as _i655;
+import '../../features/calendar/presentation/viewmodels/calendar_add_view_model.dart'
+    as _i209;
+import '../../features/calendar/presentation/viewmodels/calendar_edit_view_model.dart'
+    as _i554;
+import '../../features/calendar/presentation/viewmodels/calendar_setting_view_model.dart'
+    as _i416;
+import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart'
+    as _i271;
 import '../../features/home_widget/data/datasources/widget_local_data_source.dart'
     as _i763;
 import '../../features/home_widget/data/repositories/widget_repository_impl.dart'
@@ -393,6 +401,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i796.UpdateCalendarInfoUseCase>(
       () => _i796.UpdateCalendarInfoUseCase(gh<_i241.CalendarRepository>()),
     );
+    gh.factoryParam<
+      _i554.CalendarEditViewModel,
+      _i125.CalendarEntity?,
+      dynamic
+    >(
+      (initialCalendarData, _) => _i554.CalendarEditViewModel(
+        gh<_i743.TransferAdminRoleUseCase>(),
+        gh<_i796.UpdateCalendarInfoUseCase>(),
+        initialCalendarData,
+      ),
+    );
     gh.factory<_i862.FinishOnboardingUseCase>(
       () => _i862.FinishOnboardingUseCase(gh<_i430.OnboardingRepository>()),
     );
@@ -416,6 +435,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i511.GoogleCalendarRepository>(),
       ),
     );
+    gh.factory<_i209.CalendarAddViewModel>(
+      () => _i209.CalendarAddViewModel(
+        gh<_i954.CreateSharedCalendarUseCase>(),
+        gh<_i583.FindUserByNicknameUseCase>(),
+      ),
+    );
     gh.factory<_i570.GeocodeAddressUseCase>(
       () => _i570.GeocodeAddressUseCase(gh<_i527.LocationRepository>()),
     );
@@ -427,6 +452,25 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i590.GetOnboardingPagesUseCase>(),
         gh<_i862.FinishOnboardingUseCase>(),
         onFinished,
+      ),
+    );
+    gh.factory<_i271.PersonalCalendarViewModel>(
+      () => _i271.PersonalCalendarViewModel(
+        gh<_i654.ReadPersonalCalendarUseCase>(),
+      ),
+    );
+    gh.factoryParam<
+      _i416.CalendarSettingViewModel,
+      _i125.CalendarEntity?,
+      dynamic
+    >(
+      (calendar, _) => _i416.CalendarSettingViewModel(
+        gh<_i654.ReadPersonalCalendarUseCase>(),
+        gh<_i920.ReadSharedCalendarFromIdUseCase>(),
+        gh<_i706.ExileMemberUseCase>(),
+        gh<_i852.OutCalendarUseCase>(),
+        gh<_i605.DeleteCalendarUseCase>(),
+        calendar,
       ),
     );
     gh.factoryParam<_i60.ScheduleViewModel, _i125.CalendarEntity, dynamic>(

@@ -4,17 +4,16 @@ import 'package:dutytable/features/calendar/domain/entities/user_entity.dart';
 import 'package:dutytable/features/calendar/domain/usecases/find_user_by_nickname_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:injectable/injectable.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../../core/services/device_resource_service.dart';
 import '../../../../main.dart';
 import '../../domain/usecases/create_shared_calendar_use_case.dart';
 
+@injectable
 class CalendarAddViewModel extends ChangeNotifier {
-  final CreateSharedCalendarUseCase _createSharedCalendarUseCase =
-      getIt<CreateSharedCalendarUseCase>();
-  final FindUserByNicknameUseCase _findUserByNicknameUseCase =
-      getIt<FindUserByNicknameUseCase>();
+  final CreateSharedCalendarUseCase _createSharedCalendarUseCase;
+  final FindUserByNicknameUseCase _findUserByNicknameUseCase;
 
   /// 디바이스 리소스 서비스(private)
   final DeviceResourceService _resourceService = DeviceResourceService();
@@ -56,6 +55,11 @@ class CalendarAddViewModel extends ChangeNotifier {
   String? get description => _description;
 
   bool get isValid => _title.trim().isNotEmpty;
+
+  CalendarAddViewModel(
+    this._createSharedCalendarUseCase,
+    this._findUserByNicknameUseCase,
+  );
 
   /// 에러 지우기
   void clearError() {

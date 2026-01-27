@@ -6,13 +6,15 @@ import 'package:dutytable/features/calendar/presentation/views/add/widgets/save_
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../core/di/injection.dart';
+
 class CalendarAddScreen extends StatelessWidget {
   const CalendarAddScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CalendarAddViewModel(),
+      create: (_) => getIt<CalendarAddViewModel>(),
       child: const _CalendarAddScreen(),
     );
   }

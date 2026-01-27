@@ -56,7 +56,9 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => NotificationState()),
-        ChangeNotifierProvider(create: (context) => SharedCalendarViewModel()),
+        ChangeNotifierProvider(
+          create: (context) => getIt<SharedCalendarViewModel>(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -68,7 +70,7 @@ Future<void> _initialWidgetUpdate() async {
   final session = Supabase.instance.client.auth.currentSession;
   if (session == null) return; // 로그인 전이라면 위젯 업데이트 건너뜀
 
-  final syncAllCalendarsToWidgetUseCase =
+  final SyncAllCalendarsToWidgetUseCase syncAllCalendarsToWidgetUseCase =
       getIt<SyncAllCalendarsToWidgetUseCase>();
   try {
     await syncAllCalendarsToWidgetUseCase();

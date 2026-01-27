@@ -5,20 +5,19 @@ import 'package:dutytable/features/calendar/domain/usecases/transfer_admin_role_
 import 'package:dutytable/features/calendar/domain/usecases/update_calendar_info_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:injectable/injectable.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../../core/services/device_resource_service.dart';
 import '../../../../core/services/supabase_storage_service.dart';
 
 enum ViewState { loading, success, error }
 
+@injectable
 class CalendarEditViewModel extends ChangeNotifier {
   // UseCases
-  final TransferAdminRoleUseCase _transferAdminRoleUseCase =
-      getIt<TransferAdminRoleUseCase>();
+  final TransferAdminRoleUseCase _transferAdminRoleUseCase;
 
-  final UpdateCalendarInfoUseCase _updateCalendarInfoUseCase =
-      getIt<UpdateCalendarInfoUseCase>();
+  final UpdateCalendarInfoUseCase _updateCalendarInfoUseCase;
 
   /// 데이터 로딩 상태(private)
   ViewState _state = ViewState.success;
@@ -67,7 +66,11 @@ class CalendarEditViewModel extends ChangeNotifier {
   final DeviceResourceService _resourceService = DeviceResourceService();
 
   /// 캘린더 수정 뷰모델
-  CalendarEditViewModel({CalendarEntity? initialCalendarData}) {
+  CalendarEditViewModel(
+    this._transferAdminRoleUseCase,
+    this._updateCalendarInfoUseCase,
+    @factoryParam CalendarEntity? initialCalendarData,
+  ) {
     if (initialCalendarData != null) {
       _calendar = initialCalendarData;
       _initialCalendar = initialCalendarData; // 초기 상태 저장
