@@ -1,8 +1,8 @@
+import 'package:dutytable/core/di/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/configs/app_colors.dart';
-import '../../data/models/onboarding_model.dart';
 import '../viewmodels/onboarding_viewmodel.dart';
 import '../widgets/onboarding_indicator.dart';
 import '../widgets/onboarding_page_item.dart';
@@ -15,10 +15,7 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => OnboardingViewModel(
-        totalPages: onboardingPages.length,
-        onFinished: onFinished,
-      ),
+      create: (_) => getIt<OnboardingViewModel>(param1: onFinished),
       child: const _OnboardingView(),
     );
   }
@@ -56,15 +53,15 @@ class _OnboardingView extends StatelessWidget {
                   child: PageView.builder(
                     controller: vm.pageController,
                     onPageChanged: vm.onPageChanged,
-                    itemCount: onboardingPages.length,
+                    itemCount: vm.totalPages,
                     itemBuilder: (context, index) {
-                      return OnboardingPageItem(data: onboardingPages[index]);
+                      return OnboardingPageItem(data: vm.pages[index]);
                     },
                   ),
                 ),
                 OnboardingIndicator(
                   currentIndex: vm.currentPage,
-                  length: onboardingPages.length,
+                  length: vm.totalPages,
                 ),
                 const SizedBox(height: 24),
                 Padding(
@@ -83,9 +80,7 @@ class _OnboardingView extends StatelessWidget {
                         elevation: 0,
                       ),
                       child: Text(
-                        vm.currentPage == onboardingPages.length - 1
-                            ? '시작하기'
-                            : '다음',
+                        vm.currentPage == vm.totalPages - 1 ? '시작하기' : '다음',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

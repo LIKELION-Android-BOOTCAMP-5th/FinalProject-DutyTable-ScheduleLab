@@ -9,6 +9,8 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'dart:ui' as _i264;
+
 import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -86,6 +88,18 @@ import '../../features/home_widget/domain/repositories/widget_repository.dart'
     as _i131;
 import '../../features/home_widget/domain/usecases/sync_all_calendars_to_widget_use_case.dart'
     as _i605;
+import '../../features/onboarding/data/datasource/onboarding_local_data_source.dart'
+    as _i849;
+import '../../features/onboarding/data/repositories/onboarding_repository_impl.dart'
+    as _i452;
+import '../../features/onboarding/domain/repositories/onboarding_repository.dart'
+    as _i430;
+import '../../features/onboarding/domain/usecases/finish_onboarding_use_case.dart'
+    as _i862;
+import '../../features/onboarding/domain/usecases/get_onboarding_pages_usecase.dart'
+    as _i590;
+import '../../features/onboarding/presentation/viewmodels/onboarding_viewmodel.dart'
+    as _i758;
 import '../../features/profile/data/datasources/profile_data_source.dart'
     as _i406;
 import '../../features/profile/data/repositories/profile_repository_impl.dart'
@@ -189,6 +203,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i632.ChatDataSource>(() => _i632.ChatDataSource());
     gh.lazySingleton<_i943.UserDataSource>(() => _i943.UserDataSource());
+    gh.lazySingleton<_i849.OnboardingLocalDataSource>(
+      () => _i849.OnboardingLocalDataSource(),
+    );
     gh.lazySingleton<_i406.ProfileDataSource>(() => _i406.ProfileDataSource());
     gh.lazySingleton<_i413.ChatRepository>(
       () => _i219.ChatRepositoryImpl(gh<_i632.ChatDataSource>()),
@@ -268,6 +285,10 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i743.TransferAdminRoleUseCase>(
       () => _i743.TransferAdminRoleUseCase(gh<_i489.UserRepository>()),
+    );
+    gh.lazySingleton<_i430.OnboardingRepository>(
+      () =>
+          _i452.OnboardingRepositoryImpl(gh<_i849.OnboardingLocalDataSource>()),
     );
     gh.factory<_i585.AddScheduleUseCase>(
       () => _i585.AddScheduleUseCase(gh<_i736.ScheduleRepository>()),
@@ -372,6 +393,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i796.UpdateCalendarInfoUseCase>(
       () => _i796.UpdateCalendarInfoUseCase(gh<_i241.CalendarRepository>()),
     );
+    gh.factory<_i862.FinishOnboardingUseCase>(
+      () => _i862.FinishOnboardingUseCase(gh<_i430.OnboardingRepository>()),
+    );
+    gh.factory<_i590.GetOnboardingPagesUseCase>(
+      () => _i590.GetOnboardingPagesUseCase(gh<_i430.OnboardingRepository>()),
+    );
     gh.factory<_i1020.SetGoogleAccountUseCase>(
       () =>
           _i1020.SetGoogleAccountUseCase(gh<_i511.GoogleCalendarRepository>()),
@@ -394,6 +421,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i65.SearchAddressUseCase>(
       () => _i65.SearchAddressUseCase(gh<_i527.LocationRepository>()),
+    );
+    gh.factoryParam<_i758.OnboardingViewModel, _i264.VoidCallback, dynamic>(
+      (onFinished, _) => _i758.OnboardingViewModel(
+        gh<_i590.GetOnboardingPagesUseCase>(),
+        gh<_i862.FinishOnboardingUseCase>(),
+        onFinished,
+      ),
     );
     gh.factoryParam<_i60.ScheduleViewModel, _i125.CalendarEntity, dynamic>(
       (calendar, _) => _i60.ScheduleViewModel(

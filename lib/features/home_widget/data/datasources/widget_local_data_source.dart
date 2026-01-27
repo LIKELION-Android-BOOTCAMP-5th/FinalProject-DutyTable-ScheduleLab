@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
 
 abstract class WidgetLocalDataSource {
@@ -9,6 +10,7 @@ abstract class WidgetLocalDataSource {
   Future<void> updateCalendarWidget(List<ScheduleEntity> schedules);
 }
 
+@LazySingleton(as: WidgetLocalDataSource)
 class WidgetLocalDataSourceImpl implements WidgetLocalDataSource {
   static const String appGroupId = 'group.com.schedulelab.dutytable';
   static const String iosWidgetName = 'MyWidgetExtension';
