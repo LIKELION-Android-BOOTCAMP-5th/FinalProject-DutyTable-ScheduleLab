@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../core/di/injection.dart';
 import '../../widgets/custom_appbar_icon.dart';
 
 class SharedCalendarScreen extends StatelessWidget {
@@ -21,7 +22,7 @@ class SharedCalendarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SharedCalendarViewModel(calendar: calendar),
+      create: (_) => getIt<SharedCalendarViewModel>(param1: calendar),
       child: const _SharedCalendarScreen(),
     );
   }

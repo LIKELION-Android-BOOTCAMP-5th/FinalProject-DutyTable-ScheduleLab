@@ -1,15 +1,14 @@
 import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:dutytable/features/calendar/domain/usecases/read_personal_calendar_use_case.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../core/di/injection.dart';
+import 'package:injectable/injectable.dart';
 
 enum ViewState { loading, success, error }
 
+@injectable
 class PersonalCalendarViewModel extends ChangeNotifier {
   // UseCases
-  final ReadPersonalCalendarUseCase _readPersonalCalendarUseCase =
-      getIt<ReadPersonalCalendarUseCase>();
+  final ReadPersonalCalendarUseCase _readPersonalCalendarUseCase;
 
   /// 데이터 로딩 상태(private)
   ViewState _state = ViewState.loading;
@@ -39,7 +38,7 @@ class PersonalCalendarViewModel extends ChangeNotifier {
   CalendarEntity? get calendar => _calendar;
 
   /// 개인 캘린더 뷰모델
-  PersonalCalendarViewModel() {
+  PersonalCalendarViewModel(this._readPersonalCalendarUseCase) {
     _init();
   }
 

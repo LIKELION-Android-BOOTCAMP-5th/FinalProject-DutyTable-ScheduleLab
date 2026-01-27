@@ -5,20 +5,18 @@ import 'package:dutytable/features/calendar/domain/usecases/read_personal_calend
 import 'package:dutytable/features/calendar/domain/usecases/read_shared_calendar_from_id_use_case.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/widgets.dart';
+import 'package:injectable/injectable.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../domain/usecases/out_calendar_use_case.dart';
 
+@injectable
 class CalendarSettingViewModel extends ChangeNotifier {
   //UseCases
-  final ReadPersonalCalendarUseCase _readPersonalCalendarUseCase =
-      getIt<ReadPersonalCalendarUseCase>();
-  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase =
-      getIt<ReadSharedCalendarFromIdUseCase>();
-  final ExileMemberUseCase _exileMemberUseCase = getIt<ExileMemberUseCase>();
-  final OutCalendarUseCase _outCalendarUseCase = getIt<OutCalendarUseCase>();
-  final DeleteCalendarUseCase _deleteCalendarUseCase =
-      getIt<DeleteCalendarUseCase>();
+  final ReadPersonalCalendarUseCase _readPersonalCalendarUseCase;
+  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase;
+  final ExileMemberUseCase _exileMemberUseCase;
+  final OutCalendarUseCase _outCalendarUseCase;
+  final DeleteCalendarUseCase _deleteCalendarUseCase;
 
   /// 캘린더 데이터(private)
   late CalendarEntity _calendar;
@@ -29,7 +27,14 @@ class CalendarSettingViewModel extends ChangeNotifier {
   final currentUser = supabase.auth.currentUser;
 
   /// 캘린더 세팅 뷰모델
-  CalendarSettingViewModel({CalendarEntity? calendar}) {
+  CalendarSettingViewModel(
+    this._readPersonalCalendarUseCase,
+    this._readSharedCalendarFromIdUseCase,
+    this._exileMemberUseCase,
+    this._outCalendarUseCase,
+    this._deleteCalendarUseCase,
+    @factoryParam CalendarEntity? calendar,
+  ) {
     if (calendar != null) {
       _calendar = calendar;
     }

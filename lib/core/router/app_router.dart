@@ -21,6 +21,7 @@ import '../../features/calendar/presentation/viewmodels/personal_calendar_view_m
 import '../../features/calendar/presentation/views/setting/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/list/shared_calendar_list_screen.dart';
 import '../../oss_licenses.dart';
+import '../di/injection.dart';
 import 'app_shell.dart';
 
 GoRouter createRouter(BuildContext context) {
@@ -126,7 +127,7 @@ GoRouter createRouter(BuildContext context) {
             providers: [
               // 개인 캘린더 새로고침용 뷰모델
               ChangeNotifierProvider(
-                create: (context) => PersonalCalendarViewModel(),
+                create: (context) => getIt<PersonalCalendarViewModel>(),
               ),
             ],
             child: AppShell(child: child),

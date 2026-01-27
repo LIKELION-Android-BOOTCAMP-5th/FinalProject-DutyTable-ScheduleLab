@@ -6,9 +6,9 @@ import 'package:dutytable/features/calendar/domain/usecases/out_calendars_use_ca
 import 'package:dutytable/features/calendar/domain/usecases/read_calendar_final_list_use_case.dart';
 import 'package:dutytable/features/calendar/domain/usecases/read_shared_calendar_from_id_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../../features/notification/data/datasources/notification_data_source.dart';
 import '../../../../main.dart';
 import '../../domain/entities/user_entity.dart';
@@ -19,24 +19,13 @@ enum ViewState { loading, success, error }
 
 class SharedCalendarViewModel extends ChangeNotifier {
   // UseCases
-  final FindUserByNicknameUseCase _findUserByNicknameUseCase =
-      getIt<FindUserByNicknameUseCase>();
-
-  final InviteUsersUseCase _inviteUsersUseCase = getIt<InviteUsersUseCase>();
-
-  final ReadCalendarFinalListUseCase _readCalendarFinalListUseCase =
-      getIt<ReadCalendarFinalListUseCase>();
-
-  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase =
-      getIt<ReadSharedCalendarFromIdUseCase>();
-
-  final OutCalendarsUseCase _outCalendarsUseCase = getIt<OutCalendarsUseCase>();
-
-  final ReadUnreadChatCountUseCase _readUnreadChatCountUseCase =
-      getIt<ReadUnreadChatCountUseCase>();
-
-  final ReadNextScheduleUseCase _readNextScheduleUseCase =
-      getIt<ReadNextScheduleUseCase>();
+  final FindUserByNicknameUseCase _findUserByNicknameUseCase;
+  final InviteUsersUseCase _inviteUsersUseCase;
+  final ReadCalendarFinalListUseCase _readCalendarFinalListUseCase;
+  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase;
+  final OutCalendarsUseCase _outCalendarsUseCase;
+  final ReadUnreadChatCountUseCase _readUnreadChatCountUseCase;
+  final ReadNextScheduleUseCase _readNextScheduleUseCase;
 
   final List<UserEntity> _invitedUsers = [];
 
@@ -114,10 +103,17 @@ class SharedCalendarViewModel extends ChangeNotifier {
   }
 
   /// 공유 캘린더 목록 뷰모델
-  SharedCalendarViewModel({
-    List<CalendarEntity>? calendarList,
-    CalendarEntity? calendar,
-  }) {
+  SharedCalendarViewModel(
+    this._findUserByNicknameUseCase,
+    this._inviteUsersUseCase,
+    this._readCalendarFinalListUseCase,
+    this._readSharedCalendarFromIdUseCase,
+    this._outCalendarsUseCase,
+    this._readUnreadChatCountUseCase,
+    this._readNextScheduleUseCase,
+    // @factoryParam List<CalendarEntity>? calendarList,
+    @factoryParam CalendarEntity? calendar,
+  ) {
     if (calendar != null) {
       // 5단계 : 데이터 받아서 입력
       _calendar = calendar;
