@@ -88,6 +88,8 @@ import '../../features/calendar/presentation/viewmodels/calendar_setting_view_mo
     as _i416;
 import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart'
     as _i271;
+import '../../features/calendar/presentation/viewmodels/shared_calendar_view_model.dart'
+    as _i936;
 import '../../features/home_widget/data/datasources/widget_local_data_source.dart'
     as _i763;
 import '../../features/home_widget/data/repositories/widget_repository_impl.dart'
@@ -475,11 +477,29 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factoryParam<_i60.ScheduleViewModel, _i125.CalendarEntity, dynamic>(
       (calendar, _) => _i60.ScheduleViewModel(
+        gh<_i597.ReadGoogleCalendarConnectionUseCase>(),
+        gh<_i605.SyncAllCalendarsToWidgetUseCase>(),
         gh<_i1061.FetchSchedulesUseCase>(),
         gh<_i994.FetchMySchedulesUseCase>(),
         gh<_i1028.FetchAllSharedSchedulesUseCase>(),
         gh<_i762.DeleteAllSchedulesUseCase>(),
         gh<_i34.SyncGoogleCalendarToScheduleUseCase>(),
+        calendar,
+      ),
+    );
+    gh.factoryParam<
+      _i936.SharedCalendarViewModel,
+      _i125.CalendarEntity?,
+      dynamic
+    >(
+      (calendar, _) => _i936.SharedCalendarViewModel(
+        gh<_i583.FindUserByNicknameUseCase>(),
+        gh<_i1002.InviteUsersUseCase>(),
+        gh<_i634.ReadCalendarFinalListUseCase>(),
+        gh<_i920.ReadSharedCalendarFromIdUseCase>(),
+        gh<_i384.OutCalendarsUseCase>(),
+        gh<_i684.ReadUnreadChatCountUseCase>(),
+        gh<_i581.ReadNextScheduleUseCase>(),
         calendar,
       ),
     );

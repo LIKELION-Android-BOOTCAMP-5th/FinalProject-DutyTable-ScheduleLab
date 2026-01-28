@@ -9,7 +9,6 @@ import 'package:dutytable/features/schedule/domain/usecases/sync_google_calendar
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../calendar/domain/entities/calendar_entity.dart';
 import '../../../calendar/domain/usecases/read_google_calendar_connection_use_case.dart';
 
@@ -19,12 +18,8 @@ class ScheduleViewModel extends ChangeNotifier {
   //-------------------- UseCase --------------------
 
   final ReadGoogleCalendarConnectionUseCase
-  _readGoogleCalendarConnectionUseCase =
-      getIt<ReadGoogleCalendarConnectionUseCase>();
-
-  final SyncAllCalendarsToWidgetUseCase _syncAllCalendarsToWidgetUseCase =
-      getIt<SyncAllCalendarsToWidgetUseCase>();
-
+  _readGoogleCalendarConnectionUseCase;
+  final SyncAllCalendarsToWidgetUseCase _syncAllCalendarsToWidgetUseCase;
   final SyncGoogleCalendarToScheduleUseCase
   _syncGoogleCalendarToScheduleUseCase;
 
@@ -116,6 +111,8 @@ class ScheduleViewModel extends ChangeNotifier {
   //-------------------- Constructor --------------------
 
   ScheduleViewModel(
+    this._readGoogleCalendarConnectionUseCase,
+    this._syncAllCalendarsToWidgetUseCase,
     this._fetchSchedules,
     this._fetchMySchedules,
     this._fetchAllSharedSchedules,
