@@ -17,6 +17,7 @@ import '../../domain/usecases/read_unread_chat_count_use_case.dart';
 
 enum ViewState { loading, success, error }
 
+@injectable
 class SharedCalendarViewModel extends ChangeNotifier {
   // UseCases
   final FindUserByNicknameUseCase _findUserByNicknameUseCase;
