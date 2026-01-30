@@ -243,13 +243,13 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final networkModule = _$NetworkModule();
-    final registerModule = _$RegisterModule();
+    final supabaseModule = _$SupabaseModule();
     gh.factory<_i738.LocalDataSource>(() => _i738.LocalDataSource());
     gh.factory<_i1006.NotificationDataSource>(
       () => _i1006.NotificationDataSource(),
     );
     gh.lazySingleton<_i361.Dio>(() => networkModule.dio());
-    gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.client);
+    gh.lazySingleton<_i454.SupabaseClient>(() => supabaseModule.client);
     gh.lazySingleton<_i751.CalendarDataSource>(
       () => _i751.CalendarDataSource(),
     );
@@ -644,4 +644,4 @@ extension GetItInjectableX on _i174.GetIt {
 
 class _$NetworkModule extends _i567.NetworkModule {}
 
-class _$RegisterModule extends _i291.RegisterModule {}
+class _$SupabaseModule extends _i291.SupabaseModule {}
