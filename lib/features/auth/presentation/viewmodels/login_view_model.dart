@@ -6,26 +6,33 @@ import 'package:dutytable/features/auth/data/models/login_result_model.dart';
 import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:injectable/injectable.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../../core/utils/loading_dialog.dart';
 import '../../domain/usecases/google_sign_in_use_case.dart';
 import '../../domain/usecases/login_init_use_case.dart';
 import '../../domain/usecases/redirect_use_case.dart';
 import '../../domain/usecases/signIn_with_apple_use_case.dart';
 
+@injectable
 class LoginViewModel extends ChangeNotifier {
   bool _isAutoLogin = true;
   bool get isAutoLogin => _isAutoLogin;
 
   bool _showOnboarding = false;
   bool get showOnboarding => _showOnboarding;
-  final LoginInitUseCase _loginInitUseCase = getIt<LoginInitUseCase>();
-  final GoogleSignInUseCase _googleSignInUseCase = getIt<GoogleSignInUseCase>();
-  final SignInWithAppleUseCase _signInWithAppleUseCase =
-      getIt<SignInWithAppleUseCase>();
-  final RedirectUseCase _redirectUseCase = getIt<RedirectUseCase>();
-  LoginViewModel() {
+
+  final LoginInitUseCase _loginInitUseCase;
+  final GoogleSignInUseCase _googleSignInUseCase;
+  final SignInWithAppleUseCase _signInWithAppleUseCase;
+  final RedirectUseCase _redirectUseCase;
+
+  LoginViewModel(
+    this._loginInitUseCase,
+    this._googleSignInUseCase,
+    this._signInWithAppleUseCase,
+    this._redirectUseCase,
+  ) {
     _init(true);
   }
 

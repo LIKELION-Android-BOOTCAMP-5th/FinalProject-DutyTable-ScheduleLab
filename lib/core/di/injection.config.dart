@@ -40,6 +40,12 @@ import '../../features/auth/domain/usecases/signIn_with_apple_use_case.dart'
     as _i93;
 import '../../features/auth/domain/usecases/upload_profile_image_use_case.dart'
     as _i861;
+import '../../features/auth/presentation/viewmodels/login_view_model.dart'
+    as _i1000;
+import '../../features/auth/presentation/viewmodels/signup_view_model.dart'
+    as _i675;
+import '../../features/auth/presentation/viewmodels/splash_view_model.dart'
+    as _i638;
 import '../../features/calendar/data/datasources/calendar_data_source.dart'
     as _i751;
 import '../../features/calendar/data/datasources/chat_data_source.dart'
@@ -161,6 +167,8 @@ import '../../features/profile/domain/usecases/update_nickname_use_case.dart'
     as _i837;
 import '../../features/profile/domain/usecases/update_notification_use_case.dart'
     as _i73;
+import '../../features/profile/presentation/viewmodels/profile_view_model.dart'
+    as _i972;
 import '../../features/schedule/data/datasources/google_calendar_data_source.dart'
     as _i595;
 import '../../features/schedule/data/datasources/google_calendar_data_source_impl.dart'
@@ -474,6 +482,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i796.UpdateCalendarInfoUseCase>(
       () => _i796.UpdateCalendarInfoUseCase(gh<_i241.CalendarRepository>()),
     );
+    gh.factory<_i675.SignupViewModel>(
+      () => _i675.SignupViewModel(
+        gh<_i215.CheckNicknameDuplication>(),
+        gh<_i861.UploadProfileImageUseCase>(),
+        gh<_i715.CompleteSignupUseCase>(),
+        userDataSource: gh<_i991.UserDataSource>(),
+      ),
+    );
     gh.factoryParam<
       _i554.CalendarEditViewModel,
       _i125.CalendarEntity?,
@@ -515,6 +531,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i209.CalendarAddViewModel(
         gh<_i954.CreateSharedCalendarUseCase>(),
         gh<_i583.FindUserByNicknameUseCase>(),
+      ),
+    );
+    gh.factory<_i638.SplashViewModel>(
+      () => _i638.SplashViewModel(
+        gh<_i634.ReadCalendarFinalListUseCase>(),
+        gh<_i153.RedirectUseCase>(),
       ),
     );
     gh.factory<_i570.GeocodeAddressUseCase>(
@@ -577,6 +599,19 @@ extension GetItInjectableX on _i174.GetIt {
         calendar,
       ),
     );
+    gh.factory<_i972.ProfileViewmodel>(
+      () => _i972.ProfileViewmodel(
+        gh<_i837.UpdateNicknameUseCase>(),
+        gh<_i73.UpdateNotificationUseCase>(),
+        gh<_i825.UpdateimageUseCase>(),
+        gh<_i618.UpdateGoogleSyncUseCase>(),
+        gh<_i353.FetchUserUseCase>(),
+        gh<_i309.NicknameOverlappingUseCase>(),
+        gh<_i41.DeleteUserUseCase>(),
+        gh<_i1020.SetGoogleAccountUseCase>(),
+        gh<_i807.SyncGoogleCalendarToScheduleUseCase>(),
+      ),
+    );
     gh.factoryParam<_i103.ScheduleEditViewModel, _i798.ScheduleEntity, dynamic>(
       (schedule, _) => _i103.ScheduleEditViewModel(
         gh<_i585.AddScheduleUseCase>(),
@@ -593,6 +628,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i352.FetchHolidaysUseCase>(),
         gh<_i570.GeocodeAddressUseCase>(),
         date,
+      ),
+    );
+    gh.factory<_i1000.LoginViewModel>(
+      () => _i1000.LoginViewModel(
+        gh<_i201.LoginInitUseCase>(),
+        gh<_i946.GoogleSignInUseCase>(),
+        gh<_i93.SignInWithAppleUseCase>(),
+        gh<_i153.RedirectUseCase>(),
       ),
     );
     return this;

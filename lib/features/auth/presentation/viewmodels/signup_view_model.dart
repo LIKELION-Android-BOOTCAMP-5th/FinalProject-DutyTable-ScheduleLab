@@ -4,9 +4,9 @@ import 'package:dutytable/features/auth/data/datasources/user_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../../core/services/device_resource_service.dart';
 import '../../../../main.dart';
 import '../../domain/usecases/check_nickname_duplication_use_case.dart';
@@ -14,15 +14,13 @@ import '../../domain/usecases/complete_signup_use_case.dart';
 import '../../domain/usecases/upload_profile_image_use_case.dart';
 
 // SignupScreen의 비즈니스 로직을 담당하는 ViewModel
+@injectable
 class SignupViewModel with ChangeNotifier {
   final TextEditingController nicknameController = TextEditingController();
   final DeviceResourceService _resourceService = DeviceResourceService();
-  final CheckNicknameDuplication _checkNicknameDuplication =
-      getIt<CheckNicknameDuplication>();
-  final UploadProfileImageUseCase _uploadProfileImageUseCase =
-      getIt<UploadProfileImageUseCase>();
-  final CompleteSignupUseCase _completeSignupUseCase =
-      getIt<CompleteSignupUseCase>();
+  final CheckNicknameDuplication _checkNicknameDuplication;
+  final UploadProfileImageUseCase _uploadProfileImageUseCase;
+  final CompleteSignupUseCase _completeSignupUseCase;
 
   File? _selectedImage; // 선택된 프로필 이미지 파일
   bool _isNicknameValid = false; // 닉네임 유효성 (2글자 이상)
@@ -45,7 +43,12 @@ class SignupViewModel with ChangeNotifier {
   bool get isFormComplete =>
       _isNicknameChecked && _isTermsAgreed && !_isLoading;
 
-  SignupViewModel({UserDataSource? userDataSource}) {
+  SignupViewModel(
+    this._checkNicknameDuplication,
+    this._uploadProfileImageUseCase,
+    this._completeSignupUseCase, {
+    UserDataSource? userDataSource,
+  }) {
     // 닉네임 컨트롤러에 리스너를 추가하여 입력이 변경될 때마다 _validateNickname 함수 호출
     nicknameController.addListener(_validateNickname);
   }

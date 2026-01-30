@@ -5,9 +5,10 @@ import 'package:dutytable/features/auth/presentation/viewmodels/login_view_model
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'widgets/login_logo_section.dart';
-import 'widgets/auto_login_row.dart';
+import '../../../../../core/di/injection.dart';
 import 'widgets/auth_buttons_section.dart';
+import 'widgets/auto_login_row.dart';
+import 'widgets/login_logo_section.dart';
 import 'widgets/onboarding_overlay.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -16,7 +17,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoginViewModel(),
+      create: (_) => getIt<LoginViewModel>(),
       child: const _LoginScreenUI(),
     );
   }

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/di/injection.dart';
 import '../../../onboarding/presentation/views/onboarding_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -16,7 +17,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => ProfileViewmodel(),
+      create: (context) => getIt<ProfileViewmodel>(),
       child: const _ProfileScreen(),
     );
   }
