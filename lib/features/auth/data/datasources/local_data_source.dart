@@ -1,9 +1,12 @@
+import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+@injectable
 class LocalDataSource {
   Future<bool> isOnboardingDone() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('isOnboardingDone') ?? false;
+    final isOnboarding = prefs.getBool('isOnboardingDone') ?? false;
+    return isOnboarding;
   }
 
   Future<void> setOnboardingDone() async {

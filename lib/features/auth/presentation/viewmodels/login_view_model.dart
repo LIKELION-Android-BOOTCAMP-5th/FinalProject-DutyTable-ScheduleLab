@@ -2,39 +2,36 @@ import 'dart:io';
 
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/services/supabase_manager.dart';
-import 'package:dutytable/features/auth/data/datasources/auth_data_source.dart';
-import 'package:dutytable/features/auth/data/datasources/local_data_source.dart';
-import 'package:dutytable/features/auth/data/datasources/user_data_source.dart';
 import 'package:dutytable/features/auth/data/models/login_result_model.dart';
 import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/di/injection.dart';
 import '../../../../core/utils/loading_dialog.dart';
+import '../../domain/usecases/google_sign_in_use_case.dart';
+import '../../domain/usecases/login_init_use_case.dart';
+import '../../domain/usecases/redirect_use_case.dart';
+import '../../domain/usecases/signIn_with_apple_use_case.dart';
 
 class LoginViewModel extends ChangeNotifier {
-  final AuthDataSource _authDataSource;
-  final UserDataSource _userDataSource;
-  final LocalDataSource _localDataSource;
-
   bool _isAutoLogin = true;
   bool get isAutoLogin => _isAutoLogin;
 
   bool _showOnboarding = false;
   bool get showOnboarding => _showOnboarding;
-
-  LoginViewModel({
-    AuthDataSource? authDataSource,
-    UserDataSource? userDataSource,
-    LocalDataSource? localDataSource,
-  }) : _authDataSource = authDataSource ?? AuthDataSource(),
-       _userDataSource = userDataSource ?? UserDataSource(),
-       _localDataSource = localDataSource ?? LocalDataSource() {
-    _init();
+  final LoginInitUseCase _loginInitUseCase = getIt<LoginInitUseCase>();
+  final GoogleSignInUseCase _googleSignInUseCase = getIt<GoogleSignInUseCase>();
+  final SignInWithAppleUseCase _signInWithAppleUseCase =
+      getIt<SignInWithAppleUseCase>();
+  final RedirectUseCase _redirectUseCase = getIt<RedirectUseCase>();
+  LoginViewModel() {
+    _init(true);
   }
 
-  Future<void> _init() async {
-    final done = await _localDataSource.isOnboardingDone();
+  // 유즈케이스,LoginRepository
+  Future<void> _init(bool isOnboarding) async {
+    final done = await _loginInitUseCase(isOnboarding);
     if (!done) {
       _showOnboarding = true;
       notifyListeners();
@@ -51,16 +48,14 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 유즈케이스,LoginRepository
   Future<void> googleSignIn(
     BuildContext context, {
     required bool isAutoLogin,
   }) async {
     showFullScreenLoading(context);
     try {
-      await _authDataSource.signInWithGoogle();
-      await _localDataSource.setAutoLogin(isAutoLogin);
-
-      final result = await _userDataSource.postLoginProcess();
+      final result = await _googleSignInUseCase(isAutoLogin);
 
       if (!context.mounted) return;
 
@@ -70,9 +65,7 @@ class LoginViewModel extends ChangeNotifier {
           await SupabaseManager.shared.getCalendars();
         } catch (_) {}
 
-        await NotificationDataSource.shared.setupNotificationListenersAndState(
-          context,
-        );
+        await _redirectUseCase(context);
       }
       if (!context.mounted) return;
       _applyLoginResult(context, result);
@@ -83,6 +76,7 @@ class LoginViewModel extends ChangeNotifier {
     }
   }
 
+  //유즈케이스,LoginRepository
   Future<void> signInWithApple(
     BuildContext context, {
     required bool isAutoLogin,
@@ -93,10 +87,7 @@ class LoginViewModel extends ChangeNotifier {
         throw Exception('Apple 로그인은 iOS에서만 지원합니다.');
       }
 
-      await _authDataSource.signInWithApple();
-      await _localDataSource.setAutoLogin(isAutoLogin);
-
-      final result = await _userDataSource.postLoginProcess();
+      final result = await _signInWithAppleUseCase(isAutoLogin);
 
       if (!context.mounted) return;
 

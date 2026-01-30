@@ -4,15 +4,15 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:injectable/injectable.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+@injectable
 class AuthDataSource {
   final SupabaseClient supabase;
 
-  AuthDataSource({SupabaseClient? supabaseClient})
-      : supabase = supabaseClient ?? Supabase.instance.client;
-
+  AuthDataSource(this.supabase);
   GoogleSignInAccount? _googleUser;
   GoogleSignInAccount? get googleUser => _googleUser;
 
@@ -49,8 +49,8 @@ class AuthDataSource {
     final authorization = await _googleUser!.authorizationClient
         .authorizationForScopes(scopes)
         .catchError((_) async {
-      return await _googleUser!.authorizationClient.authorizeScopes(scopes);
-    });
+          return await _googleUser!.authorizationClient.authorizeScopes(scopes);
+        });
 
     final idToken = _googleUser!.authentication.idToken;
     if (idToken == null) {

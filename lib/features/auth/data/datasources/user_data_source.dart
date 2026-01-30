@@ -1,15 +1,15 @@
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/login_result_model.dart';
 
+@injectable
 class UserDataSource {
   final SupabaseClient supabase;
-
-  UserDataSource({SupabaseClient? supabaseClient})
-    : supabase = supabaseClient ?? Supabase.instance.client;
+  UserDataSource(this.supabase);
 
   /// 닉네임 중복 체크
   Future<bool> isNicknameDuplicated(String nickname) async {
