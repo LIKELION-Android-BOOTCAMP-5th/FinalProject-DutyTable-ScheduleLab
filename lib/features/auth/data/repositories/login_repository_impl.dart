@@ -27,7 +27,7 @@ class LoginRepositoryImpl implements LoginRepository {
   }
 
   @override
-  Future<bool> init(bool isOnboarding) {
+  Future<bool> checkOnboardingStatus() {
     return dataSource.isOnboardingDone();
   }
 

@@ -5,8 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LocalDataSource {
   Future<bool> isOnboardingDone() async {
     final prefs = await SharedPreferences.getInstance();
-    final isOnboarding = prefs.getBool('isOnboardingDone') ?? false;
-    return isOnboarding;
+    // final isOnboarding = prefs.getBool('isOnboardingDone') ?? false;
+    return prefs.getBool('isOnboardingDone') ?? false;
+
+    // return isOnboarding;
   }
 
   Future<void> setOnboardingDone() async {

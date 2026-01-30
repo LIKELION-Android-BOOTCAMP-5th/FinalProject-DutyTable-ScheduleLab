@@ -6,7 +6,7 @@ class LoginInitUseCase {
   final LoginRepository repository;
   LoginInitUseCase(this.repository);
 
-  Future<bool> call(bool isOnboarding) async {
-    return await repository.init(isOnboarding);
+  Future<bool> call() async {
+    return await repository.checkOnboardingStatus();
   }
 }

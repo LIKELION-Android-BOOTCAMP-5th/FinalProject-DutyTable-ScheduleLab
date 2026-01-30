@@ -33,12 +33,12 @@ class LoginViewModel extends ChangeNotifier {
     this._signInWithAppleUseCase,
     this._redirectUseCase,
   ) {
-    _init(true);
+    _init();
   }
 
   // 유즈케이스,LoginRepository
-  Future<void> _init(bool isOnboarding) async {
-    final done = await _loginInitUseCase(isOnboarding);
+  Future<void> _init() async {
+    final done = await _loginInitUseCase();
     if (!done) {
       _showOnboarding = true;
       notifyListeners();
