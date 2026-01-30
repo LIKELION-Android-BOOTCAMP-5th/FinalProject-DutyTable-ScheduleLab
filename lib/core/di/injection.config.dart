@@ -233,7 +233,7 @@ import '../../features/schedule/presentation/viewmodels/schedule_edit_view_model
 import '../../features/schedule/presentation/viewmodels/schedule_view_model.dart'
     as _i60;
 import 'network_module.dart' as _i567;
-import 'register_module.dart' as _i291;
+import 'supabase_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
