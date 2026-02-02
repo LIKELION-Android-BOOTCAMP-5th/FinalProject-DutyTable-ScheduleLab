@@ -1,21 +1,25 @@
-import 'package:dutytable/core/di/injection.dart';
 import 'package:dutytable/features/calendar/domain/entities/calendar_entity.dart';
 import 'package:dutytable/features/calendar/domain/usecases/read_calendar_final_list_use_case.dart';
-import 'package:dutytable/features/notification/data/datasources/notification_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../domain/usecases/redirect_use_case.dart';
+
 /// 스플래시 화면의 비즈니스 로직을 관리하는 ViewModel.
+@injectable
 class SplashViewModel with ChangeNotifier {
-  final ReadCalendarFinalListUseCase _readCalendarFinalListUseCase =
-      getIt<ReadCalendarFinalListUseCase>();
+  final ReadCalendarFinalListUseCase _readCalendarFinalListUseCase;
+  final RedirectUseCase _redirectUseCase;
   // redirect 메서드가 중복 실행되는 것을 방지하기 위한 플래그
   bool _isRedirecting = false;
 
+  SplashViewModel(this._readCalendarFinalListUseCase, this._redirectUseCase) {}
+
   /// 앱 초기화 및 경로 재지정을 담당하는 비동기 메서드.
-  /// 위젯 트리에서 단 한 번만 호출
+  /// 위젯 트리에서 단 한 번만 호출 --- 유즈케이스,LocalRepository
   Future<void> redirect(BuildContext context) async {
     // 중복 실행 방지
     if (_isRedirecting) return;
@@ -42,9 +46,7 @@ class SplashViewModel with ChangeNotifier {
 
         if (!context.mounted) return;
 
-        NotificationDataSource.shared.setupNotificationListenersAndState(
-          context,
-        );
+        _redirectUseCase(context);
       } else {
         shouldRedirectToLogin = true;
       }

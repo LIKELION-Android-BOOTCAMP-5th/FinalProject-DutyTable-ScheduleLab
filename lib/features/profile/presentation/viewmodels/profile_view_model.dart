@@ -16,31 +16,35 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:injectable/injectable.dart';
 
-import '../../../../core/di/injection.dart';
 import '../../../../core/services/device_resource_service.dart';
 
 enum viewState { loading, success }
 
+@injectable
 class ProfileViewmodel extends ChangeNotifier {
-  final UpdateNicknameUseCase _updateNicknameUseCase =
-      getIt<UpdateNicknameUseCase>();
-  final UpdateNotificationUseCase _updateNotificationUseCase =
-      getIt<UpdateNotificationUseCase>();
-  final UpdateimageUseCase _updateimageUseCase = getIt<UpdateimageUseCase>();
-  final UpdateGoogleSyncUseCase _updateGoogleSyncUseCase =
-      getIt<UpdateGoogleSyncUseCase>();
-  final FetchUserUseCase _fetchUserUseCase = getIt<FetchUserUseCase>();
-  final NicknameOverlappingUseCase _nicknameOverlappingUseCase =
-      getIt<NicknameOverlappingUseCase>();
-  final DeleteUserUseCase _deleteUserUseCase = getIt<DeleteUserUseCase>();
-  final SetGoogleAccountUseCase _setGoogleAccountUseCase =
-      getIt<SetGoogleAccountUseCase>();
+  final UpdateNicknameUseCase _updateNicknameUseCase;
+  final UpdateNotificationUseCase _updateNotificationUseCase;
+  final UpdateimageUseCase _updateimageUseCase;
+  final UpdateGoogleSyncUseCase _updateGoogleSyncUseCase;
+  final FetchUserUseCase _fetchUserUseCase;
+  final NicknameOverlappingUseCase _nicknameOverlappingUseCase;
+  final DeleteUserUseCase _deleteUserUseCase;
+  final SetGoogleAccountUseCase _setGoogleAccountUseCase;
   final SyncGoogleCalendarToScheduleUseCase
-  _syncGoogleCalendarToScheduleUseCase =
-      getIt<SyncGoogleCalendarToScheduleUseCase>();
-
-  ProfileViewmodel() {
+  _syncGoogleCalendarToScheduleUseCase;
+  ProfileViewmodel(
+    this._updateNicknameUseCase,
+    this._updateNotificationUseCase,
+    this._updateimageUseCase,
+    this._updateGoogleSyncUseCase,
+    this._fetchUserUseCase,
+    this._nicknameOverlappingUseCase,
+    this._deleteUserUseCase,
+    this._setGoogleAccountUseCase,
+    this._syncGoogleCalendarToScheduleUseCase,
+  ) {
     _init();
   }
 

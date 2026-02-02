@@ -4,13 +4,14 @@ import 'package:dio/dio.dart';
 import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/features/notification/presentation/viewmodels/notification_state.dart';
 import 'package:flutter/material.dart';
-
+import 'package:injectable/injectable.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/invite_notification_model.dart';
 import '../models/reminder_notification_model.dart';
 
+@injectable
 class NotificationDataSource {
   static final NotificationDataSource _shared = NotificationDataSource();
   static NotificationDataSource get shared => _shared;

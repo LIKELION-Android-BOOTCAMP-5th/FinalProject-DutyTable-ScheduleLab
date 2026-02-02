@@ -3,6 +3,7 @@ import 'package:dutytable/features/auth/presentation/viewmodels/signup_view_mode
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../core/di/injection.dart';
 import '../../../../../core/utils/image_picker_utils.dart';
 import 'widgets/signup_app_bar.dart';
 import 'widgets/signup_form_card.dart';
@@ -15,7 +16,7 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => SignupViewModel(),
+      create: (_) => getIt<SignupViewModel>(),
       child: const _SignupScreenUI(),
     );
   }

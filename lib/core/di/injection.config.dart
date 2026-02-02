@@ -14,7 +14,38 @@ import 'dart:ui' as _i264;
 import 'package:dio/dio.dart' as _i361;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
+import '../../features/auth/data/datasources/auth_data_source.dart' as _i970;
+import '../../features/auth/data/datasources/local_data_source.dart' as _i738;
+import '../../features/auth/data/datasources/user_data_source.dart' as _i991;
+import '../../features/auth/data/repositories/local_repository_impl.dart'
+    as _i1064;
+import '../../features/auth/data/repositories/login_repository_impl.dart'
+    as _i327;
+import '../../features/auth/data/repositories/user_repository_impl.dart'
+    as _i687;
+import '../../features/auth/domain/repositories/local_repository.dart' as _i821;
+import '../../features/auth/domain/repositories/login_repository.dart' as _i870;
+import '../../features/auth/domain/repositories/user_repository.dart' as _i926;
+import '../../features/auth/domain/usecases/check_nickname_duplication_use_case.dart'
+    as _i215;
+import '../../features/auth/domain/usecases/complete_signup_use_case.dart'
+    as _i715;
+import '../../features/auth/domain/usecases/google_sign_in_use_case.dart'
+    as _i946;
+import '../../features/auth/domain/usecases/login_init_use_case.dart' as _i201;
+import '../../features/auth/domain/usecases/redirect_use_case.dart' as _i153;
+import '../../features/auth/domain/usecases/signIn_with_apple_use_case.dart'
+    as _i93;
+import '../../features/auth/domain/usecases/upload_profile_image_use_case.dart'
+    as _i861;
+import '../../features/auth/presentation/viewmodels/login_view_model.dart'
+    as _i1000;
+import '../../features/auth/presentation/viewmodels/signup_view_model.dart'
+    as _i675;
+import '../../features/auth/presentation/viewmodels/splash_view_model.dart'
+    as _i638;
 import '../../features/calendar/data/datasources/calendar_data_source.dart'
     as _i751;
 import '../../features/calendar/data/datasources/chat_data_source.dart'
@@ -98,6 +129,8 @@ import '../../features/home_widget/domain/repositories/widget_repository.dart'
     as _i131;
 import '../../features/home_widget/domain/usecases/sync_all_calendars_to_widget_use_case.dart'
     as _i605;
+import '../../features/notification/data/datasources/notification_data_source.dart'
+    as _i1006;
 import '../../features/onboarding/data/datasource/onboarding_local_data_source.dart'
     as _i849;
 import '../../features/onboarding/data/repositories/onboarding_repository_impl.dart'
@@ -134,6 +167,8 @@ import '../../features/profile/domain/usecases/update_nickname_use_case.dart'
     as _i837;
 import '../../features/profile/domain/usecases/update_notification_use_case.dart'
     as _i73;
+import '../../features/profile/presentation/viewmodels/profile_view_model.dart'
+    as _i972;
 import '../../features/schedule/data/datasources/google_calendar_data_source.dart'
     as _i595;
 import '../../features/schedule/data/datasources/google_calendar_data_source_impl.dart'
@@ -198,6 +233,7 @@ import '../../features/schedule/presentation/viewmodels/schedule_edit_view_model
 import '../../features/schedule/presentation/viewmodels/schedule_view_model.dart'
     as _i60;
 import 'network_module.dart' as _i567;
+import 'supabase_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -207,7 +243,13 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final networkModule = _$NetworkModule();
+    final supabaseModule = _$SupabaseModule();
+    gh.factory<_i738.LocalDataSource>(() => _i738.LocalDataSource());
+    gh.factory<_i1006.NotificationDataSource>(
+      () => _i1006.NotificationDataSource(),
+    );
     gh.lazySingleton<_i361.Dio>(() => networkModule.dio());
+    gh.lazySingleton<_i454.SupabaseClient>(() => supabaseModule.client);
     gh.lazySingleton<_i751.CalendarDataSource>(
       () => _i751.CalendarDataSource(),
     );
@@ -220,8 +262,21 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i413.ChatRepository>(
       () => _i219.ChatRepositoryImpl(gh<_i632.ChatDataSource>()),
     );
+    gh.factory<_i970.AuthDataSource>(
+      () => _i970.AuthDataSource(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i991.UserDataSource>(
+      () => _i991.UserDataSource(gh<_i454.SupabaseClient>()),
+    );
     gh.lazySingleton<_i985.LocationDataSource>(
       () => _i360.LocationDataSourceImpl(),
+    );
+    gh.lazySingleton<_i870.LoginRepository>(
+      () => _i327.LoginRepositoryImpl(
+        gh<_i738.LocalDataSource>(),
+        gh<_i970.AuthDataSource>(),
+        gh<_i991.UserDataSource>(),
+      ),
     );
     gh.lazySingleton<_i894.ProfileRepository>(
       () => _i334.ProfileRepositoryImpl(gh<_i406.ProfileDataSource>()),
@@ -231,6 +286,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i763.WidgetLocalDataSource>(
       () => _i763.WidgetLocalDataSourceImpl(),
+    );
+    gh.lazySingleton<_i926.UserRepository>(
+      () => _i687.UserRepositoryImpl(gh<_i991.UserDataSource>()),
     );
     gh.lazySingleton<_i1041.StorageRepository>(
       () => _i458.StorageRepositoryImpl(),
@@ -244,8 +302,29 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i684.ReadUnreadChatCountUseCase>(
       () => _i684.ReadUnreadChatCountUseCase(gh<_i413.ChatRepository>()),
     );
+    gh.factory<_i946.GoogleSignInUseCase>(
+      () => _i946.GoogleSignInUseCase(gh<_i870.LoginRepository>()),
+    );
+    gh.factory<_i201.LoginInitUseCase>(
+      () => _i201.LoginInitUseCase(gh<_i870.LoginRepository>()),
+    );
+    gh.factory<_i93.SignInWithAppleUseCase>(
+      () => _i93.SignInWithAppleUseCase(gh<_i870.LoginRepository>()),
+    );
+    gh.factory<_i215.CheckNicknameDuplication>(
+      () => _i215.CheckNicknameDuplication(gh<_i926.UserRepository>()),
+    );
+    gh.factory<_i715.CompleteSignupUseCase>(
+      () => _i715.CompleteSignupUseCase(gh<_i926.UserRepository>()),
+    );
+    gh.factory<_i861.UploadProfileImageUseCase>(
+      () => _i861.UploadProfileImageUseCase(gh<_i926.UserRepository>()),
+    );
     gh.lazySingleton<_i241.CalendarRepository>(
       () => _i712.CalendarRepositoryImpl(gh<_i751.CalendarDataSource>()),
+    );
+    gh.lazySingleton<_i821.LocalRepository>(
+      () => _i1064.LocalRepositoryImpl(gh<_i1006.NotificationDataSource>()),
     );
     gh.factory<_i408.ChatInsertUseCase>(
       () => _i408.ChatInsertUseCase(gh<_i413.ChatRepository>()),
@@ -403,6 +482,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i796.UpdateCalendarInfoUseCase>(
       () => _i796.UpdateCalendarInfoUseCase(gh<_i241.CalendarRepository>()),
     );
+    gh.factory<_i675.SignupViewModel>(
+      () => _i675.SignupViewModel(
+        gh<_i215.CheckNicknameDuplication>(),
+        gh<_i861.UploadProfileImageUseCase>(),
+        gh<_i715.CompleteSignupUseCase>(),
+        userDataSource: gh<_i991.UserDataSource>(),
+      ),
+    );
     gh.factoryParam<
       _i554.CalendarEditViewModel,
       _i125.CalendarEntity?,
@@ -419,6 +506,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i590.GetOnboardingPagesUseCase>(
       () => _i590.GetOnboardingPagesUseCase(gh<_i430.OnboardingRepository>()),
+    );
+    gh.factory<_i153.RedirectUseCase>(
+      () => _i153.RedirectUseCase(gh<_i821.LocalRepository>()),
     );
     gh.factory<_i1020.SetGoogleAccountUseCase>(
       () =>
@@ -441,6 +531,12 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i209.CalendarAddViewModel(
         gh<_i954.CreateSharedCalendarUseCase>(),
         gh<_i583.FindUserByNicknameUseCase>(),
+      ),
+    );
+    gh.factory<_i638.SplashViewModel>(
+      () => _i638.SplashViewModel(
+        gh<_i634.ReadCalendarFinalListUseCase>(),
+        gh<_i153.RedirectUseCase>(),
       ),
     );
     gh.factory<_i570.GeocodeAddressUseCase>(
@@ -503,6 +599,19 @@ extension GetItInjectableX on _i174.GetIt {
         calendar,
       ),
     );
+    gh.factory<_i972.ProfileViewmodel>(
+      () => _i972.ProfileViewmodel(
+        gh<_i837.UpdateNicknameUseCase>(),
+        gh<_i73.UpdateNotificationUseCase>(),
+        gh<_i825.UpdateimageUseCase>(),
+        gh<_i618.UpdateGoogleSyncUseCase>(),
+        gh<_i353.FetchUserUseCase>(),
+        gh<_i309.NicknameOverlappingUseCase>(),
+        gh<_i41.DeleteUserUseCase>(),
+        gh<_i1020.SetGoogleAccountUseCase>(),
+        gh<_i807.SyncGoogleCalendarToScheduleUseCase>(),
+      ),
+    );
     gh.factoryParam<_i103.ScheduleEditViewModel, _i798.ScheduleEntity, dynamic>(
       (schedule, _) => _i103.ScheduleEditViewModel(
         gh<_i585.AddScheduleUseCase>(),
@@ -521,8 +630,18 @@ extension GetItInjectableX on _i174.GetIt {
         date,
       ),
     );
+    gh.factory<_i1000.LoginViewModel>(
+      () => _i1000.LoginViewModel(
+        gh<_i201.LoginInitUseCase>(),
+        gh<_i946.GoogleSignInUseCase>(),
+        gh<_i93.SignInWithAppleUseCase>(),
+        gh<_i153.RedirectUseCase>(),
+      ),
+    );
     return this;
   }
 }
 
 class _$NetworkModule extends _i567.NetworkModule {}
+
+class _$SupabaseModule extends _i291.SupabaseModule {}

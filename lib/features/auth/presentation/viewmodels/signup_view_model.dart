@@ -4,15 +4,23 @@ import 'package:dutytable/features/auth/data/datasources/user_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/services/device_resource_service.dart';
 import '../../../../main.dart';
+import '../../domain/usecases/check_nickname_duplication_use_case.dart';
+import '../../domain/usecases/complete_signup_use_case.dart';
+import '../../domain/usecases/upload_profile_image_use_case.dart';
 
 // SignupScreen의 비즈니스 로직을 담당하는 ViewModel
+@injectable
 class SignupViewModel with ChangeNotifier {
   final TextEditingController nicknameController = TextEditingController();
   final DeviceResourceService _resourceService = DeviceResourceService();
+  final CheckNicknameDuplication _checkNicknameDuplication;
+  final UploadProfileImageUseCase _uploadProfileImageUseCase;
+  final CompleteSignupUseCase _completeSignupUseCase;
 
   File? _selectedImage; // 선택된 프로필 이미지 파일
   bool _isNicknameValid = false; // 닉네임 유효성 (2글자 이상)
@@ -23,7 +31,6 @@ class SignupViewModel with ChangeNotifier {
   String? _lastCheckedNickname; // 마지막으로 중복 확인한 닉네임
   String? nicknameMessage; // 닉네임 필드 아래에 표시될 메시지
   bool isNicknameMessageError = false; // 닉네임 메시지가 오류 메시지인지 여부
-  final UserDataSource _userDataSource;
 
   File? get selectedImage => _selectedImage;
   bool get isNicknameValid => _isNicknameValid;
@@ -36,8 +43,12 @@ class SignupViewModel with ChangeNotifier {
   bool get isFormComplete =>
       _isNicknameChecked && _isTermsAgreed && !_isLoading;
 
-  SignupViewModel({UserDataSource? userDataSource})
-    : _userDataSource = userDataSource ?? UserDataSource() {
+  SignupViewModel(
+    this._checkNicknameDuplication,
+    this._uploadProfileImageUseCase,
+    this._completeSignupUseCase, {
+    UserDataSource? userDataSource,
+  }) {
     // 닉네임 컨트롤러에 리스너를 추가하여 입력이 변경될 때마다 _validateNickname 함수 호출
     nicknameController.addListener(_validateNickname);
   }
@@ -116,7 +127,7 @@ class SignupViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  // 닉네임 중복 확인 로직
+  // 닉네임 중복 확인 로직 ---유즈케이스,UserRepository
   Future<void> checkNicknameDuplication() async {
     final nicknameToTest = nicknameController.text.trim();
 
@@ -137,9 +148,7 @@ class SignupViewModel with ChangeNotifier {
     _setLoading(true);
 
     try {
-      final duplicated = await _userDataSource.isNicknameDuplicated(
-        nicknameToTest,
-      );
+      final duplicated = await _checkNicknameDuplication(nicknameToTest);
 
       if (!duplicated) {
         // 중복된 닉네임이 없는 경우
@@ -164,7 +173,7 @@ class SignupViewModel with ChangeNotifier {
     }
   }
 
-  // 프로필 이미지를 Supabase Storage에 업로드하는 내부 함수
+  // 프로필 이미지를 Supabase Storage에 업로드하는 내부 함수 ---유즈케이스,UserRepository
   Future<String> _uploadProfileImage() async {
     if (_selectedImage == null) {
       throw Exception('Image not selected');
@@ -176,10 +185,7 @@ class SignupViewModel with ChangeNotifier {
     }
 
     final imageFile = _selectedImage!;
-    final imageUrl = await _userDataSource.uploadProfileImage(
-      userId: currentUser.id,
-      imageFile: imageFile,
-    );
+    final imageUrl = await _uploadProfileImageUseCase(imageFile);
     return imageUrl;
   }
 
@@ -211,8 +217,8 @@ class SignupViewModel with ChangeNotifier {
         if (imageUrl != null) 'profileUrl': imageUrl,
       };
 
-      // upsert: 데이터가 없으면 새로 만들고, 있으면 업데이트
-      await _userDataSource.upsertUserProfile(updates);
+      // upsert: 데이터가 없으면 새로 만들고, 있으면 업데이트 ---유즈케이스,UserRepository
+      await _completeSignupUseCase(updates);
 
       // 회원가입 성공 후 메인 화면으로 이동
       if (context.mounted) {
