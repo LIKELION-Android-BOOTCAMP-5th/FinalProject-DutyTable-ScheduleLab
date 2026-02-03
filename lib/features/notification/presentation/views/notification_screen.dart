@@ -1,4 +1,5 @@
 import 'package:dutytable/core/configs/app_colors.dart';
+import 'package:dutytable/core/di/injection.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
 import 'package:dutytable/features/calendar/presentation/viewmodels/shared_calendar_view_model.dart';
 import 'package:dutytable/features/calendar/presentation/widgets/member_invite_dialog/invitation_dialog.dart';
@@ -19,7 +20,7 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => NotificationViewModel(),
+      create: (_) => getIt<NotificationViewModel>(),
       child: const _NotificationScreenUI(),
     );
   }

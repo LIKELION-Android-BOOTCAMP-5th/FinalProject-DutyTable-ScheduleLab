@@ -131,6 +131,24 @@ import '../../features/home_widget/domain/usecases/sync_all_calendars_to_widget_
     as _i605;
 import '../../features/notification/data/datasources/notification_data_source.dart'
     as _i1006;
+import '../../features/notification/data/repositories/notification_repository_impl.dart'
+    as _i407;
+import '../../features/notification/domain/repositories/notification_repository.dart'
+    as _i630;
+import '../../features/notification/domain/usecases/delete_all_notifications_use_case.dart'
+    as _i630;
+import '../../features/notification/domain/usecases/has_unread_notifications_use_case.dart'
+    as _i660;
+import '../../features/notification/domain/usecases/mark_reminder_as_read_use_case.dart'
+    as _i726;
+import '../../features/notification/domain/usecases/setup_realtime_listeners_use_case.dart'
+    as _i330;
+import '../../features/notification/domain/usecases/stream_use_case.dart'
+    as _i634;
+import '../../features/notification/presentation/viewmodels/notification_state.dart'
+    as _i906;
+import '../../features/notification/presentation/viewmodels/notification_view_model.dart'
+    as _i1047;
 import '../../features/onboarding/data/datasource/onboarding_local_data_source.dart'
     as _i849;
 import '../../features/onboarding/data/repositories/onboarding_repository_impl.dart'
@@ -233,7 +251,7 @@ import '../../features/schedule/presentation/viewmodels/schedule_edit_view_model
 import '../../features/schedule/presentation/viewmodels/schedule_view_model.dart'
     as _i60;
 import 'network_module.dart' as _i567;
-import 'supabase_module.dart' as _i291;
+import 'supabase_module.dart' as _i695;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -248,6 +266,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1006.NotificationDataSource>(
       () => _i1006.NotificationDataSource(),
     );
+    gh.factory<_i906.NotificationState>(() => _i906.NotificationState());
     gh.lazySingleton<_i361.Dio>(() => networkModule.dio());
     gh.lazySingleton<_i454.SupabaseClient>(() => supabaseModule.client);
     gh.lazySingleton<_i751.CalendarDataSource>(
@@ -340,6 +359,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i655.UpdateLastReadAtUseCase>(
       () => _i655.UpdateLastReadAtUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.lazySingleton<_i630.NotificationRepository>(
+      () =>
+          _i407.NotificationRepositoryImpl(gh<_i1006.NotificationDataSource>()),
+    );
+    gh.factory<_i1047.NavigationTarget>(
+      () => _i1047.NavigationTarget(gh<String>(), extra: gh<Object>()),
     );
     gh.lazySingleton<_i736.ScheduleRepository>(
       () => _i688.ScheduleRepositoryImpl(gh<_i738.ScheduleRemoteDataSource>()),
@@ -510,6 +536,27 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i153.RedirectUseCase>(
       () => _i153.RedirectUseCase(gh<_i821.LocalRepository>()),
     );
+    gh.factory<_i630.DeleteAllNotificationsUseCase>(
+      () => _i630.DeleteAllNotificationsUseCase(
+        gh<_i630.NotificationRepository>(),
+      ),
+    );
+    gh.factory<_i660.HasUnreadNotificationsUseCase>(
+      () => _i660.HasUnreadNotificationsUseCase(
+        gh<_i630.NotificationRepository>(),
+      ),
+    );
+    gh.factory<_i726.MarkReminderAsReadUseCase>(
+      () => _i726.MarkReminderAsReadUseCase(gh<_i630.NotificationRepository>()),
+    );
+    gh.factory<_i330.SetupRealtimeListenersUseCase>(
+      () => _i330.SetupRealtimeListenersUseCase(
+        gh<_i630.NotificationRepository>(),
+      ),
+    );
+    gh.factory<_i634.StreamUseCase>(
+      () => _i634.StreamUseCase(gh<_i630.NotificationRepository>()),
+    );
     gh.factory<_i1020.SetGoogleAccountUseCase>(
       () =>
           _i1020.SetGoogleAccountUseCase(gh<_i511.GoogleCalendarRepository>()),
@@ -544,6 +591,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i65.SearchAddressUseCase>(
       () => _i65.SearchAddressUseCase(gh<_i527.LocationRepository>()),
+    );
+    gh.factory<_i1047.NotificationViewModel>(
+      () => _i1047.NotificationViewModel(
+        gh<_i330.SetupRealtimeListenersUseCase>(),
+        gh<_i630.DeleteAllNotificationsUseCase>(),
+        gh<_i726.MarkReminderAsReadUseCase>(),
+        gh<_i660.HasUnreadNotificationsUseCase>(),
+        gh<_i634.StreamUseCase>(),
+      ),
     );
     gh.factoryParam<_i758.OnboardingViewModel, _i264.VoidCallback, dynamic>(
       (onFinished, _) => _i758.OnboardingViewModel(
@@ -644,4 +700,4 @@ extension GetItInjectableX on _i174.GetIt {
 
 class _$NetworkModule extends _i567.NetworkModule {}
 
-class _$SupabaseModule extends _i291.SupabaseModule {}
+class _$SupabaseModule extends _i695.SupabaseModule {}
