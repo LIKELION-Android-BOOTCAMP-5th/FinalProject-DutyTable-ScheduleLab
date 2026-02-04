@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/main.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 @lazySingleton
 class ProfileDataSource {
-  final Dio _dio = DioClient.shared.dio;
-  ProfileDataSource();
+  final Dio _dio;
+  ProfileDataSource(this._dio);
 
   /// UPDATE
   // 닉네임, 구글연동, 알림, 수파베이스에 이미지 저장

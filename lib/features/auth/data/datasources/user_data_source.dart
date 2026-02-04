@@ -5,15 +5,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/network/dio_client.dart';
 import '../models/login_result_model.dart';
 
 @injectable
 class UserDataSource {
   final SupabaseClient supabase;
-  final Dio _dio = DioClient.shared.dio;
+  final Dio _dio;
 
-  UserDataSource(this.supabase);
+  UserDataSource(this.supabase, this._dio);
 
   /// 닉네임 중복 체크 READ
   Future<bool> isNicknameDuplicated(String nickname) async {

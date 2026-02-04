@@ -145,8 +145,6 @@ import '../../features/notification/domain/usecases/setup_realtime_listeners_use
     as _i330;
 import '../../features/notification/domain/usecases/stream_use_case.dart'
     as _i634;
-import '../../features/notification/presentation/viewmodels/notification_state.dart'
-    as _i906;
 import '../../features/notification/presentation/viewmodels/notification_view_model.dart'
     as _i1047;
 import '../../features/onboarding/data/datasource/onboarding_local_data_source.dart'
@@ -266,39 +264,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i1006.NotificationDataSource>(
       () => _i1006.NotificationDataSource(),
     );
-    gh.factory<_i906.NotificationState>(() => _i906.NotificationState());
     gh.lazySingleton<_i361.Dio>(() => networkModule.dio());
     gh.lazySingleton<_i454.SupabaseClient>(() => supabaseModule.client);
-    gh.lazySingleton<_i751.CalendarDataSource>(
-      () => _i751.CalendarDataSource(),
-    );
-    gh.lazySingleton<_i632.ChatDataSource>(() => _i632.ChatDataSource());
     gh.lazySingleton<_i943.UserDataSource>(() => _i943.UserDataSource());
     gh.lazySingleton<_i849.OnboardingLocalDataSource>(
       () => _i849.OnboardingLocalDataSource(),
     );
-    gh.lazySingleton<_i406.ProfileDataSource>(() => _i406.ProfileDataSource());
-    gh.lazySingleton<_i413.ChatRepository>(
-      () => _i219.ChatRepositoryImpl(gh<_i632.ChatDataSource>()),
-    );
     gh.factory<_i970.AuthDataSource>(
       () => _i970.AuthDataSource(gh<_i454.SupabaseClient>()),
     );
-    gh.factory<_i991.UserDataSource>(
-      () => _i991.UserDataSource(gh<_i454.SupabaseClient>()),
-    );
     gh.lazySingleton<_i985.LocationDataSource>(
       () => _i360.LocationDataSourceImpl(),
-    );
-    gh.lazySingleton<_i870.LoginRepository>(
-      () => _i327.LoginRepositoryImpl(
-        gh<_i738.LocalDataSource>(),
-        gh<_i970.AuthDataSource>(),
-        gh<_i991.UserDataSource>(),
-      ),
-    );
-    gh.lazySingleton<_i894.ProfileRepository>(
-      () => _i334.ProfileRepositoryImpl(gh<_i406.ProfileDataSource>()),
     );
     gh.lazySingleton<_i595.GoogleCalendarDataSource>(
       () => _i1011.GoogleCalendarDataSourceImpl(gh<_i361.Dio>()),
@@ -306,8 +282,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i763.WidgetLocalDataSource>(
       () => _i763.WidgetLocalDataSourceImpl(),
     );
-    gh.lazySingleton<_i926.UserRepository>(
-      () => _i687.UserRepositoryImpl(gh<_i991.UserDataSource>()),
+    gh.lazySingleton<_i751.CalendarDataSource>(
+      () => _i751.CalendarDataSource(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i632.ChatDataSource>(
+      () => _i632.ChatDataSource(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i406.ProfileDataSource>(
+      () => _i406.ProfileDataSource(gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i1041.StorageRepository>(
       () => _i458.StorageRepositoryImpl(),
@@ -318,47 +300,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i738.ScheduleRemoteDataSource>(
       () => _i455.ScheduleRemoteDataSourceImpl(gh<_i361.Dio>()),
     );
-    gh.lazySingleton<_i684.ReadUnreadChatCountUseCase>(
-      () => _i684.ReadUnreadChatCountUseCase(gh<_i413.ChatRepository>()),
-    );
-    gh.factory<_i946.GoogleSignInUseCase>(
-      () => _i946.GoogleSignInUseCase(gh<_i870.LoginRepository>()),
-    );
-    gh.factory<_i201.LoginInitUseCase>(
-      () => _i201.LoginInitUseCase(gh<_i870.LoginRepository>()),
-    );
-    gh.factory<_i93.SignInWithAppleUseCase>(
-      () => _i93.SignInWithAppleUseCase(gh<_i870.LoginRepository>()),
-    );
-    gh.factory<_i215.CheckNicknameDuplication>(
-      () => _i215.CheckNicknameDuplication(gh<_i926.UserRepository>()),
-    );
-    gh.factory<_i715.CompleteSignupUseCase>(
-      () => _i715.CompleteSignupUseCase(gh<_i926.UserRepository>()),
-    );
-    gh.factory<_i861.UploadProfileImageUseCase>(
-      () => _i861.UploadProfileImageUseCase(gh<_i926.UserRepository>()),
-    );
     gh.lazySingleton<_i241.CalendarRepository>(
       () => _i712.CalendarRepositoryImpl(gh<_i751.CalendarDataSource>()),
     );
     gh.lazySingleton<_i821.LocalRepository>(
       () => _i1064.LocalRepositoryImpl(gh<_i1006.NotificationDataSource>()),
-    );
-    gh.factory<_i408.ChatInsertUseCase>(
-      () => _i408.ChatInsertUseCase(gh<_i413.ChatRepository>()),
-    );
-    gh.factory<_i711.FetchChatMessagesUseCase>(
-      () => _i711.FetchChatMessagesUseCase(gh<_i413.ChatRepository>()),
-    );
-    gh.factory<_i903.FetchUserInfoUseCase>(
-      () => _i903.FetchUserInfoUseCase(gh<_i413.ChatRepository>()),
-    );
-    gh.factory<_i208.SubscribeMessagesUseCase>(
-      () => _i208.SubscribeMessagesUseCase(gh<_i413.ChatRepository>()),
-    );
-    gh.factory<_i655.UpdateLastReadAtUseCase>(
-      () => _i655.UpdateLastReadAtUseCase(gh<_i413.ChatRepository>()),
     );
     gh.lazySingleton<_i630.NotificationRepository>(
       () =>
@@ -366,6 +312,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i1047.NavigationTarget>(
       () => _i1047.NavigationTarget(gh<String>(), extra: gh<Object>()),
+    );
+    gh.factory<_i991.UserDataSource>(
+      () => _i991.UserDataSource(gh<_i454.SupabaseClient>(), gh<_i361.Dio>()),
     );
     gh.lazySingleton<_i736.ScheduleRepository>(
       () => _i688.ScheduleRepositoryImpl(gh<_i738.ScheduleRemoteDataSource>()),
@@ -376,27 +325,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i736.ScheduleRepository>(),
         gh<_i241.CalendarRepository>(),
       ),
-    );
-    gh.factory<_i41.DeleteUserUseCase>(
-      () => _i41.DeleteUserUseCase(gh<_i894.ProfileRepository>()),
-    );
-    gh.factory<_i353.FetchUserUseCase>(
-      () => _i353.FetchUserUseCase(gh<_i894.ProfileRepository>()),
-    );
-    gh.factory<_i309.NicknameOverlappingUseCase>(
-      () => _i309.NicknameOverlappingUseCase(gh<_i894.ProfileRepository>()),
-    );
-    gh.factory<_i618.UpdateGoogleSyncUseCase>(
-      () => _i618.UpdateGoogleSyncUseCase(gh<_i894.ProfileRepository>()),
-    );
-    gh.factory<_i825.UpdateimageUseCase>(
-      () => _i825.UpdateimageUseCase(gh<_i894.ProfileRepository>()),
-    );
-    gh.factory<_i837.UpdateNicknameUseCase>(
-      () => _i837.UpdateNicknameUseCase(gh<_i894.ProfileRepository>()),
-    );
-    gh.factory<_i73.UpdateNotificationUseCase>(
-      () => _i73.UpdateNotificationUseCase(gh<_i894.ProfileRepository>()),
     );
     gh.lazySingleton<_i743.TransferAdminRoleUseCase>(
       () => _i743.TransferAdminRoleUseCase(gh<_i489.UserRepository>()),
@@ -460,6 +388,9 @@ extension GetItInjectableX on _i174.GetIt {
       () =>
           _i597.ReadGoogleCalendarConnectionUseCase(gh<_i489.UserRepository>()),
     );
+    gh.lazySingleton<_i413.ChatRepository>(
+      () => _i219.ChatRepositoryImpl(gh<_i632.ChatDataSource>()),
+    );
     gh.lazySingleton<_i954.CreateSharedCalendarUseCase>(
       () => _i954.CreateSharedCalendarUseCase(
         gh<_i241.CalendarRepository>(),
@@ -468,6 +399,16 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i527.LocationRepository>(
       () => _i683.LocationRepositoryImpl(gh<_i985.LocationDataSource>()),
+    );
+    gh.lazySingleton<_i870.LoginRepository>(
+      () => _i327.LoginRepositoryImpl(
+        gh<_i738.LocalDataSource>(),
+        gh<_i970.AuthDataSource>(),
+        gh<_i991.UserDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i894.ProfileRepository>(
+      () => _i334.ProfileRepositoryImpl(gh<_i406.ProfileDataSource>()),
     );
     gh.lazySingleton<_i511.GoogleCalendarRepository>(
       () => _i424.GoogleCalendarRepositoryImpl(
@@ -485,6 +426,9 @@ extension GetItInjectableX on _i174.GetIt {
         scheduleId,
         isAdmin,
       ),
+    );
+    gh.lazySingleton<_i926.UserRepository>(
+      () => _i687.UserRepositoryImpl(gh<_i991.UserDataSource>()),
     );
     gh.lazySingleton<_i605.DeleteCalendarUseCase>(
       () => _i605.DeleteCalendarUseCase(gh<_i241.CalendarRepository>()),
@@ -508,13 +452,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i796.UpdateCalendarInfoUseCase>(
       () => _i796.UpdateCalendarInfoUseCase(gh<_i241.CalendarRepository>()),
     );
-    gh.factory<_i675.SignupViewModel>(
-      () => _i675.SignupViewModel(
-        gh<_i215.CheckNicknameDuplication>(),
-        gh<_i861.UploadProfileImageUseCase>(),
-        gh<_i715.CompleteSignupUseCase>(),
-        userDataSource: gh<_i991.UserDataSource>(),
-      ),
+    gh.lazySingleton<_i684.ReadUnreadChatCountUseCase>(
+      () => _i684.ReadUnreadChatCountUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i946.GoogleSignInUseCase>(
+      () => _i946.GoogleSignInUseCase(gh<_i870.LoginRepository>()),
+    );
+    gh.factory<_i201.LoginInitUseCase>(
+      () => _i201.LoginInitUseCase(gh<_i870.LoginRepository>()),
+    );
+    gh.factory<_i93.SignInWithAppleUseCase>(
+      () => _i93.SignInWithAppleUseCase(gh<_i870.LoginRepository>()),
     );
     gh.factoryParam<
       _i554.CalendarEditViewModel,
@@ -532,6 +480,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i590.GetOnboardingPagesUseCase>(
       () => _i590.GetOnboardingPagesUseCase(gh<_i430.OnboardingRepository>()),
+    );
+    gh.factory<_i215.CheckNicknameDuplication>(
+      () => _i215.CheckNicknameDuplication(gh<_i926.UserRepository>()),
+    );
+    gh.factory<_i715.CompleteSignupUseCase>(
+      () => _i715.CompleteSignupUseCase(gh<_i926.UserRepository>()),
+    );
+    gh.factory<_i861.UploadProfileImageUseCase>(
+      () => _i861.UploadProfileImageUseCase(gh<_i926.UserRepository>()),
     );
     gh.factory<_i153.RedirectUseCase>(
       () => _i153.RedirectUseCase(gh<_i821.LocalRepository>()),
@@ -556,6 +513,21 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i634.StreamUseCase>(
       () => _i634.StreamUseCase(gh<_i630.NotificationRepository>()),
+    );
+    gh.factory<_i408.ChatInsertUseCase>(
+      () => _i408.ChatInsertUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i711.FetchChatMessagesUseCase>(
+      () => _i711.FetchChatMessagesUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i903.FetchUserInfoUseCase>(
+      () => _i903.FetchUserInfoUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i208.SubscribeMessagesUseCase>(
+      () => _i208.SubscribeMessagesUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i655.UpdateLastReadAtUseCase>(
+      () => _i655.UpdateLastReadAtUseCase(gh<_i413.ChatRepository>()),
     );
     gh.factory<_i1020.SetGoogleAccountUseCase>(
       () =>
@@ -585,6 +557,27 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i634.ReadCalendarFinalListUseCase>(),
         gh<_i153.RedirectUseCase>(),
       ),
+    );
+    gh.factory<_i41.DeleteUserUseCase>(
+      () => _i41.DeleteUserUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i353.FetchUserUseCase>(
+      () => _i353.FetchUserUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i309.NicknameOverlappingUseCase>(
+      () => _i309.NicknameOverlappingUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i618.UpdateGoogleSyncUseCase>(
+      () => _i618.UpdateGoogleSyncUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i825.UpdateimageUseCase>(
+      () => _i825.UpdateimageUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i837.UpdateNicknameUseCase>(
+      () => _i837.UpdateNicknameUseCase(gh<_i894.ProfileRepository>()),
+    );
+    gh.factory<_i73.UpdateNotificationUseCase>(
+      () => _i73.UpdateNotificationUseCase(gh<_i894.ProfileRepository>()),
     );
     gh.factory<_i570.GeocodeAddressUseCase>(
       () => _i570.GeocodeAddressUseCase(gh<_i527.LocationRepository>()),
@@ -676,6 +669,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i871.DeleteSchedulesByGroupIdUseCase>(),
         gh<_i570.GeocodeAddressUseCase>(),
         schedule,
+      ),
+    );
+    gh.factory<_i675.SignupViewModel>(
+      () => _i675.SignupViewModel(
+        gh<_i215.CheckNicknameDuplication>(),
+        gh<_i861.UploadProfileImageUseCase>(),
+        gh<_i715.CompleteSignupUseCase>(),
+        userDataSource: gh<_i991.UserDataSource>(),
       ),
     );
     gh.factoryParam<_i227.ScheduleAddViewModel, DateTime?, dynamic>(

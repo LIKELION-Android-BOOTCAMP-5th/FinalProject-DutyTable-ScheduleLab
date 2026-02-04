@@ -112,8 +112,8 @@ class NotificationViewModel with ChangeNotifier {
 
   /// 안 읽은 알림 존재 여부 계산
   Future<bool> hasUnreadNotifications() async {
-    final inviteFuture = _hasUnreadNotificationsUseCase();
-    final results = await Future.wait([inviteFuture]);
+    final inviteremiderFuture = _hasUnreadNotificationsUseCase();
+    final results = await Future.wait([inviteremiderFuture]);
 
     return [...results[0], ...results[1]].any((n) {
       if (n is InviteNotificationModel) return n.isRead == false;
