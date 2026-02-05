@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dutytable/core/di/injection.dart';
 import 'package:dutytable/features/calendar/domain/usecases/read_calendar_title_by_id_use_case.dart';
 import 'package:dutytable/features/calendar/domain/usecases/read_shared_calendar_from_id_use_case.dart';
 import 'package:dutytable/features/notification/domain/usecases/setup_realtime_listeners_use_case.dart';
@@ -23,10 +22,8 @@ class NavigationTarget {
 
 @injectable
 class NotificationViewModel with ChangeNotifier {
-  final ReadCalendarTitleByIdUseCase _readCalendarTitleByIdUseCase =
-      getIt<ReadCalendarTitleByIdUseCase>();
-  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase =
-      getIt<ReadSharedCalendarFromIdUseCase>();
+  final ReadCalendarTitleByIdUseCase _readCalendarTitleByIdUseCase;
+  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase;
   final SetupRealtimeListenersUseCase _setupRealtimeListenersUseCase;
   final DeleteAllNotificationsUseCase _deleteAllNotificationsUseCase;
   final MarkReminderAsReadUseCase _markReminderAsReadUseCase;
@@ -51,6 +48,8 @@ class NotificationViewModel with ChangeNotifier {
     this._markReminderAsReadUseCase,
     this._hasUnreadNotificationsUseCase,
     this._streamUseCase,
+    this._readCalendarTitleByIdUseCase,
+    this._readSharedCalendarFromIdUseCase,
   ) {
     loadInitialNotifications();
     setupRealtimeListeners();

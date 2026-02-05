@@ -529,6 +529,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i655.UpdateLastReadAtUseCase>(
       () => _i655.UpdateLastReadAtUseCase(gh<_i413.ChatRepository>()),
     );
+    gh.factory<_i1047.NotificationViewModel>(
+      () => _i1047.NotificationViewModel(
+        gh<_i330.SetupRealtimeListenersUseCase>(),
+        gh<_i630.DeleteAllNotificationsUseCase>(),
+        gh<_i726.MarkReminderAsReadUseCase>(),
+        gh<_i660.HasUnreadNotificationsUseCase>(),
+        gh<_i634.StreamUseCase>(),
+        gh<_i834.ReadCalendarTitleByIdUseCase>(),
+        gh<_i920.ReadSharedCalendarFromIdUseCase>(),
+      ),
+    );
     gh.factory<_i1020.SetGoogleAccountUseCase>(
       () =>
           _i1020.SetGoogleAccountUseCase(gh<_i511.GoogleCalendarRepository>()),
@@ -584,15 +595,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i65.SearchAddressUseCase>(
       () => _i65.SearchAddressUseCase(gh<_i527.LocationRepository>()),
-    );
-    gh.factory<_i1047.NotificationViewModel>(
-      () => _i1047.NotificationViewModel(
-        gh<_i330.SetupRealtimeListenersUseCase>(),
-        gh<_i630.DeleteAllNotificationsUseCase>(),
-        gh<_i726.MarkReminderAsReadUseCase>(),
-        gh<_i660.HasUnreadNotificationsUseCase>(),
-        gh<_i634.StreamUseCase>(),
-      ),
     );
     gh.factoryParam<_i758.OnboardingViewModel, _i264.VoidCallback, dynamic>(
       (onFinished, _) => _i758.OnboardingViewModel(
