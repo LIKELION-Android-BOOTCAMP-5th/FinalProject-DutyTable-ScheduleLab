@@ -1,25 +1,35 @@
 import 'dart:async';
 
-import 'package:dutytable/core/di/injection.dart';
 import 'package:dutytable/features/calendar/domain/usecases/read_calendar_title_by_id_use_case.dart';
 import 'package:dutytable/features/calendar/domain/usecases/read_shared_calendar_from_id_use_case.dart';
+import 'package:dutytable/features/notification/domain/usecases/setup_realtime_listeners_use_case.dart';
+import 'package:dutytable/features/notification/domain/usecases/stream_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
-import '../../data/datasources/notification_data_source.dart';
 import '../../data/models/invite_notification_model.dart';
 import '../../data/models/reminder_notification_model.dart';
+import '../../domain/usecases/delete_all_notifications_use_case.dart';
+import '../../domain/usecases/has_unread_notifications_use_case.dart';
+import '../../domain/usecases/mark_reminder_as_read_use_case.dart';
 
+@injectable
 class NavigationTarget {
   final String route;
   final Object? extra;
   const NavigationTarget(this.route, {this.extra});
 }
 
+@injectable
 class NotificationViewModel with ChangeNotifier {
-  final ReadCalendarTitleByIdUseCase _readCalendarTitleByIdUseCase =
-      getIt<ReadCalendarTitleByIdUseCase>();
-  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase =
-      getIt<ReadSharedCalendarFromIdUseCase>();
+  final ReadCalendarTitleByIdUseCase _readCalendarTitleByIdUseCase;
+  final ReadSharedCalendarFromIdUseCase _readSharedCalendarFromIdUseCase;
+  final SetupRealtimeListenersUseCase _setupRealtimeListenersUseCase;
+  final DeleteAllNotificationsUseCase _deleteAllNotificationsUseCase;
+  final MarkReminderAsReadUseCase _markReminderAsReadUseCase;
+  final HasUnreadNotificationsUseCase _hasUnreadNotificationsUseCase;
+  final StreamUseCase _streamUseCase;
+
   bool _isLoading = true;
   List<dynamic> _notifications = [];
 
@@ -32,20 +42,22 @@ class NotificationViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
   List<dynamic> get notifications => _notifications;
 
-  NotificationViewModel() {
+  NotificationViewModel(
+    this._setupRealtimeListenersUseCase,
+    this._deleteAllNotificationsUseCase,
+    this._markReminderAsReadUseCase,
+    this._hasUnreadNotificationsUseCase,
+    this._streamUseCase,
+    this._readCalendarTitleByIdUseCase,
+    this._readSharedCalendarFromIdUseCase,
+  ) {
     loadInitialNotifications();
     setupRealtimeListeners();
   }
 
   Future<void> loadInitialNotifications() async {
     try {
-      final inviteFuture = NotificationDataSource.shared
-          .getInviteNotifications();
-      final reminderFuture = NotificationDataSource.shared
-          .getReminderNotifications();
-
-      final results = await Future.wait([inviteFuture, reminderFuture]);
-      final List<dynamic> combinedList = [...results[0], ...results[1]];
+      final combinedList = await _hasUnreadNotificationsUseCase();
 
       // Invite 알림에 필요한 캘린더 제목 프리패치
       final titleFutures = <Future<void>>[];
@@ -75,34 +87,32 @@ class NotificationViewModel with ChangeNotifier {
   }
 
   void setupRealtimeListeners() {
-    _inviteSubscription = NotificationDataSource.shared.newInviteNotifications
-        .listen((notification) {
-          _notifications.insert(0, notification);
-          notifyListeners();
-        });
+    _setupRealtimeListenersUseCase();
 
-    _reminderSubscription = NotificationDataSource
-        .shared
-        .newReminderNotifications
-        .listen((notification) {
-          _notifications.insert(0, notification);
-          notifyListeners();
-        });
+    _inviteSubscription = _streamUseCase.inviteStream.listen((notification) {
+      _notifications.insert(0, notification);
+      notifyListeners();
+    });
+
+    _reminderSubscription = _streamUseCase.reminderStream.listen((
+      notification,
+    ) {
+      _notifications.insert(0, notification);
+      notifyListeners();
+    });
   }
 
   /// 전체삭제
   Future<void> deleteAllNotifications() async {
-    await NotificationDataSource.shared.deleteAllNotifications();
+    await _deleteAllNotificationsUseCase();
     _notifications.clear();
     notifyListeners();
   }
 
   /// 안 읽은 알림 존재 여부 계산
   Future<bool> hasUnreadNotifications() async {
-    final inviteFuture = NotificationDataSource.shared.getInviteNotifications();
-    final reminderFuture = NotificationDataSource.shared
-        .getReminderNotifications();
-    final results = await Future.wait([inviteFuture, reminderFuture]);
+    final inviteremiderFuture = _hasUnreadNotificationsUseCase();
+    final results = await Future.wait([inviteremiderFuture]);
 
     return [...results[0], ...results[1]].any((n) {
       if (n is InviteNotificationModel) return n.isRead == false;
@@ -126,7 +136,7 @@ class NotificationViewModel with ChangeNotifier {
   ) async {
     if (notification.isRead) return;
 
-    await NotificationDataSource.shared.markAsRead(notification.id, 'reminder');
+    await _markReminderAsReadUseCase(notification.id, 'remider');
     notification.isRead = true;
 
     notifyListeners();

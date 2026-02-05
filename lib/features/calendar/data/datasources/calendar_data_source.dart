@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart'; // Dio 라이브러리 임포트
-import 'package:dutytable/core/network/dio_client.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
@@ -10,8 +9,8 @@ import '../models/calendar_model.dart';
 
 @lazySingleton
 class CalendarDataSource {
-  CalendarDataSource();
-  final Dio _dio = DioClient.shared.dio;
+  CalendarDataSource(this._dio);
+  final Dio _dio;
 
   /// CREATE
   /// 캘린더 추가

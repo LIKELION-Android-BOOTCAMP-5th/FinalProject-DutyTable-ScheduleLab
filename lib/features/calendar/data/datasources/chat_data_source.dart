@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:dutytable/core/network/dio_client.dart';
 import 'package:dutytable/main.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,8 +7,8 @@ import '../../../../core/services/supabase_manager.dart';
 
 @lazySingleton
 class ChatDataSource {
-  ChatDataSource();
-  final Dio _dio = DioClient.shared.dio;
+  ChatDataSource(this._dio);
+  final Dio _dio;
 
   /// UPDATE
   // last_read_at 업데이트
