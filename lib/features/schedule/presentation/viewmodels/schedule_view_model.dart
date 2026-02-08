@@ -133,8 +133,19 @@ class ScheduleViewModel extends ChangeNotifier {
 
     try {
       await fetchSchedules();
-      _mySchedules = await _fetchMySchedules();
-      _allSharedSchedules = await _fetchAllSharedSchedules();
+
+      // 1. 내 일정 가져온 뒤 [My] 접두어 추가
+      final myResults = await _fetchMySchedules();
+      _mySchedules = myResults
+          .map((e) => e.copyWith(title: "[My] ${e.title}"))
+          .toList();
+
+      // 2. 모든 공유 일정 가져온 뒤 [공유] 접두어 추가
+      final sharedResults = await _fetchAllSharedSchedules();
+      _allSharedSchedules = sharedResults
+          .map((e) => e.copyWith(title: "[공유] ${e.title}"))
+          .toList();
+
       _scheduleDates = _schedules
           .map(
             (e) =>
@@ -220,12 +231,20 @@ class ScheduleViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchMySchedules() async {
-    _mySchedules = await _fetchMySchedules();
+    final results = await _fetchMySchedules();
+    // 데이터 저장 시 접두어 추가
+    _mySchedules = results
+        .map((e) => e.copyWith(title: "[My] ${e.title}"))
+        .toList();
     applyFilter();
   }
 
   Future<void> fetchAllSharedSchedules() async {
-    _allSharedSchedules = await _fetchAllSharedSchedules();
+    final results = await _fetchAllSharedSchedules();
+    // 데이터 저장 시 접두어 추가
+    _allSharedSchedules = results
+        .map((e) => e.copyWith(title: "[공유] ${e.title}"))
+        .toList();
     applyFilter();
   }
 
