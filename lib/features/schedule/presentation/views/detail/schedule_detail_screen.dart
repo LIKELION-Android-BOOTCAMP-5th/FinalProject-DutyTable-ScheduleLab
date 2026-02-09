@@ -1,7 +1,7 @@
 import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:dutytable/core/di/injection.dart';
 import 'package:dutytable/core/widgets/back_actions_app_bar.dart';
-import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
+import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
 import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_detail_view_model.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_body.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/schedule_detail_button_section.dart';
@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class ScheduleDetailScreen extends StatelessWidget {
-  final ScheduleModel scheduleDetail;
+  final ScheduleEntity scheduleDetail;
   final bool isAdmin;
   const ScheduleDetailScreen({
     super.key,
