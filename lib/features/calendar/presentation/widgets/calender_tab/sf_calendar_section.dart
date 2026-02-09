@@ -21,25 +21,30 @@ class SfCalendarSection extends StatelessWidget {
     );
 
     return Expanded(
-      child: SfCalendar(
-        dataSource: dataSource,
-        view: CalendarView.month,
-        headerDateFormat: 'yyyy년 MM월',
-        backgroundColor: AppColors.background(context),
-        todayTextStyle: TextStyle(color: AppColors.pureWhite),
-        todayHighlightColor: AppColors.primaryBlue,
-        selectionDecoration: BoxDecoration(
-          border: Border.all(color: AppColors.primaryBlue, width: 2),
-        ),
-        headerStyle: _headerStyle(context),
-        viewHeaderStyle: _viewHeaderStyle(context),
-        monthViewSettings: _monthViewSettings(context),
-        onTap: (details) => _handleCalendarTap(context, details),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final bool isSpaceTooSmall = constraints.maxHeight < 350;
+
+          return SfCalendar(
+            dataSource: dataSource,
+            view: CalendarView.month,
+            headerDateFormat: 'yyyy년 MM월',
+            backgroundColor: AppColors.background(context),
+            todayTextStyle: TextStyle(color: AppColors.pureWhite),
+            todayHighlightColor: AppColors.primaryBlue,
+            selectionDecoration: BoxDecoration(
+              border: Border.all(color: AppColors.primaryBlue, width: 2),
+            ),
+            headerStyle: _headerStyle(context),
+            viewHeaderStyle: _viewHeaderStyle(context),
+            monthViewSettings: _monthViewSettings(context, isSpaceTooSmall),
+            onTap: (details) => _handleCalendarTap(context, details),
+          );
+        },
       ),
     );
   }
 
-  /// 캘린더 헤더 스타일
   CalendarHeaderStyle _headerStyle(BuildContext context) {
     return CalendarHeaderStyle(
       textAlign: TextAlign.center,
@@ -52,7 +57,6 @@ class SfCalendarSection extends StatelessWidget {
     );
   }
 
-  /// 캘린더 뷰 헤더 스타일
   ViewHeaderStyle _viewHeaderStyle(BuildContext context) {
     return ViewHeaderStyle(
       dayTextStyle: TextStyle(
@@ -62,10 +66,16 @@ class SfCalendarSection extends StatelessWidget {
     );
   }
 
-  /// 월 뷰 셋팅
-  MonthViewSettings _monthViewSettings(BuildContext context) {
+  MonthViewSettings _monthViewSettings(
+    BuildContext context,
+    bool isSpaceTooSmall,
+  ) {
     return MonthViewSettings(
-      appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
+      appointmentDisplayMode: isSpaceTooSmall
+          ? MonthAppointmentDisplayMode.indicator
+          : MonthAppointmentDisplayMode.appointment,
+
+      appointmentDisplayCount: 2,
 
       monthCellStyle: MonthCellStyle(
         textStyle: TextStyle(color: AppColors.textMain(context)),
@@ -81,10 +91,7 @@ class SfCalendarSection extends StatelessWidget {
   ) async {
     final date = details.date;
     if (date == null) return;
-
     viewModel.changeSelectedDay(date);
-
-    // 일정 존재 여부 확인 로직
     final hasSchedule = viewModel.displaySchedules.any(
       (s) => s.containsDay(date),
     );
