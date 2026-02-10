@@ -47,6 +47,19 @@ class ProfileViewmodel extends ChangeNotifier {
   ) {
     _init();
   }
+  bool _isDisposed = false;
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_isDisposed) {
+      super.notifyListeners();
+    }
+  }
 
   /// 데이터 로딩 상태(private)
   viewState _state = viewState.success;

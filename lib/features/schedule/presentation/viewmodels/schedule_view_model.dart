@@ -376,4 +376,11 @@ class ScheduleViewModel extends ChangeNotifier {
     _isDisposed = true;
     super.dispose();
   }
+
+  @override
+  void notifyListeners() {
+    if (!_isDisposed) {
+      super.notifyListeners();
+    }
+  }
 }
