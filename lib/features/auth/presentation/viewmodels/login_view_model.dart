@@ -138,7 +138,7 @@ class LoginViewModel extends ChangeNotifier {
           margin: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
         ),
       );
-      GoRouter.of(context).go('/splash');
+      GoRouter.of(context).go('/shared');
       return;
     }
 
