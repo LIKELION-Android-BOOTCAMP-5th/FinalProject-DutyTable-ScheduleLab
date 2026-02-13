@@ -26,49 +26,46 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _redirect() async {
-    // 마운트되지 않은 위젯에서 비동기 작업을 방지하기 위해 mounted 확인
     if (!mounted) return;
 
-    // 로그인 화면으로 이동해야 하는지 여부 플래그
     bool shouldRedirectToLogin = false;
 
     try {
       final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
+
       final isAutoLogin = prefs.getBool('auto_login') ?? true;
 
-      // 자동 로그인이 꺼져 있다면 로그아웃
       if (!isAutoLogin) {
         await Supabase.instance.client.auth.signOut();
+        if (!mounted) return;
       }
 
-      // 현재 세션 확인
       final session = Supabase.instance.client.auth.currentSession;
       final isLoggedIn = isAutoLogin && session != null;
 
       if (isLoggedIn) {
-        // 로그인 상태인 경우, 데이터 로드 및 알림 리스너 설정
+        if (!mounted) return;
         await NotificationDataSource.shared.setupNotificationListenersAndState(
           context,
         );
+        if (!mounted) return;
         context.read<SharedCalendarViewModel>().fetchCalendars();
       } else {
-        // 로그인 상태가 아닌 경우, 로그인 화면으로 이동 플래그 설정
         shouldRedirectToLogin = true;
       }
     } catch (e) {
-      // 인증 또는 데이터 로드 중 오류 발생 시
       debugPrint("Auth or Data prefetch failed: $e");
-      shouldRedirectToLogin = true; // 오류 발생 시 로그인 화면으로 이동
-    } finally {
-      if (shouldRedirectToLogin) {
-        // 자동 로그인 설정이 꺼졌거나, 인증/데이터 로드에 실패하면 로그인으로 이동
-        context.go('/login');
-      } else {
-        // 인증 및 데이터 로드에 성공하면 메인 화면으로 이동하며 데이터를 전달
-        context.go('/shared');
-      }
+      shouldRedirectToLogin = true;
     }
+
     if (!mounted) return;
+
+    if (shouldRedirectToLogin) {
+      context.go('/login');
+    } else {
+      context.go('/shared');
+    }
   }
 
   @override
