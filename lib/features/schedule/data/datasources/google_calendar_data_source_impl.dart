@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dutytable/features/schedule/data/datasources/google_calendar_data_source.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:injectable/injectable.dart';
@@ -23,7 +24,7 @@ class GoogleCalendarDataSourceImpl implements GoogleCalendarDataSource {
       "www.googleapis.com",
       "/calendar/v3/calendars/$calendarId/events",
       {
-        'key': const String.fromEnvironment('GOOGLE_API_KEY'),
+        'key': dotenv.get('GOOGLE_API_KEY'),
         'timeMin': "$targetYear-01-01T00:00:00Z",
         'timeMax': "${targetYear + 1}-12-31T23:59:59Z",
         'singleEvents': 'true',
