@@ -29,6 +29,7 @@ class ScheduleDetailViewModel extends ChangeNotifier {
 
   final int _scheduleId;
   final bool _isAdmin;
+  bool _disposed = false;
 
   //-------------------- Getter --------------------
 
@@ -145,5 +146,17 @@ class ScheduleDetailViewModel extends ChangeNotifier {
     } catch (e) {
       debugPrint('❌ 공유하기 에러: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
   }
 }
