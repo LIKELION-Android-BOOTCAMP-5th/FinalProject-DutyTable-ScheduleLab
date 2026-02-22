@@ -104,11 +104,7 @@ class ScheduleDetailEditBody extends StatelessWidget {
                 /// 일정 반복 - 선택 사항(기본 값 - false, 체크 박스)
                 RepeatSection(
                   isRepeat: viewModel.isRepeat,
-                  repeatOption: viewModel.repeatOption,
-                  repeatNum: viewModel.repeatNum,
                   onRepeatToggle: (value) => viewModel.setIsRepeat(value),
-                  onRepeatNum: (value) => viewModel.setRepeatNum(value),
-                  onRepeatOption: (value) => viewModel.setRepeatOption(value),
                 ),
 
                 const SizedBox(height: 24),
@@ -116,14 +112,23 @@ class ScheduleDetailEditBody extends StatelessWidget {
                 /// 반복 옵션 - 일정 반복(false - 비활성, true - 활성)
                 RepeatOptionSection(
                   isRepeat: viewModel.isRepeat,
+                  today: viewModel.startDate,
+                  excludedDates: viewModel.excludedDates,
+                  itemCount: viewModel.excludedDates.length,
+                  onSelectedDate: (date) => viewModel.addExcludedDate(date),
+                  onRemoveDate: (index) => viewModel.removeExcludedDate(index),
                   weekendException: viewModel.weekendException,
                   holidayException: viewModel.holidayException,
+                  repeatOption: viewModel.repeatOption,
+                  repeatNum: viewModel.repeatNum,
+                  repeatCount: viewModel.repeatCount,
                   onWeekendException: (value) =>
                       viewModel.setWeekendException(value),
                   onHolidayException: (value) =>
                       viewModel.setHolidayException(value),
-                  repeatCount: viewModel.repeatCount,
                   onRepeatCount: (value) => viewModel.setRepeatCount(value),
+                  onRepeatNum: (value) => viewModel.setRepeatNum(value),
+                  onRepeatOption: (value) => viewModel.setRepeatOption(value),
                 ),
 
                 const SizedBox(height: 24),
