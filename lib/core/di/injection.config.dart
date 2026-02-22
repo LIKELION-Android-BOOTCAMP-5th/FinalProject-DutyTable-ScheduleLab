@@ -240,6 +240,8 @@ import '../../features/schedule/domain/usecases/update_schedule_use_case.dart'
     as _i595;
 import '../../features/schedule/domain/usecases/update_schedules_by_group_id_use_case.dart'
     as _i830;
+import '../../features/schedule/presentation/viewmodels/location_search_view_model.dart'
+    as _i225;
 import '../../features/schedule/presentation/viewmodels/schedule_add_view_model.dart'
     as _i227;
 import '../../features/schedule/presentation/viewmodels/schedule_detail_view_model.dart'
@@ -680,6 +682,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i715.CompleteSignupUseCase>(),
         userDataSource: gh<_i991.UserDataSource>(),
       ),
+    );
+    gh.factory<_i225.LocationSearchViewModel>(
+      () => _i225.LocationSearchViewModel(gh<_i65.SearchAddressUseCase>()),
     );
     gh.factoryParam<_i227.ScheduleAddViewModel, DateTime?, dynamic>(
       (date, _) => _i227.ScheduleAddViewModel(

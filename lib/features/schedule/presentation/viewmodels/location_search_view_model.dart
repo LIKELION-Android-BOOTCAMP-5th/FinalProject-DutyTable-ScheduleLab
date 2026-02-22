@@ -1,8 +1,11 @@
 import 'dart:async';
+
 import 'package:dutytable/features/schedule/domain/entities/location_search_result_entity.dart';
 import 'package:dutytable/features/schedule/domain/usecases/search_address_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:injectable/injectable.dart';
 
+@injectable
 class LocationSearchViewModel extends ChangeNotifier {
   final SearchAddressUseCase _searchAddressUseCase;
 

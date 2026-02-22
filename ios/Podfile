@@ -45,4 +45,7 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
   end
+# CocoaPods가 프로젝트 파일을 생성할 때 '70'이 아닌 '56'(Xcode 15) 버전으로 쓰도록 강제합니다.
+  installer.pods_project.instance_variable_set(:@object_version, '56')
+  installer.pods_project.save
 end
