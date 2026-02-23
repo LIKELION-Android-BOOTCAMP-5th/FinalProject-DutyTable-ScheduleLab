@@ -59,6 +59,9 @@ class ScheduleAddViewModel extends ChangeNotifier {
   /// 메모
   String _memo = "";
 
+  /// 제외할 특정 날짜 리스트
+  List<DateTime> _excludedDates = [];
+
   //-------------------- Getters --------------------
   ViewState get state => _state;
 
@@ -85,6 +88,8 @@ class ScheduleAddViewModel extends ChangeNotifier {
   String? get latitude => _latitude;
 
   String get memo => _memo;
+
+  List<DateTime> get excludedDates => _excludedDates;
 
   //-------------------- Constructor --------------------
 
@@ -175,6 +180,22 @@ class ScheduleAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 제외 날짜 추가 (중복 체크 포함)
+  void addExcludedDate(DateTime date) {
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    if (!_excludedDates.contains(dateOnly)) {
+      _excludedDates.add(dateOnly);
+      _excludedDates.sort(); // 날짜순 정렬
+      notifyListeners();
+    }
+  }
+
+  /// 제외 날짜 삭제
+  void removeExcludedDate(int index) {
+    _excludedDates.removeAt(index);
+    notifyListeners();
+  }
+
   //-------------------- Create --------------------
 
   /// 일정 - 추가
@@ -214,11 +235,20 @@ class ScheduleAddViewModel extends ChangeNotifier {
       while (createdCount < targetCount && attempts < 3000) {
         attempts++;
 
-        if (currentStartDate.checkIsException(
-          holidays: holidays,
-          weekendException: _weekendException,
-          holidayException: _holidayException,
-        )) {
+        // 기존 예외(주말, 공휴일) + 사용자가 직접 추가한 제외 날짜(_excludedDates) 체크
+        bool isExcludedByUser = _excludedDates.any(
+          (d) =>
+              d.year == currentStartDate.year &&
+              d.month == currentStartDate.month &&
+              d.day == currentStartDate.day,
+        );
+
+        if (isExcludedByUser ||
+            currentStartDate.checkIsException(
+              holidays: holidays,
+              weekendException: _weekendException,
+              holidayException: _holidayException,
+            )) {
           currentStartDate = currentStartDate.add(const Duration(days: 1));
           continue;
         }

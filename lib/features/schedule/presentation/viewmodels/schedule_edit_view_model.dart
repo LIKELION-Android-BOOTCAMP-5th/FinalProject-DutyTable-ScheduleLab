@@ -50,6 +50,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
   String? _latitude;
   String? _longitude;
   String _memo = "";
+  List<DateTime> _excludedDates = [];
 
   //-------------------- Getters --------------------
 
@@ -74,6 +75,7 @@ class ScheduleEditViewModel extends ChangeNotifier {
   String? get latitude => _latitude;
   String? get longitude => _longitude;
   String get memo => _memo;
+  List<DateTime> get excludedDates => _excludedDates;
 
   //-------------------- Constructor --------------------
 
@@ -145,6 +147,22 @@ class ScheduleEditViewModel extends ChangeNotifier {
   void setWeekendException(bool v) => _set(() => _weekendException = v);
   void setHolidayException(bool v) => _set(() => _holidayException = v);
   void setRepeatCount(int v) => _set(() => _repeatCount = v);
+
+  /// 제외 날짜 추가
+  void addExcludedDate(DateTime date) {
+    final dateOnly = DateTime(date.year, date.month, date.day);
+    if (!_excludedDates.contains(dateOnly)) {
+      _excludedDates.add(dateOnly);
+      _excludedDates.sort();
+      notifyListeners();
+    }
+  }
+
+  /// 제외 날짜 삭제
+  void removeExcludedDate(int index) {
+    _excludedDates.removeAt(index);
+    notifyListeners();
+  }
 
   //-------------------- Update --------------------
 
@@ -249,11 +267,21 @@ class ScheduleEditViewModel extends ChangeNotifier {
     while (createdCount < _repeatCount && safetyLoop < 3000) {
       safetyLoop++;
 
-      if (currentStart.checkIsException(
-        holidays: holidays,
-        weekendException: _weekendException,
-        holidayException: _holidayException,
-      )) {
+      // 1. 사용자가 직접 추가한 제외 날짜 리스트에 포함되는지 확인
+      bool isExcludedByUser = _excludedDates.any(
+        (d) =>
+            d.year == currentStart.year &&
+            d.month == currentStart.month &&
+            d.day == currentStart.day,
+      );
+
+      // 2. 사용자 제외 날짜이거나 주말/공휴일 예외인 경우 건너뛰기
+      if (isExcludedByUser ||
+          currentStart.checkIsException(
+            holidays: holidays,
+            weekendException: _weekendException,
+            holidayException: _holidayException,
+          )) {
         currentStart = currentStart.add(const Duration(days: 1));
         continue;
       }
