@@ -37,6 +37,12 @@ class PersonalCalendarViewModel extends ChangeNotifier {
   /// 캘린더 데이터(public)
   CalendarEntity? get calendar => _calendar;
 
+  /// 현재 탭 인덱스(private)
+  int _currentIndex = 0;
+
+  /// 현재 탭 인덱스(public)
+  int get currentIndex => _currentIndex;
+
   /// 개인 캘린더 뷰모델
   PersonalCalendarViewModel(this._readPersonalCalendarUseCase) {
     _init();
@@ -60,5 +66,11 @@ class PersonalCalendarViewModel extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  /// 탭 인덱스 변경
+  void setTabIndex(int index) {
+    _currentIndex = index;
+    notifyListeners();
   }
 }

@@ -187,4 +187,11 @@ class ChatViewModel extends ChangeNotifier {
     scrollController.dispose();
     super.dispose();
   }
+
+  bool aiScheduleFold = true;
+
+  void toggleAiScheduleFold() {
+    aiScheduleFold = !aiScheduleFold;
+    notifyListeners();
+  }
 }

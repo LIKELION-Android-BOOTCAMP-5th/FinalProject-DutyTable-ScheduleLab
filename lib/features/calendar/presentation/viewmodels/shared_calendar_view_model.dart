@@ -52,10 +52,16 @@ class SharedCalendarViewModel extends ChangeNotifier {
   int get tabLength => _tabNames.length;
 
   /// 현재 선택 된 탭의 인덱스(private)
-  final int _currentIndex = 0;
+  int _currentIndex = 0;
 
   /// 현재 선택 된 탭의 인덱스(public)
   int get currentIndex => _currentIndex;
+
+  /// 탭 인덱스 변경
+  void setTabIndex(int index) {
+    _currentIndex = index;
+    notifyListeners();
+  }
 
   /// 에러 메세지(private)
   String? _errorMessage;

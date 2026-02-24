@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../core/di/injection.dart';
+import '../../widgets/chat_ai_info_dialog/chat_ai_info.dart';
 import '../../widgets/custom_appbar_icon.dart';
 
 class SharedCalendarScreen extends StatelessWidget {
@@ -49,6 +50,17 @@ class _SharedCalendarScreen extends StatelessWidget {
             actions: [
               Row(
                 children: [
+                  viewModel.currentIndex == 2
+                      ? CustomAppBarIcon(
+                          icon: Icons.info_outline,
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => ChatAiInfo(),
+                            );
+                          },
+                        )
+                      : SizedBox.shrink(),
                   viewModel.calendar!.userId == viewModel.currentUserId
                       ? CustomAppBarIcon(
                           icon: Icons.person_add_alt,
@@ -84,6 +96,9 @@ class _SharedCalendarScreen extends StatelessWidget {
           body: SafeArea(
             // 커스텀 캘린더 탭뷰 사용
             child: CustomCalendarTabView(
+              onTabChanged: (index) {
+                context.read<SharedCalendarViewModel>().setTabIndex(index);
+              },
               // 탭 갯수
               tabLength: viewModel.tabLength,
               // 각 탭의 이름 리스트

@@ -20,6 +20,7 @@ import '../../features/calendar/domain/entities/calendar_entity.dart';
 import '../../features/calendar/presentation/viewmodels/personal_calendar_view_model.dart';
 import '../../features/calendar/presentation/views/setting/calendar_setting_screen.dart';
 import '../../features/calendar/presentation/views/shared/list/shared_calendar_list_screen.dart';
+import '../../features/calendar/presentation/widgets/chat_ai_info_dialog/chat_ai_info.dart';
 import '../../oss_licenses.dart';
 import '../di/injection.dart';
 import 'app_shell.dart';
@@ -48,6 +49,14 @@ GoRouter createRouter(BuildContext context) {
         builder: (context, state) {
           final CalendarEntity? calendar = state.extra as CalendarEntity?;
           return CalendarEditScreen(calendar: calendar);
+        },
+      ),
+
+      // 공유(개인)캘린더 - 채팅 ai 정보
+      GoRoute(
+        path: '/calendar/chatInfo',
+        builder: (context, state) {
+          return ChatAiInfo();
         },
       ),
 

@@ -5,12 +5,14 @@ class CustomCalendarTabView extends StatefulWidget {
   final int tabLength;
   final List<String> tabNameList;
   final List<Widget> tabViewWidgetList;
+  final ValueChanged<int>? onTabChanged;
 
   const CustomCalendarTabView({
     super.key,
     required this.tabLength,
     required this.tabNameList,
     required this.tabViewWidgetList,
+    this.onTabChanged,
   }) : assert(
          tabLength == tabNameList.length &&
              tabLength == tabViewWidgetList.length,
@@ -50,6 +52,7 @@ class _CustomCalendarTabViewState extends State<CustomCalendarTabView> {
     });
 
     _pageController.jumpToPage(index);
+    widget.onTabChanged?.call(index);
   }
 
   @override
@@ -66,6 +69,7 @@ class _CustomCalendarTabViewState extends State<CustomCalendarTabView> {
             onPageChanged: (index) {
               setState(() {
                 _selectedIndex = index;
+                widget.onTabChanged?.call(index);
               });
             },
             children: widget.tabViewWidgetList,
