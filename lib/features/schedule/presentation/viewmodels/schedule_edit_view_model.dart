@@ -51,6 +51,8 @@ class ScheduleEditViewModel extends ChangeNotifier {
   String? _longitude;
   String _memo = "";
   List<DateTime> _excludedDates = [];
+  late String _endOption;
+  late DateTime _endDateForRepeat;
 
   //-------------------- Getters --------------------
 
@@ -76,6 +78,8 @@ class ScheduleEditViewModel extends ChangeNotifier {
   String? get longitude => _longitude;
   String get memo => _memo;
   List<DateTime> get excludedDates => _excludedDates;
+  String get endOption => _endOption;
+  DateTime get endDateForRepeat => _endDateForRepeat;
 
   //-------------------- Constructor --------------------
 
@@ -117,6 +121,15 @@ class ScheduleEditViewModel extends ChangeNotifier {
     _weekendException = schedule.weekendException ?? false;
     _holidayException = schedule.holidayException ?? false;
     _repeatCount = schedule.repeatCount ?? 1;
+    // [추가] String 리스트를 DateTime 리스트로 변환하여 초기화
+    _excludedDates =
+        schedule.excludedDates?.map((dateStr) {
+          return DateTime.parse(dateStr);
+        }).toList() ??
+        [];
+    // [보완] 기존 데이터의 종료 옵션 판단 (repeatCount가 있으면 'count', 없으면 'date' 등 서비스 기획에 맞춰 설정)
+    _endOption = "count";
+    _endDateForRepeat = DateTime.now().add(const Duration(days: 30));
 
     _address = schedule.address;
     _latitude = schedule.latitude;
@@ -164,6 +177,52 @@ class ScheduleEditViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateEndOption(String value) {
+    _endOption = value;
+    _calculateRepeatCountFromDate(); // 옵션 변경 시 횟수 재계산
+    notifyListeners();
+  }
+
+  void updateEndDateForRepeat(DateTime value) {
+    _endDateForRepeat = value;
+    _calculateRepeatCountFromDate(); // 날짜 변경 시 횟수 재계산
+    notifyListeners();
+  }
+
+  /// 종료 날짜를 기준으로 repeatCount를 역산하는 로직
+  void _calculateRepeatCountFromDate() {
+    if (_endOption != 'date') return;
+
+    int count = 0;
+    DateTime tempDate = DateTime(
+      _startDate.year,
+      _startDate.month,
+      _startDate.day,
+    );
+    DateTime targetEndDate = DateTime(
+      _endDateForRepeat.year,
+      _endDateForRepeat.month,
+      _endDateForRepeat.day,
+    );
+
+    // 안전을 위해 최대 1000회까지만 계산
+    while ((tempDate.isBefore(targetEndDate) ||
+            tempDate.isAtSameMomentAs(targetEndDate)) &&
+        count < 1000) {
+      // jumpToNextWorkingDay 등의 확장 함수를 활용해 다음 일정 날짜로 이동
+      // (이 로직은 프로젝트의 extensions.dart에 정의된 jump 로직과 동일해야 함)
+      count++;
+      tempDate = tempDate.jumpToNextWorkingDay(
+        repeatOption: _repeatOption,
+        repeatNum: _repeatNum,
+        holidays: [], // 정확한 계산을 위해 필요시 holidays fetch 로직 연동
+        weekendException: _weekendException,
+        holidayException: _holidayException,
+      );
+    }
+    _repeatCount = count > 0 ? count : 1;
+  }
+
   //-------------------- Update --------------------
 
   Future<void> updateSingleSchedule() async =>
@@ -182,49 +241,74 @@ class ScheduleEditViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final startedAt = DateTime(
-        _startDate.year,
-        _startDate.month,
-        _startDate.day,
-        _startTime.hour,
-        _startTime.minute,
-      );
-      final endedAt = DateTime(
-        _endDate.year,
-        _endDate.month,
-        _endDate.day,
-        _endTime.hour,
-        _endTime.minute,
-      );
-
-      final Map<String, dynamic> commonPayload = {
-        'title': _title.trim(),
-        'emotion_tag': _emotionTag,
-        'color_value': _colorValue,
-        'address': _address,
-        'latitude': _latitude,
-        'longitude': _longitude,
-        'memo': _memo.trim().isEmpty ? null : _memo.trim(),
-        'is_done': _isDone,
-        'weekend_exception': _weekendException,
-        'holiday_exception': _holidayException,
-      };
-
       if (isAll && repeatGroupId != null) {
+        // 1. 기존 그룹 삭제
         await _deleteSchedulesByGroupIdUseCase(repeatGroupId!);
 
-        final newSchedules = await _generateNewSchedules(repeatGroupId!);
+        // 2. 엣지 펑션용 페이로드 생성 (ScheduleAddViewModel과 동일한 규격)
+        final Map<String, dynamic> payload = {
+          'calendarId': _scheduleFromEdit.calendarId,
+          'title': _title.trim(),
+          'emotionTag': _emotionTag,
+          'colorValue': _colorValue,
+          'isDone': _isDone,
+          'startDate': _startDate.toIso8601String().split('T')[0],
+          'startTime':
+              '${_startTime.hour.toString().padLeft(2, '0')}:${_startTime.minute.toString().padLeft(2, '0')}',
+          'endTime':
+              '${_endTime.hour.toString().padLeft(2, '0')}:${_endTime.minute.toString().padLeft(2, '0')}',
+          'isRepeat': _isRepeat,
+          'repeatOption': _isRepeat ? _repeatOption : 'none',
+          'repeatNum': _isRepeat ? _repeatNum : 1,
+          'repeatCount': _isRepeat ? _repeatCount : 1,
+          'weekendException': _weekendException,
+          'holidayException': _holidayException,
+          'excludedDates': _excludedDates
+              .map((d) => d.toIso8601String().split('T')[0])
+              .toList(),
+          'address': _address,
+          'latitude': _latitude,
+          'longitude': _longitude,
+          'memo': _memo.trim().isEmpty ? null : _memo.trim(),
+          'excludedDates': _excludedDates
+              .map(
+                (d) =>
+                    "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}",
+              )
+              .toList(),
+        };
 
-        await _addScheduleUseCase(newSchedules);
+        // 3. 엣지 펑션을 호출하여 새 그룹 생성
+        await _addScheduleUseCase(payload);
       } else {
+        // 단건 수정 로직 (기존 유지)
+        final startedAt = DateTime(
+          _startDate.year,
+          _startDate.month,
+          _startDate.day,
+          _startTime.hour,
+          _startTime.minute,
+        );
+        final endedAt = DateTime(
+          _endDate.year,
+          _endDate.month,
+          _endDate.day,
+          _endTime.hour,
+          _endTime.minute,
+        );
+
         final singlePayload = {
-          ...commonPayload,
+          'title': _title.trim(),
+          'emotion_tag': _emotionTag,
+          'color_value': _colorValue,
           'started_at': startedAt.toUtc().toIso8601String(),
           'ended_at': endedAt.toUtc().toIso8601String(),
           'is_repeat': _isRepeat,
-          'repeat_option': _isRepeat ? _repeatOption : null,
-          'repeat_num': _isRepeat ? _repeatNum : null,
-          'repeat_count': _isRepeat ? _repeatCount : null,
+          'address': _address,
+          'latitude': _latitude,
+          'longitude': _longitude,
+          'memo': _memo.trim().isEmpty ? null : _memo.trim(),
+          'is_done': _isDone,
         };
         await _updateSchedule(scheduleId, singlePayload);
       }
