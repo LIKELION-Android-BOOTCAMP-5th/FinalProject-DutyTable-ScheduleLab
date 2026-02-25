@@ -263,9 +263,6 @@ class ScheduleEditViewModel extends ChangeNotifier {
           'repeatCount': _isRepeat ? _repeatCount : 1,
           'weekendException': _weekendException,
           'holidayException': _holidayException,
-          'excludedDates': _excludedDates
-              .map((d) => d.toIso8601String().split('T')[0])
-              .toList(),
           'address': _address,
           'latitude': _latitude,
           'longitude': _longitude,
