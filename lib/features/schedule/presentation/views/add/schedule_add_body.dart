@@ -6,7 +6,7 @@ import 'package:dutytable/features/schedule/presentation/views/widgets/location_
 import 'package:dutytable/features/schedule/presentation/views/widgets/location_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/memo_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_option_section.dart';
-import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_section.dart';
+import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_toggle_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/start_and_end_date_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/start_and_end_time_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/title_section.dart';
@@ -105,7 +105,7 @@ class ScheduleAddBody extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   /// 일정 반복 - 선택 사항(기본 값 - false, 체크 박스)
-                  RepeatSection(
+                  RepeatToggleSection(
                     isRepeat: viewModel.isRepeat,
                     onRepeatToggle: (value) => viewModel.isRepeat = value,
                   ),

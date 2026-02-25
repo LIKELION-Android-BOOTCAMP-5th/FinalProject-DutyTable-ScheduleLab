@@ -2,7 +2,7 @@ import 'package:dutytable/features/schedule/presentation/viewmodels/schedule_det
 import 'package:dutytable/features/schedule/presentation/views/detail/widgets/emotion_color_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/widgets/location_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/widgets/memo_section.dart';
-import 'package:dutytable/features/schedule/presentation/views/detail/widgets/repeat_section.dart';
+import 'package:dutytable/features/schedule/presentation/views/detail/widgets/repeat_detail_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/widgets/schedule_date_time.dart';
 import 'package:dutytable/features/schedule/presentation/views/detail/widgets/success_status_section.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +53,7 @@ class ScheduleDetailBody extends StatelessWidget {
 
                 ///일정 상세 - 반복
                 // 반복 설정이 있을 때만 보여주거나, 없으면 '없음'으로 표시
-                const RepeatSection(),
+                const RepeatDetailSection(),
 
                 const _DividerGap(),
 
