@@ -114,12 +114,16 @@ class ScheduleAddBody extends StatelessWidget {
 
                   /// 반복 옵션 - 일정 반복(false - 비활성, true - 활성)
                   RepeatOptionSection(
+                    endOption: viewModel.endOption,
+                    endDate: viewModel.endDateForRepeat,
+                    onEndOption: (value) => viewModel.updateEndOption(value),
+                    onEndDate: (value) =>
+                        viewModel.updateEndDateForRepeat(value),
                     excludedDates: viewModel.excludedDates,
                     onRemoveDate: (index) =>
                         viewModel.removeExcludedDate(index),
                     today: viewModel.startDate,
                     onSelectedDate: (date) => viewModel.addExcludedDate(date),
-                    itemCount: viewModel.excludedDates.length,
                     isRepeat: viewModel.isRepeat,
                     weekendException: viewModel.weekendException,
                     holidayException: viewModel.holidayException,
