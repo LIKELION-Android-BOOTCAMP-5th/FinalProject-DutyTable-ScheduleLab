@@ -62,6 +62,12 @@ class ScheduleAddViewModel extends ChangeNotifier {
   /// 제외할 특정 날짜 리스트
   List<DateTime> _excludedDates = [];
 
+  /// 반복 종료 옵션 ('count': 횟수 기준, 'date': 날짜 기준)
+  String _endOption = "count";
+
+  /// 반복 종료 날짜 (날짜 기준 선택 시 사용)
+  DateTime _endDateForRepeat = DateTime.now().add(const Duration(days: 30));
+
   //-------------------- Getters --------------------
   ViewState get state => _state;
 
@@ -90,6 +96,9 @@ class ScheduleAddViewModel extends ChangeNotifier {
   String get memo => _memo;
 
   List<DateTime> get excludedDates => _excludedDates;
+
+  String get endOption => _endOption;
+  DateTime get endDateForRepeat => _endDateForRepeat;
 
   //-------------------- Constructor --------------------
 
@@ -196,114 +205,98 @@ class ScheduleAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateEndOption(String value) {
+    _endOption = value;
+    _calculateRepeatCountFromDate(); // 옵션 변경 시 횟수 재계산
+    notifyListeners();
+  }
+
+  void updateEndDateForRepeat(DateTime value) {
+    _endDateForRepeat = value;
+    _calculateRepeatCountFromDate(); // 날짜 변경 시 횟수 재계산
+    notifyListeners();
+  }
+
+  /// 종료 날짜를 기준으로 repeatCount를 역산하는 로직
+  void _calculateRepeatCountFromDate() {
+    if (_endOption != 'date') return;
+
+    int count = 0;
+    DateTime tempDate = DateTime(
+      _startDate.year,
+      _startDate.month,
+      _startDate.day,
+    );
+    DateTime targetEndDate = DateTime(
+      _endDateForRepeat.year,
+      _endDateForRepeat.month,
+      _endDateForRepeat.day,
+    );
+
+    // 안전을 위해 최대 1000회까지만 계산
+    while ((tempDate.isBefore(targetEndDate) ||
+            tempDate.isAtSameMomentAs(targetEndDate)) &&
+        count < 1000) {
+      count++;
+      tempDate = tempDate.jumpToNextWorkingDay(
+        repeatOption: _repeatOption,
+        repeatNum: _repeatNum,
+        holidays: [],
+        weekendException: _weekendException,
+        holidayException: _holidayException,
+      );
+    }
+    _repeatCount = count > 0 ? count : 1;
+  }
+
   //-------------------- Create --------------------
 
-  /// 일정 - 추가
+  /// 일정 - 추가 (Edge Function 호출 방식으로 변경)
   Future<void> addSchedule(int calendarId) async {
     _state = ViewState.loading;
     notifyListeners();
 
     try {
-      List<DateTime> holidays = [];
-      if (_isRepeat && _holidayException) {
-        holidays = await _fetchHolidaysUseCase(_startDate.year);
-      }
+      final Map<String, dynamic> payload = {
+        'calendarId': calendarId,
+        'title': _title.trim(),
+        'emotionTag': _emotionTag,
+        'colorValue': _colorValue,
+        'isDone': _isDone,
 
-      final String? groupId = _isRepeat
-          ? "group_${DateTime.now().millisecondsSinceEpoch}_$calendarId"
-          : null;
+        // 날짜 및 시간 정보 (문자열로 전달)
+        'startDate': _startDate.toIso8601String().split('T')[0], // yyyy-MM-dd
+        'startTime':
+            '${_startTime.hour.toString().padLeft(2, '0')}:${_startTime.minute.toString().padLeft(2, '0')}',
+        'endTime':
+            '${_endTime.hour.toString().padLeft(2, '0')}:${_endTime.minute.toString().padLeft(2, '0')}',
 
-      List<Map<String, dynamic>> payloads = [];
-      int createdCount = 0;
-      int targetCount = _isRepeat ? (_repeatCount) : 1;
+        // 반복 관련 설정
+        'isRepeat': _isRepeat,
+        'repeatOption': _isRepeat ? _repeatOption : 'none',
+        'repeatNum': _isRepeat ? _repeatNum : 1,
+        'repeatCount': _isRepeat ? _repeatCount : 1,
+        'weekendException': _weekendException,
+        'holidayException': _holidayException,
 
-      final scheduleDuration = DateTime(
-        2000,
-        1,
-        1,
-        _endTime.hour,
-        _endTime.minute,
-      ).difference(DateTime(2000, 1, 1, _startTime.hour, _startTime.minute));
+        // 사용자가 직접 선택한 제외 날짜들
+        'excludedDates': _excludedDates
+            .map((d) => d.toIso8601String().split('T')[0])
+            .toList(),
 
-      DateTime currentStartDate = DateTime(
-        _startDate.year,
-        _startDate.month,
-        _startDate.day,
-      );
-      int attempts = 0;
+        // 기타 정보
+        'address': _address,
+        'latitude': _latitude,
+        'longitude': _longitude,
+        'memo': _memo.trim().isEmpty ? null : _memo.trim(),
+      };
 
-      while (createdCount < targetCount && attempts < 3000) {
-        attempts++;
+      await _addScheduleUseCase(payload);
 
-        // 기존 예외(주말, 공휴일) + 사용자가 직접 추가한 제외 날짜(_excludedDates) 체크
-        bool isExcludedByUser = _excludedDates.any(
-          (d) =>
-              d.year == currentStartDate.year &&
-              d.month == currentStartDate.month &&
-              d.day == currentStartDate.day,
-        );
-
-        if (isExcludedByUser ||
-            currentStartDate.checkIsException(
-              holidays: holidays,
-              weekendException: _weekendException,
-              holidayException: _holidayException,
-            )) {
-          currentStartDate = currentStartDate.add(const Duration(days: 1));
-          continue;
-        }
-
-        DateTime startDateTime = DateTime(
-          currentStartDate.year,
-          currentStartDate.month,
-          currentStartDate.day,
-          _startTime.hour,
-          _startTime.minute,
-        );
-
-        payloads.add({
-          'calendar_id': calendarId,
-          'repeat_group_id': groupId,
-          'title': _title.trim(),
-          'emotion_tag': _emotionTag,
-          'color_value': _colorValue,
-          'is_done': _isDone,
-          'started_at': startDateTime.toUtc().toIso8601String(),
-          'ended_at': startDateTime
-              .add(scheduleDuration)
-              .toUtc()
-              .toIso8601String(),
-          'is_repeat': _isRepeat,
-          'repeat_option': _isRepeat ? _repeatOption : null,
-          'repeat_num': _isRepeat ? _repeatNum : null,
-          'weekend_exception': _isRepeat ? _weekendException : false,
-          'holiday_exception': _isRepeat ? _holidayException : false,
-          'repeat_count': _isRepeat ? _repeatCount : null,
-          'address': _address,
-          'latitude': _latitude,
-          'longitude': _longitude,
-          'memo': _memo.trim().isEmpty ? null : _memo.trim(),
-        });
-
-        createdCount++;
-        if (!_isRepeat) break;
-
-        currentStartDate = currentStartDate.jumpToNextWorkingDay(
-          repeatOption: _repeatOption,
-          repeatNum: _repeatNum,
-          holidays: holidays,
-          weekendException: _weekendException,
-          holidayException: _holidayException,
-        );
-      }
-
-      if (payloads.isNotEmpty) {
-        await _addScheduleUseCase(payloads);
-      }
       _state = ViewState.success;
     } catch (e) {
       _state = ViewState.error;
-      debugPrint('❌ addSchedule error: $e');
+      debugPrint('❌ addSchedule (Edge Function) error: $e');
     } finally {
       notifyListeners();
     }
