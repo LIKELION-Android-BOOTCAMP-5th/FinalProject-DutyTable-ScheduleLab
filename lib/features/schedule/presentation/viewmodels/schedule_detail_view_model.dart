@@ -64,6 +64,8 @@ class ScheduleDetailViewModel extends ChangeNotifier {
 
   String get memo => _schedule?.memo ?? '';
 
+  /// 제외된 날짜 리스트 게터
+  List<String> get excludedDates => _schedule?.excludedDates ?? [];
   //-------------------- Constructor --------------------
 
   ScheduleDetailViewModel(
