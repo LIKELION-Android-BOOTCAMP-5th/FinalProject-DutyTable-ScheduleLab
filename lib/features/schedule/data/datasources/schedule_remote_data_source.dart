@@ -2,7 +2,7 @@ import 'package:dutytable/features/schedule/data/models/schedule_model.dart';
 
 abstract class ScheduleRemoteDataSource {
   /// CREATE
-  Future<void> addSchedule(List<Map<String, dynamic>> payloads);
+  Future<void> addSchedule(Map<String, dynamic> payload);
 
   /// READ
   Future<List<ScheduleModel>> fetchSchedules(int calendarId);

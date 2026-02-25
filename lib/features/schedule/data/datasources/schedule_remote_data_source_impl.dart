@@ -2,9 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
-import 'schedule_remote_data_source.dart';
-import '../models/schedule_model.dart';
 import '../../../../main.dart';
+import '../models/schedule_model.dart';
+import 'schedule_remote_data_source.dart';
 
 @LazySingleton(as: ScheduleRemoteDataSource)
 class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
@@ -13,14 +13,11 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
   ScheduleRemoteDataSourceImpl(this._dio);
 
   // ------------------ CREATE ------------------
-  /// 일정 추가
+
+  /// 일정 추가 (Edge Function 호출 방식)
   @override
-  Future<void> addSchedule(List<Map<String, dynamic>> payloads) async {
-    await _dio.post(
-      '/rest/v1/schedules',
-      data: payloads,
-      options: Options(headers: {'Prefer': 'return=minimal'}),
-    );
+  Future<void> addSchedule(Map<String, dynamic> payload) async {
+    await _dio.post('/functions/v1/add-schedule-gemini', data: payload);
   }
 
   // ------------------ READ --------------------
@@ -29,7 +26,11 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
   Future<List<ScheduleModel>> fetchSchedules(int calendarId) async {
     final response = await _dio.get(
       '/rest/v1/schedules',
-      queryParameters: {'select': '*', 'calendar_id': 'eq.$calendarId'},
+      queryParameters: {
+        'select': '*',
+        'calendar_id': 'eq.$calendarId',
+        'order': 'started_at.asc',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -117,7 +118,11 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
       final idsQuery = "(${calendarIds.join(',')})";
       final scheduleResponse = await _dio.get(
         '/rest/v1/schedules',
-        queryParameters: {'select': '*', 'calendar_id': 'in.$idsQuery'},
+        queryParameters: {
+          'select': '*',
+          'calendar_id': 'in.$idsQuery',
+          'order': 'started_at.asc',
+        },
       );
 
       if (scheduleResponse.statusCode == 200) {
@@ -126,7 +131,7 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
       }
       return [];
     } catch (e) {
-      debugPrint("❌ fetchJoinedSharedSchedules 에러: $e");
+      debugPrint("❌ fetchAllSharedSchedules 에러: $e");
       return [];
     }
   }
@@ -144,6 +149,7 @@ class ScheduleRemoteDataSourceImpl implements ScheduleRemoteDataSource {
         'calendar_id': 'eq.$calendarId',
         'started_at': 'lte.${to.toIso8601String()}',
         'ended_at': 'gte.${from.toIso8601String()}',
+        'order': 'started_at.asc',
       },
     );
 
