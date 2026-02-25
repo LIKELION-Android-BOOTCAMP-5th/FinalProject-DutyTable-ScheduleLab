@@ -1,4 +1,13 @@
 import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
+import 'package:flutter/material.dart';
+
+extension TimeOfDayExtension on TimeOfDay {
+  String to24hours() {
+    final String hour = this.hour.toString().padLeft(2, '0');
+    final String minute = this.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+}
 
 extension NullableStringDateExtensions on String? {
   DateTime? toDateTimeOrNull() {
