@@ -19,6 +19,8 @@ class ScheduleModel {
   final bool? holidayException;
   final int? repeatCount;
 
+  final List<String>? excludedDates;
+
   final String? address;
   final String? longitude;
   final String? latitude;
@@ -44,6 +46,7 @@ class ScheduleModel {
     this.weekendException,
     this.holidayException,
     this.repeatCount,
+    this.excludedDates,
     this.address,
     this.longitude,
     this.latitude,
@@ -67,6 +70,9 @@ class ScheduleModel {
       weekendException: json['weekend_exception'] as bool?,
       holidayException: json['holiday_exception'] as bool?,
       repeatCount: json['repeat_count'] as int?,
+      excludedDates: (json['excluded_dates'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList(),
       address: json['address'] as String?,
       longitude: json['longitude'] as String?,
       latitude: json['latitude'] as String?,
@@ -92,6 +98,7 @@ class ScheduleModel {
       'weekend_exception': weekendException,
       'holiday_exception': holidayException,
       'repeat_count': repeatCount,
+      'excluded_dates': excludedDates,
       'address': address,
       'longitude': longitude,
       'latitude': latitude,
@@ -111,6 +118,7 @@ class ScheduleModel {
     bool? weekendException,
     bool? holidayException,
     int? repeatCount,
+    List<String>? excludedDates,
     String? memo,
     String? repeatGroupId,
     List<Map<String, dynamic>>? schedules,
@@ -131,6 +139,7 @@ class ScheduleModel {
       weekendException: weekendException ?? this.weekendException,
       holidayException: holidayException ?? this.holidayException,
       repeatCount: repeatCount ?? this.repeatCount,
+      excludedDates: excludedDates ?? this.excludedDates,
       address: address,
       longitude: longitude,
       latitude: latitude,

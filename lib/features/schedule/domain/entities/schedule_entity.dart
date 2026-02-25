@@ -19,6 +19,8 @@ class ScheduleEntity {
   final bool? holidayException;
   final int? repeatCount;
 
+  final List<String>? excludedDates;
+
   final String? address;
   final String? longitude;
   final String? latitude;
@@ -44,6 +46,7 @@ class ScheduleEntity {
     this.weekendException,
     this.holidayException,
     this.repeatCount,
+    this.excludedDates,
     this.address,
     this.longitude,
     this.latitude,
@@ -66,6 +69,7 @@ class ScheduleEntity {
     bool? weekendException,
     bool? holidayException,
     int? repeatCount,
+    List<String>? excludedDates,
     String? address,
     String? longitude,
     String? latitude,
@@ -88,6 +92,7 @@ class ScheduleEntity {
       weekendException: weekendException ?? this.weekendException,
       holidayException: holidayException ?? this.holidayException,
       repeatCount: repeatCount ?? this.repeatCount,
+      excludedDates: excludedDates ?? this.excludedDates,
       address: address ?? this.address,
       longitude: longitude ?? this.longitude,
       latitude: latitude ?? this.latitude,
