@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 import '../widgets/location_section.dart';
 import '../widgets/memo_section.dart';
-import '../widgets/repeat_section.dart';
+import '../widgets/repeat_toggle_section.dart';
 
 class ScheduleDetailEditBody extends StatelessWidget {
   const ScheduleDetailEditBody({super.key});
@@ -102,7 +102,7 @@ class ScheduleDetailEditBody extends StatelessWidget {
                 const SizedBox(height: 24),
 
                 /// 일정 반복 - 선택 사항(기본 값 - false, 체크 박스)
-                RepeatSection(
+                RepeatToggleSection(
                   isRepeat: viewModel.isRepeat,
                   onRepeatToggle: (value) => viewModel.setIsRepeat(value),
                 ),
@@ -114,7 +114,10 @@ class ScheduleDetailEditBody extends StatelessWidget {
                   isRepeat: viewModel.isRepeat,
                   today: viewModel.startDate,
                   excludedDates: viewModel.excludedDates,
-                  itemCount: viewModel.excludedDates.length,
+                  endOption: viewModel.endOption,
+                  endDate: viewModel.endDate,
+                  onEndOption: (value) => viewModel.updateEndOption(value),
+                  onEndDate: (value) => viewModel.updateEndDateForRepeat(value),
                   onSelectedDate: (date) => viewModel.addExcludedDate(date),
                   onRemoveDate: (index) => viewModel.removeExcludedDate(index),
                   weekendException: viewModel.weekendException,

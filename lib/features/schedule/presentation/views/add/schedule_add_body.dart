@@ -6,7 +6,7 @@ import 'package:dutytable/features/schedule/presentation/views/widgets/location_
 import 'package:dutytable/features/schedule/presentation/views/widgets/location_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/memo_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_option_section.dart';
-import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_section.dart';
+import 'package:dutytable/features/schedule/presentation/views/widgets/repeat_toggle_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/start_and_end_date_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/start_and_end_time_section.dart';
 import 'package:dutytable/features/schedule/presentation/views/widgets/title_section.dart';
@@ -105,7 +105,7 @@ class ScheduleAddBody extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   /// 일정 반복 - 선택 사항(기본 값 - false, 체크 박스)
-                  RepeatSection(
+                  RepeatToggleSection(
                     isRepeat: viewModel.isRepeat,
                     onRepeatToggle: (value) => viewModel.isRepeat = value,
                   ),
@@ -114,12 +114,16 @@ class ScheduleAddBody extends StatelessWidget {
 
                   /// 반복 옵션 - 일정 반복(false - 비활성, true - 활성)
                   RepeatOptionSection(
+                    endOption: viewModel.endOption,
+                    endDate: viewModel.endDateForRepeat,
+                    onEndOption: (value) => viewModel.updateEndOption(value),
+                    onEndDate: (value) =>
+                        viewModel.updateEndDateForRepeat(value),
                     excludedDates: viewModel.excludedDates,
                     onRemoveDate: (index) =>
                         viewModel.removeExcludedDate(index),
                     today: viewModel.startDate,
                     onSelectedDate: (date) => viewModel.addExcludedDate(date),
-                    itemCount: viewModel.excludedDates.length,
                     isRepeat: viewModel.isRepeat,
                     weekendException: viewModel.weekendException,
                     holidayException: viewModel.holidayException,

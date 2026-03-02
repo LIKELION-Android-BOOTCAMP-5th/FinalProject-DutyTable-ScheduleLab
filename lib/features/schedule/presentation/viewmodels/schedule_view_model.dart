@@ -85,27 +85,24 @@ class ScheduleViewModel extends ChangeNotifier {
 
   /// 실제로 화면(캘린더)에 그려질 일정 리스트
   List<ScheduleEntity> get displaySchedules {
-    List<ScheduleEntity> combined = [];
+    List<ScheduleEntity> rawCombined = [];
 
-    // 1. 현재 들어와 있는 캘린더의 일정 추가
-    combined.addAll(_schedules);
+    // 1. 소스 데이터 수집
+    rawCombined.addAll(_schedules);
+    if (_isShowMySchedule) rawCombined.addAll(_mySchedules);
+    if (_isShowAllSchedule) rawCombined.addAll(_allSharedSchedules);
 
-    // 2. 내 개인 일정 토글 시 추가
-    if (_isShowMySchedule) {
-      combined.addAll(_mySchedules);
+    // 2. ID 기반 중복 제거 및 정렬
+    // (동일한 데이터 소스에서 중복이 발생할 수 있는 경우를 대비)
+    final Map<int, ScheduleEntity> uniqueSchedules = {};
+    for (var s in rawCombined) {
+      uniqueSchedules[s.id] = s;
     }
 
-    // 3. 모든 공유 일정 토글 시 추가
-    if (_isShowAllSchedule) {
-      combined.addAll(_allSharedSchedules);
-    }
+    List<ScheduleEntity> result = uniqueSchedules.values.toList();
+    result.sort((a, b) => a.startedAt.compareTo(b.startedAt));
 
-    // ID 중복 제거 (여러 리스트에 같은 일정이 있을 경우 대비)
-    final ids = <String>{};
-    combined.retainWhere((s) => ids.add(s.id.toString()));
-
-    combined.sort((a, b) => a.startedAt.compareTo(b.startedAt));
-    return combined;
+    return result;
   }
 
   //-------------------- Constructor --------------------

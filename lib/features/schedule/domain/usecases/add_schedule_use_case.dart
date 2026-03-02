@@ -7,7 +7,8 @@ class AddScheduleUseCase {
 
   AddScheduleUseCase(this.repository);
 
-  Future<void> call(List<Map<String, dynamic>> schedule) {
-    return repository.addSchedule(schedule);
+  // [수정] 인자 타입을 List<Map>에서 단일 Map으로 변경
+  Future<void> call(Map<String, dynamic> schedulePayload) {
+    return repository.addSchedule(schedulePayload);
   }
 }

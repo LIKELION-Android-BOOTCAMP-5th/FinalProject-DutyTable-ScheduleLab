@@ -1,7 +1,7 @@
 import 'package:dutytable/features/schedule/domain/entities/schedule_entity.dart';
 
 abstract class ScheduleRepository {
-  Future<void> addSchedule(List<Map<String, dynamic>> payloads);
+  Future<void> addSchedule(Map<String, dynamic> payload);
 
   Future<List<ScheduleEntity>> fetchSchedules(int calendarId);
   Future<ScheduleEntity> fetchScheduleById(int scheduleId);

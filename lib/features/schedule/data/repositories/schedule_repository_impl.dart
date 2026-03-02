@@ -11,8 +11,8 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
   ScheduleRepositoryImpl(this.dataSource);
 
   @override
-  Future<void> addSchedule(List<Map<String, dynamic>> payloads) {
-    return dataSource.addSchedule(payloads);
+  Future<void> addSchedule(Map<String, dynamic> payload) async {
+    return await dataSource.addSchedule(payload);
   }
 
   @override
