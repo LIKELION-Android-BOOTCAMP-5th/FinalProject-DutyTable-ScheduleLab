@@ -3,8 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DioClient {
-  static final DioClient _instance = DioClient._internal();
-  static DioClient get shared => _instance;
+  static final DioClient _shared = DioClient._internal();
+  static DioClient get shared => _shared;
 
   static const String _baseUrl = 'https://eexkppotdipyrzzjakur.supabase.co';
   static final String _apiKey = dotenv.env['SUPABASE_ANON_KEY']!;
