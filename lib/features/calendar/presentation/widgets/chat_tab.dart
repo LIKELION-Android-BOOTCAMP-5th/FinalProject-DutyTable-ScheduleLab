@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../domain/entities/calendar_entity.dart';
+import 'ai_schedule.dart';
 
 class ChatTab extends StatelessWidget {
   final CalendarEntity? calendar;
@@ -17,6 +18,81 @@ class ChatTab extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => ChatViewModel(calendar?.id ?? 0),
       child: _ChatTab(),
+    );
+  }
+}
+
+class ChatAi extends StatelessWidget {
+  const ChatAi({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<ChatViewModel>();
+    final AiScheduleList = [
+      AiSchedule(
+        aiScheduleDate: '내일',
+        aiScheduleTime: '오전 10시',
+        aiScheduleTitle: '',
+        aiSchedulePlace: '광화문 앞',
+      ),
+      AiSchedule(
+        aiScheduleDate: '3월 1일',
+        aiScheduleTime: '오전 10시',
+        aiScheduleTitle: '친구랑 약속',
+      ),
+      AiSchedule(
+        aiScheduleDate: '3월 1일',
+        aiScheduleTime: '오전 10시',
+        aiScheduleTitle: '친구랑 약속',
+        aiSchedulePlace: '용산역',
+      ),
+      AiSchedule(
+        aiScheduleDate: '내일',
+        aiScheduleTime: '오전 10시',
+        aiScheduleTitle: '',
+        aiSchedulePlace: '광화문 앞',
+      ),
+      AiSchedule(
+        aiScheduleDate: '내일',
+        aiScheduleTime: '오전 10시',
+        aiScheduleTitle: '',
+        aiSchedulePlace: '광화문 앞',
+      ),
+    ];
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: double.maxFinite,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Text(
+              "• 일정 추가 알림",
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: Color(0xFF628EF0),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        if (!viewModel.aiScheduleFold)
+          SizedBox(
+            height: 200,
+            child: SingleChildScrollView(
+              child: Column(children: [...AiScheduleList]),
+            ),
+          )
+        else
+          Column(children: [AiScheduleList.first]),
+        GestureDetector(
+          onTap: () => context.read<ChatViewModel>().toggleAiScheduleFold(),
+          child: Icon(
+            viewModel.aiScheduleFold
+                ? Icons.arrow_drop_down
+                : Icons.arrow_drop_up,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -49,6 +125,7 @@ class _ChatTab extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
+              ChatAi(),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),

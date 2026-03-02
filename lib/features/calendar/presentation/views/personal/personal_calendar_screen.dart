@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../../core/widgets/logo_actions_app_bar.dart';
 import '../../viewmodels/personal_calendar_view_model.dart';
+import '../../widgets/chat_ai_info_dialog/chat_ai_info.dart';
 import '../../widgets/custom_calendar_tabview.dart';
 
 class PersonalCalendarScreen extends StatelessWidget {
@@ -55,6 +56,9 @@ class _PersonalCalendarScreen extends StatelessWidget {
 
       case ViewState.success:
         bodyContent = CustomCalendarTabView(
+          onTabChanged: (index) {
+            context.read<PersonalCalendarViewModel>().setTabIndex(index);
+          },
           // 탭 갯수
           tabLength: viewModel.tabLength,
           // 각 탭의 이름 리스트
@@ -85,6 +89,18 @@ class _PersonalCalendarScreen extends StatelessWidget {
         ),
         rightActions: Row(
           children: [
+            viewModel.currentIndex == 2
+                ? CustomAppBarIcon(
+                    icon: Icons.info_outline,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => ChatAiInfo(),
+                      );
+                    },
+                  )
+                : SizedBox.shrink(),
+
             const NotificationIcon(),
             // 커스텀 캘린더 앱바 아이콘 사용
             CustomAppBarIcon(
