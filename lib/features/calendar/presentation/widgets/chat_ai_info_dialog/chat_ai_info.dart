@@ -33,7 +33,7 @@ class ChatAiInfo extends StatelessWidget {
                               width: 100,
                               height: 23,
                               decoration: BoxDecoration(
-                                color: AppColors.info(context),
+                                color: AppColors.aiInfo(context),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Container(
@@ -59,7 +59,7 @@ class ChatAiInfo extends StatelessWidget {
                         onTap: () => context.pop(context),
                         child: Icon(
                           Icons.close,
-                          color: AppColors.closeIcon(context),
+                          color: AppColors.dialogCloseIcon(context),
                         ),
                       ),
                     ),
@@ -106,9 +106,9 @@ class ChatAiInfo extends StatelessWidget {
                     height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: AppColors.info(context),
+                      color: AppColors.aiInfo(context),
                       border: Border.all(
-                        color: AppColors.infoBorder(context),
+                        color: AppColors.aiInfoBorder(context),
                         width: 2.0,
                       ),
                     ),

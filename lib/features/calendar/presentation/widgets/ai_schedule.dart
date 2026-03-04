@@ -26,10 +26,10 @@ class AiSchedule extends StatelessWidget {
           width: double.maxFinite,
           decoration: BoxDecoration(
             border: Border.all(
-              color: AppColors.infoBorder(context),
+              color: AppColors.aiInfoBorder(context),
               width: 2.0,
             ),
-            color: AppColors.info(context),
+            color: AppColors.aiInfo(context),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Padding(
@@ -61,7 +61,7 @@ class AiSchedule extends StatelessWidget {
                   child: Icon(
                     Icons.close,
                     size: 20,
-                    color: AppColors.closeIcon(context),
+                    color: AppColors.dialogCloseIcon(context),
                   ),
                 ),
               ],
