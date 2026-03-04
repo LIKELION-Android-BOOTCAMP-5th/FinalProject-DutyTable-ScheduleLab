@@ -20,6 +20,10 @@ class AppColors {
   static const Color lCalendarYellowBorder = Color(0xFFFFEF8A);
   static const Color lDanger = Color(0xFFF25C5C);
   static const Color lIconSub = Color(0xFF545D6A);
+  static const Color lInfo = Color(0xFFEEF3FD);
+  static const Color lInfoBorder = Color(0xFFF5F7FE);
+  static const Color lTextBlue = Color(0xFF628EF0);
+  static const Color lCloseIcon = Color(0xFF9D9D9E);
 
   // 다크 모드 전용 (Dark Mode)
   static const Color dBackground = Color(0xFF101827);
@@ -31,6 +35,10 @@ class AppColors {
   static const Color dWarningBg = Color(0xFF2F2523);
   static const Color dWarningBorder = Color(0xFF85520E);
   static const Color dIconSub = Color(0xFF9CA3AF);
+  static const Color dInfo = Color(0xFF2A314A);
+  static const Color dInfoBorder = Color(0xFF31416A);
+  static const Color dTextBlue = Color(0xFF699AF5);
+  static const Color dCloseIcon = Color(0xFF646464);
 
   static Color background(BuildContext context) =>
       _isDark(context) ? dBackground : lBackground;
@@ -63,6 +71,17 @@ class AppColors {
 
   static Color iconSub(BuildContext context) =>
       _isDark(context) ? dIconSub : lIconSub;
+
+  static Color info(BuildContext context) => _isDark(context) ? dInfo : lInfo;
+
+  static Color infoBorder(BuildContext context) =>
+      _isDark(context) ? dInfoBorder : lInfoBorder;
+
+  static Color textBlue(BuildContext context) =>
+      _isDark(context) ? dTextBlue : lTextBlue;
+
+  static Color closeIcon(BuildContext context) =>
+      _isDark(context) ? dCloseIcon : lCloseIcon;
 
   static Color notificationCardBg(
     BuildContext context, {
