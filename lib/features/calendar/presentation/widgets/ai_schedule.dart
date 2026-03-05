@@ -1,3 +1,4 @@
+import 'package:dutytable/core/configs/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AiSchedule extends StatelessWidget {
@@ -23,35 +24,48 @@ class AiSchedule extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
           width: double.maxFinite,
-          height: 50,
           decoration: BoxDecoration(
-            border: Border.all(color: Color(0xFFDAE6FB), width: 2.0),
-            color: Color(0xFFF8FAFF),
+            border: Border.all(
+              color: AppColors.aiInfoBorder(context),
+              width: 2.0,
+            ),
+            color: AppColors.aiInfo(context),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Row(
-            children: [
-              Row(
-                children: [
-                  Text(
-                    "${aiScheduleTitle} ${aiScheduleDate} ${aiScheduleTime} ",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text:
+                              "${aiScheduleTitle} ${aiScheduleDate} ${aiScheduleTime} ",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: "${aiSchedulePlace} ",
+                          style: (aiSchedulePlace == "(장소 없음)")
+                              ? TextStyle(color: AppColors.textSub(context))
+                              : TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: "일정에 추가하시겠습니까?"),
+                      ],
+                    ),
                   ),
-                  Text(
-                    "${aiSchedulePlace} ",
-                    style: (aiSchedulePlace == "(장소 없음)")
-                        ? TextStyle(color: Colors.grey)
-                        : TextStyle(fontWeight: FontWeight.bold),
+                ),
+                GestureDetector(
+                  onTap: () {},
+                  child: Icon(
+                    Icons.close,
+                    size: 20,
+                    color: AppColors.dialogCloseIcon(context),
                   ),
-                  Text("일정에 추가하시겠습니까?"),
-                ],
-              ),
-              Spacer(),
-              GestureDetector(
-                onTap: () {},
-                child: Icon(Icons.close, size: 20, color: Color(0xFFDAE6FB)),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

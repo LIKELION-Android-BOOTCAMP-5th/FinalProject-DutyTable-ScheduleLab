@@ -69,7 +69,7 @@ class ChatAi extends StatelessWidget {
               "• 일정 추가 알림",
               textAlign: TextAlign.left,
               style: TextStyle(
-                color: Color(0xFF628EF0),
+                color: AppColors.textBlue(context),
                 fontWeight: FontWeight.bold,
               ),
             ),

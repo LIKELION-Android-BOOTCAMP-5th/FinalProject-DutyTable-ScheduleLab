@@ -33,15 +33,19 @@ class ChatAiInfo extends StatelessWidget {
                               width: 100,
                               height: 23,
                               decoration: BoxDecoration(
-                                color: Color(0xFFEEF3FD),
+                                color: AppColors.aiInfo(context),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Text(
-                                "• AI 일정 인식",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF628EF0),
+                              child: Container(
+                                width: double.infinity,
+                                child: Text(
+                                  "• AI 일정 인식",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textBlue(context),
+                                  ),
                                 ),
+                                alignment: Alignment.center,
                               ),
                             ),
                           ],
@@ -53,7 +57,10 @@ class ChatAiInfo extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 25, right: 20.0),
                       child: GestureDetector(
                         onTap: () => context.pop(context),
-                        child: Icon(Icons.close, color: Colors.grey),
+                        child: Icon(
+                          Icons.close,
+                          color: AppColors.dialogCloseIcon(context),
+                        ),
                       ),
                     ),
                   ],
@@ -68,6 +75,7 @@ class ChatAiInfo extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
+                        color: AppColors.textMain(context),
                       ),
                     ),
                   ),
@@ -81,7 +89,10 @@ class ChatAiInfo extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 25.0),
               child: Container(
                 width: double.infinity,
-                child: Text("날짜, 시간, 장소를 채팅으로 입력하면 AI가\n자동으로 일정을 입력해요!"),
+                child: Text(
+                  "날짜, 시간, 장소를 채팅으로 입력하면 AI가\n자동으로 일정을 입력해요!",
+                  style: TextStyle(color: AppColors.textSub(context)),
+                ),
                 alignment: Alignment.centerLeft,
               ),
             ),
@@ -95,7 +106,11 @@ class ChatAiInfo extends StatelessWidget {
                     height: 60,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: Color(0xFFEEF3FD),
+                      color: AppColors.aiInfo(context),
+                      border: Border.all(
+                        color: AppColors.aiInfoBorder(context),
+                        width: 2.0,
+                      ),
                     ),
                   ),
                   SizedBox(
@@ -117,13 +132,13 @@ class ChatAiInfo extends StatelessWidget {
                                 "\"3월 1일 오전 10시 용산역 친구 약속\"",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF628EF0),
+                                  color: AppColors.textBlue(context),
                                 ),
                               ),
                               Text(
                                 "이렇게 입력하면 바로 인식해요",
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: AppColors.textSub(context),
                                   fontSize: 13,
                                 ),
                                 textAlign: TextAlign.left,
