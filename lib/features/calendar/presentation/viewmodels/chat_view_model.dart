@@ -1,7 +1,14 @@
+import 'dart:convert';
+
 import 'package:dutytable/core/utils/extensions.dart';
+import 'package:dutytable/features/calendar/domain/entities/detect_result.dart';
+import 'package:dutytable/features/calendar/domain/entities/detected_schedule.dart';
+import 'package:dutytable/features/calendar/domain/usecases/detect_schedule_use_case.dart';
 import 'package:dutytable/features/calendar/domain/usecases/fetch_chat_messages_use_case.dart';
 import 'package:dutytable/features/calendar/domain/usecases/update_last_read_at_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/di/injection.dart';
@@ -43,6 +50,8 @@ class ChatViewModel extends ChangeNotifier {
       getIt<FetchUserInfoUseCase>();
   final SubscribeMessagesUseCase _subscribeMessagesUseCase =
       getIt<SubscribeMessagesUseCase>();
+  final DetectScheduleUseCase _detectScheduleUseCase =
+      getIt<DetectScheduleUseCase>();
   ViewState _state = ViewState.loading;
 
   ViewState get state => _state;
@@ -61,6 +70,9 @@ class ChatViewModel extends ChangeNotifier {
 
   /// 채팅 메시지 리스트
   List<ChatMessage> chatMessages = [];
+
+  /// AI 감지된 일정 리스트
+  List<DetectedSchedule> detectedSchedules = [];
 
   final ScrollController scrollController = ScrollController();
 
@@ -120,16 +132,122 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   ChatViewModel(this.calendarId) {
+    _loadDetectedSchedules(); // 저장된 감지된 일정 로드
     fetchChatMessages();
+  }
+
+  /// SharedPreferences에서 감지된 일정 로드
+  Future<void> _loadDetectedSchedules() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final schedulesJson = prefs.getStringList('detected_schedules') ?? [];
+
+      detectedSchedules = schedulesJson
+          .map(
+            (json) => DetectedSchedule.fromJson(
+              jsonDecode(json) as Map<String, dynamic>,
+            ),
+          )
+          .toList();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('감지된 일정 로드 실패: $e');
+    }
+  }
+
+  /// SharedPreferences에 감지된 일정 저장
+  Future<void> _saveDetectedSchedules() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final schedulesJson = detectedSchedules
+          .map((s) => jsonEncode(s.toJson()))
+          .toList();
+      await prefs.setStringList('detected_schedules', schedulesJson);
+    } catch (e) {
+      debugPrint('감지된 일정 저장 실패: $e');
+    }
   }
 
   // 채팅을 수파베이스에 저장
   Future<void> chatInsert() async {
-    final chatMessage = chatController.text;
+    final msg = chatController.text.trim();
     // 메시지가 비어있으면 전송하지 않음
-    if (chatController.text.trim().isEmpty) return;
-    await _chatInsertUseCase(chatMessage, calendarId);
+    if (msg.isEmpty) return;
+    await _chatInsertUseCase(msg, calendarId);
     chatController.clear();
+    _detectAndAddSchedule(msg); // await 없음 - 채팅 전송에 영향 없음
+  }
+
+  /// 메시지에서 일정 감지 (fire-and-forget)
+  /// 이전 5개 메시지와 함께 분석하여 여러 메시지에 걸친 일정도 감지
+  Future<void> _detectAndAddSchedule(String message) async {
+    try {
+      // 이전 메시지 5개 추출 (사용자 메시지만, 최근순)
+      final previousMessages = <String>[];
+      for (
+        int i = chatMessages.length - 1;
+        i >= 0 && previousMessages.length < 5;
+        i--
+      ) {
+        previousMessages.insert(0, chatMessages[i].message);
+      }
+
+      final result = await _detectScheduleUseCase(
+        message,
+        previousMessages: previousMessages,
+      );
+
+      if (result != null) {
+        switch (result) {
+          case ScheduleDetected(:final schedule):
+            // 날짜+시간이 있는 경우 새 알림 추가
+            detectedSchedules.add(schedule);
+
+            // 11개 이상이면 가장 오래된 것 삭제 (최대 10개 유지)
+            if (detectedSchedules.length > 10) {
+              detectedSchedules.removeAt(0);
+            }
+
+          case PlaceOnlyDetected(:final place):
+            // 장소만 있는 경우 가장 최근 알림에 장소 업데이트
+            if (detectedSchedules.isNotEmpty) {
+              final lastIndex = detectedSchedules.length - 1;
+              detectedSchedules[lastIndex] =
+                  detectedSchedules[lastIndex].copyWith(place: place);
+            }
+        }
+
+        notifyListeners();
+        await _saveDetectedSchedules(); // 저장
+      }
+    } catch (e) {
+      debugPrint('일정 감지 실패 (무시됨): $e');
+    }
+  }
+
+  /// 감지된 일정 제거
+  Future<void> removeDetectedSchedule(int index) async {
+    if (index >= 0 && index < detectedSchedules.length) {
+      detectedSchedules.removeAt(index);
+      notifyListeners();
+      await _saveDetectedSchedules(); // 저장
+    }
+  }
+
+  /// AI 감지 일정으로 일정 추가 화면 열기
+  void addScheduleFromAi(Object? context, int index) {
+    if (index < 0 || index >= detectedSchedules.length) return;
+    final schedule = detectedSchedules[index];
+    if (context is BuildContext) {
+      context.push(
+        '/schedule/add',
+        extra: {
+          'calendarId': calendarId,
+          'date': DateTime.tryParse(schedule.date),
+          'detectedSchedule': schedule,
+        },
+      );
+    }
   }
 
   // 모든 데이터를 한 번에 가져오는 함수로 통합

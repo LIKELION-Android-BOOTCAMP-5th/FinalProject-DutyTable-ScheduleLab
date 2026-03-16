@@ -1,4 +1,6 @@
 import 'package:dutytable/features/calendar/data/datasources/chat_data_source.dart';
+import 'package:dutytable/features/calendar/domain/entities/detect_result.dart';
+import 'package:dutytable/features/calendar/domain/entities/detected_schedule.dart';
 import 'package:dutytable/features/calendar/domain/repositories/chat_repository.dart';
 import 'package:injectable/injectable.dart';
 import 'package:realtime_client/src/realtime_channel.dart';
@@ -49,4 +51,11 @@ class ChatRepositoryImpl implements ChatRepository {
   Future<Map<String, dynamic>> fetchUserInfo(String senderId) {
     return dataSource.fetchNewChatImageNickname(senderId);
   }
+
+  @override
+  Future<DetectResult?> detectSchedule(
+    String message, {
+    List<String> previousMessages = const [],
+  }) =>
+      dataSource.detectSchedule(message, previousMessages: previousMessages);
 }

@@ -27,72 +27,125 @@ class ChatAi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<ChatViewModel>();
-    final AiScheduleList = [
-      AiSchedule(
-        aiScheduleDate: '내일',
-        aiScheduleTime: '오전 10시',
-        aiScheduleTitle: '',
-        aiSchedulePlace: '광화문 앞',
+    print(viewModel.detectedSchedules);
+
+    // 최대 10개까지만 표시
+    final displaySchedules = viewModel.detectedSchedules.length > 10
+        ? viewModel.detectedSchedules.sublist(0, 10)
+        : viewModel.detectedSchedules;
+
+    final isExpanded = !viewModel.aiScheduleFold;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.aiInfo(context),
+        border: Border.all(
+          color: AppColors.aiInfoBorder(context),
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(12),
       ),
-      AiSchedule(
-        aiScheduleDate: '3월 1일',
-        aiScheduleTime: '오전 10시',
-        aiScheduleTitle: '친구랑 약속',
-      ),
-      AiSchedule(
-        aiScheduleDate: '3월 1일',
-        aiScheduleTime: '오전 10시',
-        aiScheduleTitle: '친구랑 약속',
-        aiSchedulePlace: '용산역',
-      ),
-      AiSchedule(
-        aiScheduleDate: '내일',
-        aiScheduleTime: '오전 10시',
-        aiScheduleTitle: '',
-        aiSchedulePlace: '광화문 앞',
-      ),
-      AiSchedule(
-        aiScheduleDate: '내일',
-        aiScheduleTime: '오전 10시',
-        aiScheduleTitle: '',
-        aiSchedulePlace: '광화문 앞',
-      ),
-    ];
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: double.maxFinite,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              "• 일정 추가 알림",
-              textAlign: TextAlign.left,
-              style: TextStyle(
-                color: AppColors.textBlue(context),
-                fontWeight: FontWeight.bold,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 아코디언 헤더 (탭 시 토글)
+          GestureDetector(
+            onTap: () => context.read<ChatViewModel>().toggleAiScheduleFold(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "• 일정 추가 알림",
+                          style: TextStyle(
+                            color: AppColors.textBlue(context),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            "${displaySchedules.length}개의 감지된 일정",
+                            style: TextStyle(
+                              color: AppColors.textSub(context),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 300),
+                    child: Icon(
+                      Icons.expand_more,
+                      color: AppColors.textBlue(context),
+                      size: 24,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-        if (!viewModel.aiScheduleFold)
-          SizedBox(
-            height: 200,
-            child: SingleChildScrollView(
-              child: Column(children: [...AiScheduleList]),
+          // 펼쳐질 때 구분선 + 콘텐츠
+          if (isExpanded) ...[
+            Divider(
+              height: 1,
+              color: AppColors.aiInfoBorder(context),
             ),
-          )
-        else
-          Column(children: [AiScheduleList.first]),
-        GestureDetector(
-          onTap: () => context.read<ChatViewModel>().toggleAiScheduleFold(),
-          child: Icon(
-            viewModel.aiScheduleFold
-                ? Icons.arrow_drop_down
-                : Icons.arrow_drop_up,
-          ),
-        ),
-      ],
+            displaySchedules.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                      "감지된 일정이 없습니다",
+                      style: TextStyle(
+                        color: AppColors.textSub(context),
+                        fontSize: 14,
+                      ),
+                    ),
+                  )
+                : SizedBox(
+                    height: 180,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(displaySchedules.length, (index) {
+                          final schedule = displaySchedules[index];
+                          return AiSchedule(
+                            aiScheduleTitle: schedule.title,
+                            aiScheduleDate: schedule.date,
+                            aiScheduleTime: schedule.time,
+                            aiSchedulePlace: schedule.place ?? "(장소 없음)",
+                            onTap: () =>
+                                viewModel.addScheduleFromAi(context, index),
+                            onRemove: () {
+                              viewModel.removeDetectedSchedule(index);
+                            },
+                          );
+                        }),
+                      ),
+                    ),
+                  ),
+            // 10개 초과 시 안내 문구
+            if (viewModel.detectedSchedules.length > 10)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Text(
+                  '+${viewModel.detectedSchedules.length - 10}개 더 있음',
+                  style: TextStyle(color: AppColors.textSub(context), fontSize: 12),
+                ),
+              ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -123,60 +176,75 @@ class _ChatTab extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background(context),
         body: SafeArea(
-          child: Column(
+          child: Stack(
             children: [
-              ChatAi(),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListView.separated(
-                    controller: viewModel.scrollController,
-                    itemCount: chatMessages.length,
-                    itemBuilder: (context, index) {
-                      final currentMessage = chatMessages[index];
+              // 채팅 메시지 영역 (배경)
+              Column(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListView.separated(
+                        controller: viewModel.scrollController,
+                        itemCount: chatMessages.length,
+                        itemBuilder: (context, index) {
+                          final currentMessage = chatMessages[index];
 
-                      // 이전 메시지가 있는지 확인
-                      final isFirstMessage = index == 0;
-                      final previousMessage = isFirstMessage
-                          ? null
-                          : chatMessages[index - 1];
+                          // 이전 메시지가 있는지 확인
+                          final isFirstMessage = index == 0;
+                          final previousMessage = isFirstMessage
+                              ? null
+                              : chatMessages[index - 1];
 
-                      // 날짜가 변경되었는지 확인 (첫 메시지이거나 이전 메시지와 날짜가 다를 경우)
-                      final bool showDateDivider =
-                          isFirstMessage ||
-                          !_isSameDay(
-                            currentMessage.createdAt,
-                            previousMessage!.createdAt,
+                          // 날짜가 변경되었는지 확인 (첫 메시지이거나 이전 메시지와 날짜가 다를 경우)
+                          final bool showDateDivider =
+                              isFirstMessage ||
+                              !_isSameDay(
+                                currentMessage.createdAt,
+                                previousMessage!.createdAt,
+                              );
+
+                          return Column(
+                            children: [
+                              // 날짜가 변경되었을 때만 날짜 구분선 표시
+                              if (showDateDivider)
+                                CustomNextDayLine(
+                                  date: _formatDate(currentMessage.createdAt),
+                                ),
+
+                              // 커스텀 채팅 소유자에 따른 UI 변경 카드 사용
+                              CustomChatCard(
+                                isMyChat: currentMessage.isMe,
+                                chatTime: currentMessage.time,
+                                message: currentMessage.message,
+                                image: currentMessage.image,
+                                nickname: currentMessage.nickname,
+                                id: currentMessage.id,
+                              ),
+                            ],
                           );
-
-                      return Column(
-                        children: [
-                          // 날짜가 변경되었을 때만 날짜 구분선 표시
-                          if (showDateDivider)
-                            CustomNextDayLine(
-                              date: _formatDate(currentMessage.createdAt),
-                            ),
-
-                          // 커스텀 채팅 소유자에 따른 UI 변경 카드 사용
-                          CustomChatCard(
-                            isMyChat: currentMessage.isMe,
-                            chatTime: currentMessage.time,
-                            message: currentMessage.message,
-                            image: currentMessage.image,
-                            nickname: currentMessage.nickname,
-                            id: currentMessage.id,
-                          ),
-                        ],
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 12.0);
-                    },
+                        },
+                        separatorBuilder: (context, index) {
+                          return const SizedBox(height: 12.0);
+                        },
+                      ),
+                    ),
                   ),
+                  // 커스텀 채팅 입력창 사용
+                  CustomInputChatMessageBox(),
+                ],
+              ),
+              // 알림 (z-index 높음, 맨 위)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Material(
+                  elevation: 8,
+                  color: AppColors.background(context),
+                  child: ChatAi(),
                 ),
               ),
-              // 커스텀 채팅 입력창 사용
-              CustomInputChatMessageBox(),
             ],
           ),
         ),
@@ -204,17 +272,25 @@ class CustomInputChatMessageBox extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              onTap: () async {
-                await Future.delayed(Duration(milliseconds: 1000));
-                if (viewModel.scrollController.hasClients) {
-                  viewModel.scrollController.animateTo(
-                    viewModel.scrollController.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.fastEaseInToSlowEaseOut,
-                  );
-                }
+              onTap: () {
+                // 키보드 올라온 후 스크롤 (에러 방지)
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (viewModel.scrollController.hasClients) {
+                    try {
+                      viewModel.scrollController.animateTo(
+                        viewModel.scrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.fastEaseInToSlowEaseOut,
+                      );
+                    } catch (e) {
+                      debugPrint('스크롤 에러: $e');
+                    }
+                  }
+                });
               },
               controller: viewModel.chatController,
+              maxLines: 3,
+              minLines: 1,
               style: TextStyle(color: AppColors.textMain(context)),
               decoration: InputDecoration(
                 hintText: '메시지를 입력하세요...',
