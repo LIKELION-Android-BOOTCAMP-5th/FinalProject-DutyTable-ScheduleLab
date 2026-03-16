@@ -4,6 +4,8 @@ import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/services/supabase_manager.dart';
+import '../../../calendar/domain/entities/detect_result.dart';
+import '../../../calendar/domain/entities/detected_schedule.dart';
 
 @lazySingleton
 class ChatDataSource {
@@ -137,5 +139,42 @@ class ChatDataSource {
     } catch (e) {
       throw Exception("create 에러:  $e");
     }
+  }
+
+  /// 메시지에서 일정 감지 (이전 메시지들과 함께 분석)
+  Future<DetectResult?> detectSchedule(
+    String message, {
+    List<String> previousMessages = const [],
+  }) async {
+    final now = DateTime.now();
+    final currentDate =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final response = await _dio.post(
+      '/functions/v1/detect-schedule-from-chat',
+      data: {
+        'message': message,
+        'currentDate': currentDate,
+        'previousMessages': previousMessages,
+      },
+    );
+    final body = response.data as Map<String, dynamic>;
+    print('📤 Edge Function 응답: $body');
+
+    // 날짜+시간 감지된 경우
+    if (body['detected'] == true && body['schedule'] != null) {
+      final schedule = DetectedSchedule.fromJson(body['schedule'] as Map<String, dynamic>);
+      print('✅ ScheduleDetected 반환');
+      return ScheduleDetected(schedule);
+    }
+
+    // 장소만 감지된 경우
+    if (body['placeOnly'] != null) {
+      final place = body['placeOnly'] as String;
+      print('📍 PlaceOnlyDetected 반환: $place');
+      return PlaceOnlyDetected(place);
+    }
+
+    print('❌ null 반환');
+    return null;
   }
 }

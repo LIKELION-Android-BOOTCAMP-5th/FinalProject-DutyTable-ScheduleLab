@@ -148,7 +148,10 @@ class ScheduleAddBody extends StatelessWidget {
                     longitude: viewModel.longitude,
                     addressController: viewModel.addressController,
                     onSearch: () async {
-                      final selected = await showLocationDialog(context);
+                      final selected = await showLocationDialog(
+                        context,
+                        initialKeyword: viewModel.address,
+                      );
                       if (selected == null) return;
 
                       await viewModel.updateLocationAction(selected.address);
@@ -161,6 +164,7 @@ class ScheduleAddBody extends StatelessWidget {
                   MemoSection(
                     memo: viewModel.memo,
                     onMemo: (value) => viewModel.setMemo(value),
+                    controller: viewModel.memoController,
                   ),
                   const SizedBox(height: 16),
                 ],

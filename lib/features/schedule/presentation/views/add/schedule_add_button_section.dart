@@ -63,9 +63,19 @@ class ScheduleAddButtonSection extends StatelessWidget {
                 onTap: isEnabled
                     ? () async {
                         await viewModel.addSchedule(calendarId);
-                        if (context.mounted &&
-                            viewModel.state == ViewState.success) {
+                        if (!context.mounted) return;
+                        if (viewModel.state == ViewState.success &&
+                            context.canPop()) {
                           context.pop(true);
+                        } else if (viewModel.state == ViewState.error) {
+                          final msg =
+                              viewModel.errorMessage ?? '알 수 없는 오류가 발생했습니다.';
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('저장 실패: $msg'),
+                              duration: const Duration(seconds: 5),
+                            ),
+                          );
                         }
                       }
                     : null,

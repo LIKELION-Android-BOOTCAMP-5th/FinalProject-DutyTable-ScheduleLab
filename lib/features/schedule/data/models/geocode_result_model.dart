@@ -6,8 +6,8 @@ class GeocodeResultModel {
 
   factory GeocodeResultModel.fromJson(Map<String, dynamic> json) {
     return GeocodeResultModel(
-      latitude: json['latitude'] as String,
-      longitude: json['longitude'] as String,
+      latitude: json['latitude'].toString(),
+      longitude: json['longitude'].toString(),
     );
   }
 

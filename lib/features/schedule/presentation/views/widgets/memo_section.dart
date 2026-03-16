@@ -4,9 +4,15 @@ import 'package:flutter/material.dart';
 class MemoSection extends StatelessWidget {
   final String memo;
   final ValueChanged<String> onMemo;
+  final TextEditingController? controller;
 
   /// 일정 추가 - 메모
-  const MemoSection({super.key, required this.memo, required this.onMemo});
+  const MemoSection({
+    super.key,
+    required this.memo,
+    required this.onMemo,
+    this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +32,8 @@ class MemoSection extends StatelessWidget {
         const SizedBox(height: 10),
 
         TextFormField(
-          initialValue: memo,
+          controller: controller,
+          initialValue: controller == null ? memo : null,
           maxLength: 300,
           maxLines: 4,
           onChanged: onMemo,
