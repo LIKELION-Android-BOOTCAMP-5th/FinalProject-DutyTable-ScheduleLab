@@ -35,6 +35,19 @@ class LocationSearchViewModel extends ChangeNotifier {
     });
   }
 
+  /// 초기 키워드로 즉시 검색 (debounce 없음)
+  Future<void> searchImmediately(String keyword) async {
+    if (keyword.length < 2) return;
+
+    isLoading = true;
+    notifyListeners();
+
+    results = await _searchAddressUseCase(keyword);
+
+    isLoading = false;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _debounce?.cancel();

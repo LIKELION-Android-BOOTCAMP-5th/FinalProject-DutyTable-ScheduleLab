@@ -26,6 +26,8 @@ class ScheduleAddScreen extends StatelessWidget {
       create: (_) {
         final vm = getIt<ScheduleAddViewModel>(param1: date);
         if (detectedSchedule != null) {
+          // async 메서드를 동기 create 콜백에서 실행 (fire-and-forget)
+          // ignore: unawaited_futures
           vm.prefillFromDetectedSchedule(detectedSchedule!);
         }
         return vm;
@@ -35,14 +37,19 @@ class ScheduleAddScreen extends StatelessWidget {
   }
 }
 
-class _ScheduleAddScreen extends StatelessWidget {
+class _ScheduleAddScreen extends StatefulWidget {
   final int calendarId;
   const _ScheduleAddScreen({required this.calendarId});
 
   @override
-  Widget build(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
+  State<_ScheduleAddScreen> createState() => _ScheduleAddScreenState();
+}
 
+class _ScheduleAddScreenState extends State<_ScheduleAddScreen> {
+  final formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background(context),
       appBar: BackActionsAppBar(
@@ -59,7 +66,7 @@ class _ScheduleAddScreen extends StatelessWidget {
       body: ScheduleAddBody(formKey: formKey),
       bottomNavigationBar: ScheduleAddButtonSection(
         formKey: formKey,
-        calendarId: calendarId,
+        calendarId: widget.calendarId,
       ),
     );
   }

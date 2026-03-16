@@ -1,8 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:dutytable/core/utils/extensions.dart';
 import 'package:dutytable/features/calendar/domain/entities/detected_schedule.dart';
 import 'package:dutytable/features/schedule/domain/usecases/add_schedule_use_case.dart';
 import 'package:dutytable/features/schedule/domain/usecases/fetch_holidays_use_case.dart';
 import 'package:dutytable/features/schedule/domain/usecases/geocode_address_use_case.dart';
+import 'package:dutytable/features/schedule/domain/usecases/search_address_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
@@ -15,12 +17,15 @@ class ScheduleAddViewModel extends ChangeNotifier {
   final AddScheduleUseCase _addScheduleUseCase;
   final FetchHolidaysUseCase _fetchHolidaysUseCase;
   final GeocodeAddressUseCase _geocodeAddressUseCase;
+  final SearchAddressUseCase _searchAddressUseCase;
 
   //-------------------- UI --------------------
 
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController memoController = TextEditingController();
 
   ViewState _state = ViewState.idle;
+  String? _errorMessage;
 
   //-------------------- Fields --------------------
 
@@ -71,6 +76,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
 
   //-------------------- Getters --------------------
   ViewState get state => _state;
+  String? get errorMessage => _errorMessage;
 
   String get emotionTag => _emotionTag;
   String get colorValue => _colorValue;
@@ -107,6 +113,7 @@ class ScheduleAddViewModel extends ChangeNotifier {
     this._addScheduleUseCase,
     this._fetchHolidaysUseCase,
     this._geocodeAddressUseCase,
+    this._searchAddressUseCase,
     @factoryParam DateTime? date,
   ) {
     if (date != null) {
@@ -295,8 +302,18 @@ class ScheduleAddViewModel extends ChangeNotifier {
       await _addScheduleUseCase(payload);
 
       _state = ViewState.success;
+      _errorMessage = null;
     } catch (e) {
       _state = ViewState.error;
+      if (e is DioException) {
+        final data = e.response?.data;
+        final serverMsg =
+            (data is Map) ? (data['error'] ?? data.toString()) : e.message;
+        _errorMessage = serverMsg?.toString() ?? e.toString();
+        debugPrint('❌ addSchedule response body: $data');
+      } else {
+        _errorMessage = e.toString();
+      }
       debugPrint('❌ addSchedule (Edge Function) error: $e');
     } finally {
       notifyListeners();
@@ -306,6 +323,10 @@ class ScheduleAddViewModel extends ChangeNotifier {
   void setMemo(String value) {
     if (value.length <= 300) {
       _memo = value;
+      memoController.value = memoController.value.copyWith(
+        text: value,
+        selection: TextSelection.collapsed(offset: value.length),
+      );
       notifyListeners();
     }
   }
@@ -350,8 +371,8 @@ class ScheduleAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// AI 감지 일정으로 초기값 세팅
-  void prefillFromDetectedSchedule(DetectedSchedule schedule) {
+  /// AI 감지 일정으로 초기값 세팅 - 장소 지오코딩 포함
+  Future<void> prefillFromDetectedSchedule(DetectedSchedule schedule) async {
     if (schedule.title.isNotEmpty) {
       _title = schedule.title;
     }
@@ -363,14 +384,52 @@ class ScheduleAddViewModel extends ChangeNotifier {
       _endTime = TimeOfDay(hour: (h + 1).clamp(0, 23), minute: m);
     }
     if (schedule.place != null && schedule.place!.isNotEmpty) {
+      // 1단계: 텍스트를 먼저 채워 화면에 표시
       _address = schedule.place;
       addressController.text = schedule.place!;
+      notifyListeners();
+
+      // 2단계: geocoding 시도
+      try {
+        final geo = await _geocodeAddressUseCase(schedule.place!);
+        setLocation(
+          address: schedule.place!,
+          latitude: geo.latitude,
+          longitude: geo.longitude,
+        );
+      } catch (e) {
+        debugPrint('⚠️ Geocoding failed for "${schedule.place}": $e');
+        // POI 이름일 수 있으므로 searchAddress로 fallback
+        try {
+          final results = await _searchAddressUseCase(schedule.place!);
+          if (results.isNotEmpty) {
+            final foundAddress = results.first.address;
+            final geo = await _geocodeAddressUseCase(foundAddress);
+            setLocation(
+              address: schedule.place!,
+              latitude: geo.latitude,
+              longitude: geo.longitude,
+            );
+          } else {
+            // 검색 결과 없음 (내부 공간명 등) → 메모에 기록
+            final prefix = _memo.isEmpty ? '' : '$_memo\n';
+            setMemo('${prefix}장소: ${schedule.place}');
+          }
+        } catch (e2) {
+          debugPrint('⚠️ Search fallback also failed: $e2');
+          final prefix = _memo.isEmpty ? '' : '$_memo\n';
+          setMemo('${prefix}장소: ${schedule.place}');
+        }
+      }
+    } else {
+      notifyListeners();
     }
   }
 
   @override
   void dispose() {
     addressController.dispose();
+    memoController.dispose();
     super.dispose();
   }
 }

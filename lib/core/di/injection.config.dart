@@ -688,16 +688,17 @@ extension GetItInjectableX on _i174.GetIt {
         userDataSource: gh<_i991.UserDataSource>(),
       ),
     );
-    gh.factory<_i225.LocationSearchViewModel>(
-      () => _i225.LocationSearchViewModel(gh<_i65.SearchAddressUseCase>()),
-    );
     gh.factoryParam<_i227.ScheduleAddViewModel, DateTime?, dynamic>(
       (date, _) => _i227.ScheduleAddViewModel(
         gh<_i585.AddScheduleUseCase>(),
         gh<_i352.FetchHolidaysUseCase>(),
         gh<_i570.GeocodeAddressUseCase>(),
+        gh<_i65.SearchAddressUseCase>(),
         date,
       ),
+    );
+    gh.factory<_i225.LocationSearchViewModel>(
+      () => _i225.LocationSearchViewModel(gh<_i65.SearchAddressUseCase>()),
     );
     gh.factory<_i1000.LoginViewModel>(
       () => _i1000.LoginViewModel(
