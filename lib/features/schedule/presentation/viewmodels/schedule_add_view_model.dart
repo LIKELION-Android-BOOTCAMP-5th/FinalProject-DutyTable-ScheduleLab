@@ -1,4 +1,5 @@
 import 'package:dutytable/core/utils/extensions.dart';
+import 'package:dutytable/features/calendar/domain/entities/detected_schedule.dart';
 import 'package:dutytable/features/schedule/domain/usecases/add_schedule_use_case.dart';
 import 'package:dutytable/features/schedule/domain/usecases/fetch_holidays_use_case.dart';
 import 'package:dutytable/features/schedule/domain/usecases/geocode_address_use_case.dart';
@@ -347,6 +348,24 @@ class ScheduleAddViewModel extends ChangeNotifier {
 
     addressController.clear();
     notifyListeners();
+  }
+
+  /// AI 감지 일정으로 초기값 세팅
+  void prefillFromDetectedSchedule(DetectedSchedule schedule) {
+    if (schedule.title.isNotEmpty) {
+      _title = schedule.title;
+    }
+    final parts = schedule.time.split(':');
+    if (parts.length == 2) {
+      final h = int.tryParse(parts[0]) ?? 7;
+      final m = int.tryParse(parts[1]) ?? 0;
+      _startTime = TimeOfDay(hour: h, minute: m);
+      _endTime = TimeOfDay(hour: (h + 1).clamp(0, 23), minute: m);
+    }
+    if (schedule.place != null && schedule.place!.isNotEmpty) {
+      _address = schedule.place;
+      addressController.text = schedule.place!;
+    }
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:dutytable/features/calendar/domain/entities/detected_schedule.dart';
 import 'package:dutytable/features/calendar/presentation/views/add/calendar_add_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/edit/calendar_edit_screen.dart';
 import 'package:dutytable/features/calendar/presentation/views/personal/personal_calendar_screen.dart';
@@ -73,8 +74,13 @@ GoRouter createRouter(BuildContext context) {
           final data = state.extra as Map<String, dynamic>;
           final calendarId = data["calendarId"] as int;
           final date = data["date"] as DateTime?;
+          final detectedSchedule = data["detectedSchedule"] as DetectedSchedule?;
 
-          return ScheduleAddScreen(calendarId: calendarId, date: date);
+          return ScheduleAddScreen(
+            calendarId: calendarId,
+            date: date,
+            detectedSchedule: detectedSchedule,
+          );
         },
       ),
 

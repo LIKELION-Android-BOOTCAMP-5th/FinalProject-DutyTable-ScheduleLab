@@ -179,14 +179,14 @@ class ChatViewModel extends ChangeNotifier {
   }
 
   /// 메시지에서 일정 감지 (fire-and-forget)
-  /// 이전 5개 메시지와 함께 분석하여 여러 메시지에 걸친 일정도 감지
+  /// 이전 2개 메시지와 함께 분석하여 여러 메시지에 걸친 일정도 감지
   Future<void> _detectAndAddSchedule(String message) async {
     try {
-      // 이전 메시지 5개 추출 (사용자 메시지만, 최근순)
+      // 이전 메시지 2개 추출 (사용자 메시지만, 최근순)
       final previousMessages = <String>[];
       for (
         int i = chatMessages.length - 1;
-        i >= 0 && previousMessages.length < 5;
+        i >= 0 && previousMessages.length < 2;
         i--
       ) {
         previousMessages.insert(0, chatMessages[i].message);
@@ -212,13 +212,15 @@ class ChatViewModel extends ChangeNotifier {
             // 장소만 있는 경우 가장 최근 알림에 장소 업데이트
             if (detectedSchedules.isNotEmpty) {
               final lastIndex = detectedSchedules.length - 1;
-              detectedSchedules[lastIndex] =
-                  detectedSchedules[lastIndex].copyWith(place: place);
+              detectedSchedules[lastIndex] = detectedSchedules[lastIndex]
+                  .copyWith(place: place);
             }
         }
 
         notifyListeners();
         await _saveDetectedSchedules(); // 저장
+      } else {
+        debugPrint('❌ 감지 실패: null 반환');
       }
     } catch (e) {
       debugPrint('일정 감지 실패 (무시됨): $e');

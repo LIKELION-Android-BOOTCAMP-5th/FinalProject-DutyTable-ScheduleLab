@@ -75,6 +75,8 @@ import '../../features/calendar/domain/usecases/create_shared_calendar_use_case.
     as _i954;
 import '../../features/calendar/domain/usecases/delete_calendar_use_case.dart'
     as _i605;
+import '../../features/calendar/domain/usecases/detect_schedule_use_case.dart'
+    as _i213;
 import '../../features/calendar/domain/usecases/exile_member_use_case.dart'
     as _i706;
 import '../../features/calendar/domain/usecases/fetch_chat_messages_use_case.dart'
@@ -518,6 +520,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i408.ChatInsertUseCase>(
       () => _i408.ChatInsertUseCase(gh<_i413.ChatRepository>()),
+    );
+    gh.factory<_i213.DetectScheduleUseCase>(
+      () => _i213.DetectScheduleUseCase(gh<_i413.ChatRepository>()),
     );
     gh.factory<_i711.FetchChatMessagesUseCase>(
       () => _i711.FetchChatMessagesUseCase(gh<_i413.ChatRepository>()),

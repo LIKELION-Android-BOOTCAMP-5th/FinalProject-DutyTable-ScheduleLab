@@ -158,19 +158,23 @@ class ChatDataSource {
       },
     );
     final body = response.data as Map<String, dynamic>;
+    print('📤 Edge Function 응답: $body');
 
     // 날짜+시간 감지된 경우
     if (body['detected'] == true && body['schedule'] != null) {
       final schedule = DetectedSchedule.fromJson(body['schedule'] as Map<String, dynamic>);
+      print('✅ ScheduleDetected 반환');
       return ScheduleDetected(schedule);
     }
 
     // 장소만 감지된 경우
     if (body['placeOnly'] != null) {
       final place = body['placeOnly'] as String;
+      print('📍 PlaceOnlyDetected 반환: $place');
       return PlaceOnlyDetected(place);
     }
 
+    print('❌ null 반환');
     return null;
   }
 }

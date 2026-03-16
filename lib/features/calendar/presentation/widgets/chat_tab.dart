@@ -53,7 +53,7 @@ class ChatAi extends StatelessWidget {
           GestureDetector(
             onTap: () => context.read<ChatViewModel>().toggleAiScheduleFold(),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

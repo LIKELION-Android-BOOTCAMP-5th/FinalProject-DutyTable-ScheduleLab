@@ -1,7 +1,6 @@
 import 'package:injectable/injectable.dart';
 
 import '../entities/detect_result.dart';
-import '../entities/detected_schedule.dart';
 import '../repositories/chat_repository.dart';
 
 @injectable
@@ -14,6 +13,5 @@ class DetectScheduleUseCase {
   Future<DetectResult?> call(
     String message, {
     List<String> previousMessages = const [],
-  }) =>
-      repository.detectSchedule(message, previousMessages: previousMessages);
+  }) => repository.detectSchedule(message, previousMessages: previousMessages);
 }
