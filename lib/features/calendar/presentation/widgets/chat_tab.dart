@@ -57,29 +57,12 @@ class ChatAi extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "• 일정 추가 알림",
-                          style: TextStyle(
-                            color: AppColors.textBlue(context),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            "${displaySchedules.length}개의 감지된 일정",
-                            style: TextStyle(
-                              color: AppColors.textSub(context),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
+                  Text(
+                    "• 일정 추가 알림",
+                    style: TextStyle(
+                      color: AppColors.textBlue(context),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                   ),
                   AnimatedRotation(
